@@ -1,0 +1,71 @@
+erDiagram
+    HORARIO ||--o{ VIAJE : genera
+    VIAJE ||--o{ PASAJE : tiene
+    USUARIO ||--o{ PASAJE : reserva
+    PARADA ||--o{ PASAJE : "origen"
+    PARADA ||--o{ PASAJE : "destino"
+    PASAJE ||--|| PAGO : genera
+
+    USUARIO {
+        int id PK
+        string dni UK "obligatorio si rol=pasajero"
+        string nombre
+        string apellido
+        string email UK
+        string password_hash
+        string rol "pasajero | chofer | administrador"
+        boolean activo
+        boolean es_moroso "solo aplica a pasajero"
+        int inasistencias_efectivo "solo aplica a pasajero"
+        boolean promo_primer_viaje_usada "solo aplica a pasajero"
+        datetime fecha_registro
+    }
+
+    HORARIO {
+        int id PK
+        string sentido
+        string dia_semana
+        time hora
+        boolean activo
+    }
+
+    VIAJE {
+        int id PK
+        int horario_id FK
+        date fecha
+        time hora "copiada del Horario al generarse"
+        int capacidad_total
+        string estado
+    }
+
+    PARADA {
+        int id PK
+        string nombre
+        string pueblo
+        float latitud
+        float longitud
+    }
+
+    PASAJE {
+        int id PK
+        int usuario_id FK
+        int viaje_id FK
+        int parada_origen_id FK
+        string domicilio_origen
+        int parada_destino_id FK
+        string domicilio_destino
+        string estado
+        boolean documento_verificado
+        datetime fecha_reserva
+    }
+
+    PAGO {
+        int id PK
+        int pasaje_id FK
+        string metodo
+        decimal monto
+        string estado
+        string comprobante_url
+        datetime fecha_pago
+        datetime fecha_expiracion_hold
+    }
