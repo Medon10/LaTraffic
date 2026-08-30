@@ -1,0 +1,32 @@
+flowchart TD
+    subgraph FE["Frontend — React + TypeScript"]
+        UIP[Vista Pasajero]
+        UICh[Vista Chofer]
+        UIAd[Vista Administrador]
+    end
+
+    subgraph BE["Backend — Node.js + Express + TypeScript"]
+        MW[Middleware Auth / RBAC]
+        RT[Routes / Controllers]
+        SV[Services — lógica de negocio y reglas]
+    end
+
+    subgraph DATA["Persistencia"]
+        ORM[MikroORM]
+        DB[(PostgreSQL)]
+    end
+
+    subgraph EXT["Servicios externos"]
+        MP[Mercado Pago API]
+        GM[Google Maps API]
+    end
+
+    UIP -->|HTTPS / REST + JWT| MW
+    UICh -->|HTTPS / REST + JWT| MW
+    UIAd -->|HTTPS / REST + JWT| MW
+    MW --> RT
+    RT --> SV
+    SV --> ORM
+    ORM --> DB
+    SV -->|crear preferencia / recibir webhook| MP
+    SV -->|calcular ruta óptima| GM
