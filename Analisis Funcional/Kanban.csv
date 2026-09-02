@@ -1,0 +1,29 @@
+ID,Titulo,Tipo,Etapa,Prioridad,Relacionado,Estado
+T-01,"Setup del proyecto backend (carpetas, MikroORM + PostgreSQL)",Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Por hacer
+T-02,"Setup del proyecto frontend (carpetas, React + routing)",Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Por hacer
+T-03,Migraciones de base de datos (todas las tablas del esquema),Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Por hacer
+T-04,Autenticacion JWT + middleware de roles,Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Por hacer
+T-05,Cargar manualmente las cuentas de chofer y administrador,Tecnica,Etapa 1 - Fundacional,Media,der-documento,Por hacer
+HU-01,"Registrarme (DNI, contrasena, email)",HU,Etapa 1 - Fundacional,Alta,RF-02;RF-25;RN-01,Por hacer
+HU-02,Iniciar sesion,HU,Etapa 1 - Fundacional,Alta,RF-02;RF-05,Por hacer
+HU-04,Ver viajes disponibles sin loguearme,HU,Etapa 1 - Fundacional,Alta,RF-01;RF-03,Por hacer
+HU-05,"Elegir sentido, fecha y puntos del viaje",HU,Etapa 1 - Fundacional,Alta,RF-03,Por hacer
+HU-06,Ver el precio antes de confirmar,HU,Etapa 1 - Fundacional,Alta,RF-04;RF-14,Por hacer
+HU-07,Completar datos de la reserva,HU,Etapa 1 - Fundacional,Alta,RF-05;RF-06,Por hacer
+T-06,Integrar Mercado Pago (modo sandbox),Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Por hacer
+HU-08,Pagar con Mercado Pago,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-08;RF-12,Por hacer
+HU-09,Pagar por transferencia,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-09;RF-10,Por hacer
+HU-10,Pagar en efectivo,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-11,Por hacer
+T-08,Integrar Google Maps API,Tecnica,Etapa 2 - Operar el primer viaje,Alta,diseno-arquitectura,Por hacer
+HU-12,Ver pasajeros del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,RF-15,Por hacer
+HU-13,Ver ruta optima del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,RF-16,Por hacer
+HU-14,Marcar documento no verificado (chofer),HU,Etapa 2 - Operar el primer viaje,Media,RF-17,Por hacer
+HU-15,Validar comprobantes de transferencia (administrador),HU,Etapa 2 - Operar el primer viaje,Alta,RF-21;RN-06,Por hacer
+HU-03,Recuperar contrasena,HU,Etapa 3 - Gestion y pulido,Media,RF-25,Por hacer
+HU-11,Ver historial de viajes,HU,Etapa 3 - Gestion y pulido,Media,RF-13,Por hacer
+HU-16,Marcado automatico de moroso,HU,Etapa 3 - Gestion y pulido,Media,RF-19;RN-05,Por hacer
+HU-17,Reactivar a un pasajero moroso,HU,Etapa 3 - Gestion y pulido,Media,RF-20,Por hacer
+HU-18,Deshabilitar cuentas,HU,Etapa 3 - Gestion y pulido,Baja,RF-18,Por hacer
+HU-19,Ver estadisticas,HU,Etapa 3 - Gestion y pulido,Media,RF-22,Por hacer
+HU-20,Editar horarios,HU,Etapa 3 - Gestion y pulido,Baja,RF-23,Por hacer
+HU-21,Configurar el descuento por transferencia/efectivo (BLOQUEADA: falta monto del cliente),HU,Etapa 3 - Gestion y pulido,Baja,RF-24,Bloqueada
