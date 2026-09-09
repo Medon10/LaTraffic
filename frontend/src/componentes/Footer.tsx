@@ -3,39 +3,26 @@ import { Link } from 'react-router-dom';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="footer">
-      <div className="footer-container">
-        <div className="footer-col">
-          <div className="footer-brand">
-            <span className="brand-icon">🚐</span>
-            <span className="brand-name">LaTraffic</span>
-          </div>
-          <p className="footer-description">
-            Servicio de transporte interurbano entre Colón y Rosario.
+    <footer className="app-footer">
+      <div className="footer-inner">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <div className="brand-logo-icon" style={{ width: '28px', height: '28px', fontSize: '0.95rem' }}>C</div>
+          <span style={{ fontWeight: 700, color: 'var(--primary)' }}>LaTraffic</span>
+          <span style={{ color: 'var(--on-surface-variant)', fontSize: '0.8rem' }}>&bull; Colón &mdash; Rosario</span>
+        </div>
+
+        <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.85rem' }}>
+          <Link to="/" style={{ color: 'var(--on-surface-variant)' }}>Inicio</Link>
+          <Link to="/seleccion-viaje" style={{ color: 'var(--on-surface-variant)' }}>Viajes</Link>
+          <Link to="/mis-reservas" style={{ color: 'var(--on-surface-variant)' }}>Mis Reservas</Link>
+          <Link to="/login" style={{ color: 'var(--on-surface-variant)' }}>Acceso</Link>
+        </div>
+
+        <div>
+          <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--outline)' }}>
+            &copy; {new Date().getFullYear()} LaTraffic. Todos los derechos reservados.
           </p>
         </div>
-
-        <div className="footer-col">
-          <h4>Navegación</h4>
-          <ul className="footer-links">
-            <li><Link to="/">Inicio</Link></li>
-            <li><Link to="/seleccion-viaje">Seleccionar Viaje</Link></li>
-            <li><Link to="/mis-reservas">Mis Reservas</Link></li>
-          </ul>
-        </div>
-
-        <div className="footer-col">
-          <h4>Cuenta</h4>
-          <ul className="footer-links">
-            <li><Link to="/login">Iniciar Sesión</Link></li>
-            <li><Link to="/registro">Crear Cuenta</Link></li>
-            <li><Link to="/recuperar-password">Recuperar Contraseña</Link></li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} LaTraffic. Todos los derechos reservados.</p>
       </div>
     </footer>
   );
