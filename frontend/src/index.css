@@ -49,6 +49,14 @@
   --outline: #75777f;
   --outline-variant: #c5c6cf;
 
+  /* Trust & WhatsApp accent colors */
+  --whatsapp-color: #25d366;
+  --whatsapp-dark: #128c7e;
+  --whatsapp-bg: #eafaf1;
+
+  --success: #15803d;
+  --success-bg: #dcfce7;
+
   --error: #ba1a1a;
   --error-container: #ffdad6;
   --on-error: #ffffff;
@@ -112,11 +120,26 @@ button {
   cursor: pointer;
 }
 
-/* Material Symbols alignment helper */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   vertical-align: middle;
   line-height: 1;
+}
+
+/* Helpers responsivos */
+.desktop-only-flex {
+  display: none;
+}
+.desktop-only-text {
+  display: none;
+}
+@media (min-width: 640px) {
+  .desktop-only-flex {
+    display: inline-flex;
+  }
+  .desktop-only-text {
+    display: inline;
+  }
 }
 
 /* App Shell Layout */
@@ -131,7 +154,7 @@ button {
 .main-content {
   flex: 1;
   width: 100%;
-  max-width: 520px;
+  max-width: 560px;
   margin: 0 auto;
   padding: 4.75rem 1rem 6rem; /* Top header & Bottom nav clearance */
   transition: max-width var(--transition-normal);
@@ -139,14 +162,14 @@ button {
 
 @media (min-width: 768px) {
   .main-content {
-    max-width: 760px;
+    max-width: 720px;
     padding: 5.5rem 1.5rem 4rem;
   }
 }
 
 @media (min-width: 1024px) {
   .main-content {
-    max-width: 960px;
+    max-width: 860px;
   }
 }
 
@@ -157,7 +180,7 @@ button {
   left: 0;
   right: 0;
   z-index: 50;
-  background-color: rgba(255, 255, 255, 0.88);
+  background-color: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: var(--shadow-bottom);
@@ -243,39 +266,17 @@ button {
   border-radius: var(--radius-full);
 }
 
-.header-user-btn {
-  width: var(--touch-target);
-  height: var(--touch-target);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-full);
-  transition: background-color var(--transition-fast);
-}
-
-.header-user-btn:hover {
-  background-color: var(--surface-container);
-}
-
-.user-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1.5px solid var(--surface-variant);
-}
-
 .user-avatar-fallback {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background-color: var(--primary-fixed);
   color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: 700;
 }
 
 /* Bottom Navigation (Mobile) */
@@ -295,7 +296,7 @@ button {
 
 @media (min-width: 768px) {
   .bottom-nav {
-    display: none; /* In desktop, navigation is in the top bar */
+    display: none;
   }
 }
 
@@ -314,7 +315,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  width: 72px;
+  width: 80px;
   height: 100%;
   color: var(--on-surface-variant);
   font-size: 0.775rem;
@@ -336,325 +337,392 @@ button {
   font-weight: 600;
 }
 
-/* Card: Buscar Viaje */
-.search-card {
+/* Card Principal de Reserva Directa */
+.booking-card {
   background-color: var(--surface-container-lowest);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-md);
-  padding: 1.25rem;
+  padding: 1.35rem;
   margin-bottom: 1.75rem;
-  border: 1px solid rgba(216, 227, 250, 0.5);
+  border: 1px solid rgba(216, 227, 250, 0.6);
   animation: fadeIn 0.3s ease-out;
 }
 
-.search-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--surface-variant);
-}
-
-.search-card-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--primary);
-  letter-spacing: -0.01em;
-}
-
-.trip-type-toggle {
-  display: flex;
-  background-color: var(--surface-container-low);
-  border-radius: var(--radius-md);
-  padding: 3px;
-  border: 1px solid var(--surface-variant);
-}
-
-.trip-type-btn {
-  padding: 0.3rem 0.75rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--on-surface-variant);
-  border-radius: var(--radius-xs);
-  transition: all var(--transition-fast);
-}
-
-.trip-type-btn.active {
-  background-color: #ffffff;
-  color: var(--primary);
-  font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-/* Direction Container (Origen / Destino) */
-.direction-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+/* Selector de Sentido de Viaje (Tabs destacadas) */
+.direction-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   background-color: var(--surface-container-low);
-  padding: 0.85rem;
+  padding: 4px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--surface-variant);
 }
 
-.direction-row {
+.direction-tab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.5rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  transition: all var(--transition-fast);
+  text-align: center;
+  line-height: 1.25;
+}
+
+.direction-tab-btn .tab-route {
+  font-size: 0.925rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.3rem;
 }
 
-.direction-row .material-symbols-outlined {
-  color: var(--outline);
-  font-size: 22px;
-}
-
-.direction-field {
-  flex: 1;
-}
-
-.field-label {
-  display: block;
+.direction-tab-btn .tab-desc {
   font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--outline);
+  margin-top: 2px;
+}
+
+.direction-tab-btn.active {
+  background-color: #ffffff;
+  color: var(--primary);
+  box-shadow: 0 2px 6px rgba(3, 22, 53, 0.08);
+}
+
+.direction-tab-btn.active .tab-desc {
+  color: var(--secondary);
   font-weight: 600;
+}
+
+/* Banner de Próxima Salida Fija */
+.next-departure-box {
+  background-color: var(--surface-container-low);
+  border: 1px solid var(--surface-variant);
+  border-radius: var(--radius-xl);
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.25rem;
+}
+
+.departure-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.departure-tag {
+  font-size: 0.725rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--secondary);
+  background-color: var(--secondary-fixed);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-xs);
+}
+
+.departure-seats-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--success);
+  background-color: var(--success-bg);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.departure-main-info {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.departure-datetime {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.departure-price {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--secondary);
+}
+
+.departure-price-sub {
+  font-size: 0.725rem;
+  font-weight: 500;
+  color: var(--outline);
+  text-align: right;
+}
+
+/* Selector alternativo de fecha (si viaja la próxima semana) */
+.departure-date-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--surface-variant);
+}
+
+.date-chip {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  background-color: #ffffff;
+  border: 1px solid var(--surface-variant);
+  border-radius: var(--radius-md);
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.date-chip.selected {
+  border-color: var(--secondary);
+  background-color: var(--secondary-fixed);
+  color: var(--primary);
+}
+
+/* Campos de Trayecto (Punto fijo vs Domicilio en Rosario) */
+.trip-stops-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.35rem;
+}
+
+.stop-field-box {
+  background-color: var(--surface-container-low);
+  border: 1.5px solid var(--surface-variant);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 0.9rem;
+  transition: border-color var(--transition-fast);
+}
+
+.stop-field-box:focus-within {
+  border-color: var(--secondary);
+  background-color: #ffffff;
+}
+
+.stop-field-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--on-surface-variant);
-  margin-bottom: 2px;
+  margin-bottom: 0.35rem;
 }
 
-.direction-select {
+.stop-field-header .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--secondary);
+}
+
+.stop-select {
   width: 100%;
   background: transparent;
   border: none;
-  font-size: 1rem;
+  font-size: 0.975rem;
   font-weight: 600;
   color: var(--on-surface);
   font-family: inherit;
   outline: none;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
 }
 
-.direction-divider {
-  height: 1px;
-  background-color: var(--surface-variant);
+.stop-address-input {
   width: 100%;
-  margin: 0.25rem 0;
-}
-
-.swap-btn {
-  position: absolute;
-  top: 50%;
-  right: 1rem;
-  transform: translateY(-50%);
-  width: 34px;
-  height: 34px;
-  background-color: var(--surface-container-lowest);
-  border-radius: 50%;
-  border: 1px solid var(--surface-variant);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--secondary);
-  transition: all var(--transition-fast);
-  z-index: 10;
-}
-
-.swap-btn:hover {
-  background-color: var(--surface-container);
-  color: var(--primary);
-  transform: translateY(-50%) scale(1.06);
-}
-
-.swap-btn:active {
-  transform: translateY(-50%) scale(0.95);
-}
-
-/* Date & Passengers Row */
-.search-details-row {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-}
-
-.detail-card {
-  background-color: var(--surface-container-low);
-  padding: 0.75rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--surface-variant);
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.detail-card-date {
-  flex: 1;
-}
-
-.detail-card-passengers {
-  width: 105px;
-}
-
-.detail-card .material-symbols-outlined {
-  color: var(--outline);
-  font-size: 22px;
-}
-
-.detail-input {
   background: transparent;
   border: none;
-  font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 0.975rem;
   font-weight: 600;
   color: var(--on-surface);
+  font-family: inherit;
   outline: none;
-  width: 100%;
 }
 
-/* Big Search CTA Button */
-.btn-search {
+.stop-address-input::placeholder {
+  font-weight: 400;
+  color: var(--outline);
+  font-size: 0.875rem;
+}
+
+.stop-note {
+  font-size: 0.75rem;
+  color: #854d0e;
+  background-color: #fef9c3;
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-sm);
+  margin-top: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Botón de Reserva Directa */
+.btn-reserve-main {
   width: 100%;
-  height: 48px;
+  height: 52px;
   background-color: var(--secondary);
   color: var(--on-secondary);
-  border-radius: var(--radius-md);
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: var(--radius-lg);
+  font-size: 1.05rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  box-shadow: var(--shadow-sm);
+  gap: 0.6rem;
+  box-shadow: 0 4px 12px rgba(0, 101, 141, 0.25);
   transition: all var(--transition-fast);
 }
 
-.btn-search:hover {
+.btn-reserve-main:hover {
   background-color: #005070;
-  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 101, 141, 0.32);
 }
 
-.btn-search:active {
+.btn-reserve-main:active {
   transform: translateY(0);
 }
 
-/* Benefits Section */
-.benefits-section {
-  margin-bottom: 1.75rem;
-}
-
-.section-title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--on-surface);
-  margin-bottom: 0.85rem;
-  padding-left: 2px;
-}
-
-.benefits-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.65rem;
-}
-
-.benefit-card {
-  background-color: var(--surface-container-lowest);
+/* Banner de Atención Directa por WhatsApp (Estrategia de Confianza Genuina) */
+.whatsapp-banner {
+  background-color: var(--whatsapp-bg);
+  border: 1.5px solid #a7f3d0;
   border-radius: var(--radius-xl);
-  padding: 1rem 0.5rem;
-  border: 1px solid var(--surface-variant);
-  box-shadow: var(--shadow-sm);
+  padding: 1.15rem;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
-  gap: 0.6rem;
-  transition: transform var(--transition-fast);
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
-.benefit-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+.whatsapp-banner-info {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
 }
 
-.benefit-icon-circle {
-  width: 42px;
-  height: 42px;
+.whatsapp-icon-circle {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
+  background-color: var(--whatsapp-color);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(37, 211, 102, 0.35);
 }
 
-.benefit-icon-circle.primary {
-  background-color: var(--primary-fixed);
+.whatsapp-banner-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #064e3b;
+}
+
+.whatsapp-banner-desc {
+  font-size: 0.8rem;
+  color: #047857;
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: var(--whatsapp-color);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(37, 211, 102, 0.3);
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.btn-whatsapp:hover {
+  background-color: var(--whatsapp-dark);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Sección de Confianza Real y Cercanía Local */
+.local-trust-section {
+  background-color: #ffffff;
+  border: 1px solid var(--surface-variant);
+  border-radius: var(--radius-2xl);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.local-trust-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.local-trust-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.local-trust-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.local-trust-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background-color: var(--surface-container-low);
+  color: var(--secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.local-trust-item h4 {
+  font-size: 0.875rem;
+  font-weight: 700;
   color: var(--primary);
 }
 
-.benefit-icon-circle.secondary {
-  background-color: var(--secondary-fixed);
-  color: var(--secondary);
-}
-
-.benefit-icon-circle.tertiary {
-  background-color: var(--tertiary-fixed);
-  color: var(--tertiary);
-}
-
-.benefit-label {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--on-surface);
-}
-
-/* Teaser Banner */
-.teaser-banner {
-  width: 100%;
-  height: 165px;
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  position: relative;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 1.5rem;
-}
-
-.teaser-banner-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-}
-
-.teaser-banner-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(3, 22, 53, 0.82) 0%, rgba(3, 22, 53, 0.2) 60%, transparent 100%);
-}
-
-.teaser-banner-content {
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
-  right: 1rem;
-  color: #ffffff;
-}
-
-.teaser-banner-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.teaser-banner-subtitle {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.88);
-  margin-top: 0.2rem;
+.local-trust-item p {
+  font-size: 0.8rem;
+  color: var(--on-surface-variant);
+  line-height: 1.35;
+  margin-top: 1px;
 }
 
 /* General Pages / Cards Styling */
@@ -689,12 +757,6 @@ h1 {
   color: var(--on-surface-variant);
 }
 
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1rem;
-}
-
 .card {
   background-color: var(--surface-container-lowest);
   border: 1px solid var(--surface-variant);
@@ -710,35 +772,6 @@ h1 {
 .card:hover {
   box-shadow: var(--shadow-md);
   border-color: var(--secondary-fixed-dim);
-}
-
-.card h3 {
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--primary);
-}
-
-.card p {
-  color: var(--on-surface-variant);
-  font-size: 0.9rem;
-  flex-grow: 1;
-}
-
-.skeleton-card {
-  padding: 2rem 1.5rem;
-}
-
-.placeholder-box {
-  background: var(--surface-container-low);
-  border: 1.5px dashed var(--surface-variant);
-  border-radius: var(--radius-lg);
-  padding: 3rem 1.5rem;
-  text-align: center;
-}
-
-.muted-text {
-  color: var(--on-surface-variant);
-  font-size: 0.9rem;
 }
 
 /* Buttons */
@@ -787,37 +820,6 @@ h1 {
   border-color: var(--secondary);
   color: var(--secondary);
   background-color: var(--surface-container-low);
-}
-
-/* Form Styles */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  margin-bottom: 1rem;
-}
-
-.form-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--on-surface-variant);
-}
-
-.form-control {
-  background-color: var(--surface-container-low);
-  border: 1px solid var(--surface-variant);
-  border-radius: var(--radius-md);
-  padding: 0.65rem 0.85rem;
-  font-size: 0.95rem;
-  font-family: inherit;
-  color: var(--on-surface);
-  transition: border-color var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--secondary);
-  background-color: #ffffff;
 }
 
 /* Desktop Footer */
