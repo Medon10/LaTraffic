@@ -8,7 +8,7 @@ export const HorarioSchema = defineEntity({
   properties: {
     id: p.integer().primary(),
     sentido: p.enum(() => Sentido),
-    diaSemana: p.string(),
+    diaSemana: p.string().length(15),
     hora: p.time(),
     activo: p.boolean().default(true),
     viajes: () => p.oneToMany(Viaje).mappedBy('horario'),

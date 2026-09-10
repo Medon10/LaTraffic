@@ -9,7 +9,7 @@ export const ViajeSchema = defineEntity({
   properties: {
     id: p.integer().primary(),
     horario: () => p.manyToOne(Horario),
-    fecha: p.date(),
+    fecha: p.date().index('idx_viajes_fecha'),
     hora: p.time(),
     capacidadTotal: p.integer().default(14),
     cuposOcupados: p.integer().default(0),

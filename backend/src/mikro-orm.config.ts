@@ -1,25 +1,33 @@
-import { PostgreSqlDriver } from '@mikro-orm/postgresql';
-import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { Migrator } from '@mikro-orm/migrations';
 import { defineConfig } from '@mikro-orm/postgresql';
 import dotenv from 'dotenv';
+
+import { UsuarioSchema } from './usuarios/usuario.entity.js';
+import { HorarioSchema } from './horarios/horario.entity.js';
+import { ViajeSchema } from './viajes/viaje.entity.js';
+import { ParadaSchema } from './paradas/parada.entity.js';
+import { PasajeSchema } from './pasajes/pasaje.entity.js';
+import { PagoSchema } from './pagos/pago.entity.js';
 
 dotenv.config();
 
 export default defineConfig({
   clientUrl: process.env.DATABASE_URL,
 
-  // Entidades — descubiertas automáticamente en todos los subdirectorios
-  entities: ['./dist/**/*.entity.js'],
-  entitiesTs: ['./src/**/*.entity.ts'],
-
-  // Metadatos via ts-morph (evita problemas de reflect-metadata)
-  metadataProvider: TsMorphMetadataProvider,
+  // Entidades registradas explícitamente con defineEntity
+  entities: [
+    UsuarioSchema,
+    HorarioSchema,
+    ViajeSchema,
+    ParadaSchema,
+    PasajeSchema,
+    PagoSchema,
+  ],
 
   // Migraciones
   extensions: [Migrator],
   migrations: {
-    path: './src/migrations',
+    path: './dist/migrations',
     pathTs: './src/migrations',
     glob: '!(*.d).{js,ts}',
     transactional: true,

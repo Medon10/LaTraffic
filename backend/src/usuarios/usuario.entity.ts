@@ -7,11 +7,11 @@ export const UsuarioSchema = defineEntity({
   tableName: 'usuarios',
   properties: {
     id: p.integer().primary(),
-    dni: p.string().nullable().unique(),
-    nombre: p.string(),
-    apellido: p.string(),
-    email: p.string().unique(),
-    passwordHash: p.string().hidden(),
+    dni: p.string().length(20).nullable(),
+    nombre: p.string().length(100),
+    apellido: p.string().length(100),
+    email: p.string().length(150).unique(),
+    passwordHash: p.string().length(255).hidden(),
     rol: p.enum(() => Rol).default(Rol.PASAJERO),
     activo: p.boolean().default(true),
     esMoroso: p.boolean().default(false),
@@ -20,6 +20,12 @@ export const UsuarioSchema = defineEntity({
     fechaRegistro: p.datetime().default('now()'),
     pasajes: () => p.oneToMany(Pasaje).mappedBy('usuario'),
   },
+  indexes: [
+    {
+      name: 'uq_usuarios_dni_pasajero',
+      expression: 'create unique index "uq_usuarios_dni_pasajero" on "usuarios" ("dni") where "rol" = \'pasajero\'',
+    },
+  ],
 });
 
 export class Usuario extends UsuarioSchema.class {}

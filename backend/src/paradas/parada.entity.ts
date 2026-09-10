@@ -5,10 +5,10 @@ export const ParadaSchema = defineEntity({
   tableName: 'paradas',
   properties: {
     id: p.integer().primary(),
-    nombre: p.string(),
-    pueblo: p.string(),
-    latitud: p.double().nullable(),
-    longitud: p.double().nullable(),
+    nombre: p.string().length(100),
+    pueblo: p.string().length(100),
+    latitud: p.decimal().precision(9).scale(6).nullable(),
+    longitud: p.decimal().precision(9).scale(6).nullable(),
   },
 });
 
