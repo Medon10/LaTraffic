@@ -37,8 +37,9 @@ Cada requisito referencia la sección de la Minuta de la que se desprende (colum
 | RF-11 | El sistema debe permitir reservar pagando en efectivo, descontando el cupo de forma inmediata al confirmar la reserva. | Minuta §7 — confirmado |
 | RF-12 | El sistema debe impedir que se reserven más de 14 lugares por viaje, incluso ante reservas simultáneas. | Minuta §4, §7 |
 | RF-13 | El sistema debe registrar el historial de viajes de cada pasajero. | Minuta §5 |
-| RF-14 | El sistema debe aplicar el descuento de "primera vez" evaluándolo por persona (DNI), no por cuenta. | Minuta §5, §8 |
+| RF-14 | El sistema debe aplicar el descuento de "primera vez" mediante un cupón de uso único por persona, no por cuenta. *(actualizado — ver revisión de esta fecha)* | Minuta §5, §8 |
 | RF-25 | El sistema debe asociar un email a la cuenta, utilizado para recuperar la contraseña y, opcionalmente, para enviar en el futuro ofertas o promociones. | Confirmado por el cliente (28/08/2026) |
+| RF-26 | El sistema debe permitir al pasajero ingresar un código de cupón al confirmar la reserva, validando vigencia y que no haya sido usado antes por esa persona si el cupón es de uso único, y aplicando el descuento correspondiente. | Propuesta del usuario — reemplaza el mecanismo anterior de RF-14 |
 
 ### 2.2 Módulo Chofer
 
@@ -59,6 +60,7 @@ Cada requisito referencia la sección de la Minuta de la que se desprende (colum
 | RF-22 | El sistema debe mostrarle al administrador estadísticas de recaudación y uso por método de pago. | Minuta §9.2 |
 | RF-23 | El sistema debe permitirle al administrador editar los horarios de los viajes. | Minuta §4, §9.2 |
 | RF-24 | El sistema debe permitirle al administrador configurar el monto del descuento por transferencia/efectivo. | Minuta §7, §9.2, §12 |
+| RF-27 | El sistema debe permitirle al administrador crear y gestionar cupones de descuento (código, tipo, valor, vigencia, uso único o no), para poder lanzar promociones futuras sin depender de un cambio de código. | Propuesta del usuario — generaliza RF-14 |
 
 ---
 
@@ -81,7 +83,7 @@ Cada requisito referencia la sección de la Minuta de la que se desprende (colum
 | ID | Regla | Origen |
 |---|---|---|
 | RN-01 | Una persona solo puede tener una cuenta registrada en el sistema; se garantiza mediante el DNI como identificador único de cuenta. | Minuta §5 |
-| RN-02 | El descuento de "primera vez" se aplica una única vez por persona (identificada por DNI), no por cuenta. | Minuta §5 |
+| RN-02 | Un cupón marcado como "uso único por persona" no puede aplicarse más de una vez a la misma persona (verificado por usuario_id en CuponUso). El descuento de "primera vez" es la primera aplicación concreta de esta regla, mediante el cupón `PRIMERVIAJE`. | Minuta §5 |
 | RN-03 | La capacidad máxima por viaje es de 14 pasajeros. | Minuta §4 |
 | RN-04 | El precio base del pasaje es único por recorrido, pero varía según el método de pago elegido. | Minuta §7 |
 | RN-05 | Un pasajero que reserva en efectivo y no se presenta 3 veces queda marcado como moroso de forma permanente, hasta que el administrador lo reactive. | Minuta §7 |
@@ -98,6 +100,9 @@ Cada requisito referencia la sección de la Minuta de la que se desprende (colum
 - RF-17 → lógica invertida: verificado por defecto, el chofer marca la excepción.
 - RF-25 → confirmado: se guarda un email por cuenta, para recuperación de contraseña y futuras comunicaciones de ofertas.
 - Consecuencia de marcar "no verificado" (RF-17) → ninguna acción automática; queda registrado como dato informativo para referencia futura, sin bloqueo ni alerta.
+
+**Resuelto en revisión posterior:**
+- El mecanismo del descuento de primera vez (RF-14) cambió de una bandera en Usuario a un sistema de **cupones** (RF-26, RF-27) — decisión del usuario, pensada para soportar promociones futuras sin rediseñar el modelo. Ver DER sección 1.7-1.8 para el detalle de las nuevas entidades `Cupon` y `CuponUso`.
 
 **Pendiente:**
 1. **Monto del descuento por transferencia/efectivo (RF-24)**: aún no definido por el cliente (heredado de Minuta §12). No bloquea el modelado ni el desarrollo de las Historias de Usuario, solo la implementación final del cálculo de precio.

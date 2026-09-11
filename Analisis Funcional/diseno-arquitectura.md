@@ -18,16 +18,18 @@ Arquitectura en capas simple — sin microservicios ni patrones complejos, porqu
 
 **Frontend (React)** → **API REST (Express)** → **Capa de servicios (lógica de negocio)** → **MikroORM** → **PostgreSQL**, con dos integraciones externas (Mercado Pago y Google Maps) llamadas desde la capa de servicios. Ver `diseno-arquitectura.mermaid`.
 
+La separación en capas dentro del backend (routes → services → ORM) es la misma que ya usaste en [[vacationmatch]] al resolver las correcciones de esa materia (lógica de negocio en servicios, no en los controllers).
+
 ---
 
 ## 2. Stack tecnológico
 
 | Capa | Tecnología | Motivo |
 |---|---|---|
-| Backend | Node.js + Express + TypeScript | Ya usado en proyectos anteriores; tipado fuerte reduce errores sin un equipo que revise el código |
-| ORM | MikroORM | Ya usado |
+| Backend | Node.js + Express + TypeScript | Ya usado en VacationMatch; tipado fuerte reduce errores sin un equipo que revise el código |
+| ORM | MikroORM | Ya usado en VacationMatch |
 | Base de datos | PostgreSQL | Buen soporte de transacciones y locks (necesario para el control de cupo, sección 7) |
-| Validación de datos | Zod | La mejor librería para validación centralizada |
+| Validación de datos | Zod | Ya usado en VacationMatch para validación centralizada |
 | Autenticación | JWT | Consistente con el patrón ya usado (variable `TOKEN_SECRET`) |
 | Frontend | React + TypeScript | Ya usado en VacationMatch |
 | Pagos | SDK de Mercado Pago | Definido por el cliente (Minuta §7) |
@@ -38,7 +40,7 @@ Arquitectura en capas simple — sin microservicios ni patrones complejos, porqu
 
 ## 3. Estructura de carpetas propuesta
 
-Organización por *feature* (módulo de negocio), no por tipo de archivo — más fácil de navegar en un proyecto chico manejado por una sola persona.
+Sigue la misma convención usada en el proyecto anterior del desarrollador ([[petit-accesorios]]): organización por entidad de dominio, con archivos planos por capa usando notación de puntos dentro de cada módulo (backend), y `pages/` mapeando 1 a 1 con las rutas (frontend).
 
 ```
 backend/
@@ -50,6 +52,7 @@ backend/
     paradas/         (parada.entity.ts + controller/repository/routes/service)
     pasajes/         (pasaje.entity.ts + controller/repository/routes/service)
     pagos/           (pago.entity.ts + controller/repository/routes/service, mercadopago.service.ts)
+    cupones/         (cupon.entity.ts, cuponUso.entity.ts + controller/repository/routes/service)
     chofer/          (chofer.controller.ts, chofer.routes.ts, chofer.service.ts — reutiliza repos de viajes/pasajes)
     admin/           (admin.controller.ts, admin.routes.ts, admin.service.ts — reutiliza repos de otros módulos)
     shared/          (bdd, middleware, storage, types, utils)
@@ -66,6 +69,8 @@ frontend/
       AdminUsuarios/ AdminPagos/ AdminEstadisticas/ AdminHorarios/
     shared/          (api.ts, auth.ts, utils.ts)
 ```
+
+`chofer` y `admin` no tienen `entity.ts` propio porque no representan una tabla — operan sobre entidades de otros módulos (Usuario, Pasaje, Viaje).
 
 ---
 
@@ -85,7 +90,6 @@ CREATE TABLE usuarios (
   activo BOOLEAN NOT NULL DEFAULT true,
   es_moroso BOOLEAN NOT NULL DEFAULT false,
   inasistencias_efectivo INT NOT NULL DEFAULT 0,
-  promo_primer_viaje_usada BOOLEAN NOT NULL DEFAULT false,
   fecha_registro TIMESTAMP NOT NULL DEFAULT now()
 );
 CREATE UNIQUE INDEX uq_usuarios_dni_pasajero ON usuarios(dni) WHERE rol = 'pasajero';
@@ -144,6 +148,26 @@ CREATE TABLE pagos (
   fecha_pago TIMESTAMP,
   fecha_expiracion_hold TIMESTAMP
 );
+
+CREATE TABLE cupones (
+  id SERIAL PRIMARY KEY,
+  codigo VARCHAR(50) UNIQUE NOT NULL,
+  tipo VARCHAR(20) NOT NULL,             -- 'monto_fijo' | 'porcentaje'
+  valor DECIMAL(10,2) NOT NULL,
+  fecha_inicio TIMESTAMP,
+  fecha_fin TIMESTAMP,
+  uso_unico_por_persona BOOLEAN NOT NULL DEFAULT true,
+  activo BOOLEAN NOT NULL DEFAULT true
+);
+
+CREATE TABLE cupon_usos (
+  id SERIAL PRIMARY KEY,
+  cupon_id INT NOT NULL REFERENCES cupones(id),
+  usuario_id INT NOT NULL REFERENCES usuarios(id),
+  pasaje_id INT NOT NULL UNIQUE REFERENCES pasajes(id),
+  fecha_uso TIMESTAMP NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_cupon_usos_cupon_usuario ON cupon_usos(cupon_id, usuario_id);
 ```
 
 ---
@@ -213,7 +237,7 @@ Cuando el chofer pide la ruta del día (RF-16):
 | Auth | `POST /auth/recuperar-password` / `POST /auth/reset-password` | Público |
 | Viajes | `GET /viajes?sentido=&fecha=` | Público |
 | Viajes | `GET /viajes/:id` | Público |
-| Pasajes | `POST /pasajes` (crear reserva) | Pasajero |
+| Pasajes | `POST /pasajes` (crear reserva, acepta `codigo_cupon` opcional) | Pasajero |
 | Pasajes | `GET /pasajes/mis-reservas` | Pasajero |
 | Pasajes | `POST /pasajes/:id/comprobante` (subir comprobante transferencia) | Pasajero |
 | Pagos | `POST /pagos/mercadopago/webhook` | Mercado Pago (server-to-server) |
@@ -226,17 +250,25 @@ Cuando el chofer pide la ruta del día (RF-16):
 | Admin | `GET /admin/estadisticas` | Administrador |
 | Admin | `GET /admin/horarios` / `POST /admin/horarios` / `PATCH /admin/horarios/:id` | Administrador |
 | Admin | `PATCH /admin/config/descuento` | Administrador |
+| Admin | `GET /admin/cupones` / `POST /admin/cupones` / `PATCH /admin/cupones/:id` | Administrador |
 
 ---
 
 ## 11. Seguridad — resumen aterrizado (RNF-01, RNF-02)
 
-- HTTPS en toda comunicación, JWT y cookies.
+- HTTPS en toda comunicación.
 - Contraseñas con hash (bcrypt/argon2), nunca en texto plano.
-- Validación de todos los inputs con Zod en cada endpoint.
+- Validación de todos los inputs con Zod en cada endpoint (patrón ya usado en VacationMatch).
 - Autorización por rol verificada en el servidor en cada ruta protegida, nunca solo ocultando botones en el frontend.
 - `rol` nunca se acepta desde el formulario público de registro (ver sección 5).
 - Rate limiting en `/auth/login` y `/auth/registro` para mitigar fuerza bruta.
+
+---
+
+## 12. Próximos pasos
+
+- **Fase 5b — Diseño de interfaz (UX/UI)**: wireframes de las pantallas principales (selección de viaje, checkout, panel chofer, panel admin). Puede resolverse con otra herramienta o acá mismo, cuando quieras retomarlo.
+- **Fase 6 — Kanban**: convertir las Historias de Usuario en tarjetas de un tablero (Trello/GitHub Projects/Notion), usando la prioridad ya asignada en `historias-usuario.md` como orden inicial.
 
 ---
 *Documento vivo: acompaña a `diseno-arquitectura.mermaid`, que se actualiza en conjunto.*

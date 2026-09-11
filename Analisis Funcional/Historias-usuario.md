@@ -40,7 +40,7 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 - El sistema envía un enlace o código de recuperación al email registrado.
 - El enlace/código tiene un tiempo de expiración razonable.
 
-**Trazabilidad:** RF-25 · **Prioridad:** Baja
+**Trazabilidad:** RF-25 · **Prioridad:** Media
 
 ---
 
@@ -60,18 +60,29 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 
 **Criterios de aceptación:**
 - Si elijo un pueblo intermedio como origen/destino, el sistema me indica que el punto de encuentro es fijo, al costado de la ruta (no puerta a puerta).
-- Si el destino es Rosario, se solicita el domicilio; si el origen es Rosario (viaje de vuelta), también se solicita el domicilio de partida y destino(Colon - Pueblo intermedio).
+- Si el destino es Rosario, se solicita el domicilio; si el origen es Rosario (viaje de vuelta), también se solicita el domicilio de partida.
 
 **Trazabilidad:** RF-03 · **Prioridad:** Alta
 
 ### HU-06 — Ver el precio antes de confirmar
-**Como** pasajero, **quiero** ver el precio del pasaje, incluyendo el descuento de "primera vez" si corresponde, **para** saber cuánto voy a pagar antes de confirmar la compra.
+**Como** pasajero, **quiero** ver el precio del pasaje antes de confirmar la compra, **para** saber cuánto voy a pagar.
 
 **Criterios de aceptación:**
-- El precio mostrado refleja si es mi primer viaje (según mi DNI) o no.
-- El precio final puede variar según el método de pago que elija más adelante (ver Épica 3).
+- El precio mostrado es el precio base del viaje.
+- El precio final puede variar según el método de pago (ver Épica 3) y según si se aplica un cupón (ver HU-22).
 
-**Trazabilidad:** RF-04, RF-14 · **Prioridad:** Alta
+**Trazabilidad:** RF-04 · **Prioridad:** Alta
+
+### HU-22 — Ingresar código de cupón
+**Como** pasajero, **quiero** ingresar un código de cupón al confirmar mi reserva, **para** obtener el descuento correspondiente (por ejemplo, en mi primer viaje).
+
+**Criterios de aceptación:**
+- El sistema valida que el cupón exista, esté activo y dentro de su vigencia.
+- Si el cupón es de uso único por persona, el sistema rechaza el cupón si ya existe un `CuponUso` de ese cupón para mi usuario.
+- Si el cupón es inválido, se muestra un error claro sin bloquear el resto de la reserva (puedo seguir sin cupón).
+- Al confirmar con un cupón válido, se aplica el descuento y se registra el `CuponUso`.
+
+**Trazabilidad:** RF-26, RN-02 · **Prioridad:** Alta
 
 ---
 
@@ -87,7 +98,7 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 **Trazabilidad:** RF-05, RF-06 · **Prioridad:** Alta
 
 ### HU-08 — Pagar con Mercado Pago
-**Como** pasajero, **quiero** pagar con Mercado Pago (checkout), **para** que mi lugar se confirme al instante.
+**Como** pasajero, **quiero** pagar con Mercado Pago (QR), **para** que mi lugar se confirme al instante.
 
 **Criterios de aceptación:**
 - Al aprobarse el pago, el cupo se descuenta de inmediato y la reserva queda confirmada.
@@ -161,7 +172,7 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 **Como** administrador, **quiero** validar o rechazar comprobantes de transferencia dentro de las 4 horas, **para** confirmar o liberar el cupo reservado.
 
 **Criterios de aceptación:**
-- El comprobante del pasajero lo veo por whatsapp (fuera de alcance del sistema), admin solo aprueba.
+- Puedo ver el comprobante adjuntado por el pasajero.
 - Al aprobar, el cupo queda confirmado; al rechazar (o si se vence el plazo), el cupo se libera.
 
 **Trazabilidad:** RF-21, RN-06 · **Prioridad:** Alta
@@ -197,7 +208,7 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 **Criterios de aceptación:**
 - Puedo ver totales recaudados por período y desglosados por método de pago (Mercado Pago, transferencia, efectivo).
 
-**Trazabilidad:** RF-22 · **Prioridad:** Baja
+**Trazabilidad:** RF-22 · **Prioridad:** Media
 
 ### HU-20 — Editar horarios
 **Como** administrador, **quiero** poder editar los horarios de los viajes, **para** ajustar la operación sin depender del desarrollador.
@@ -206,6 +217,16 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 - Puedo modificar día y horario de los viajes fijos existentes.
 
 **Trazabilidad:** RF-23 · **Prioridad:** Baja
+
+### HU-23 — Gestionar cupones de descuento
+**Como** administrador, **quiero** crear y gestionar cupones de descuento (código, tipo, valor, vigencia, uso único o no), **para** poder lanzar promociones futuras sin depender de un cambio de código.
+
+**Criterios de aceptación:**
+- Puedo crear un cupón nuevo con código, tipo (monto fijo o porcentaje), valor, vigencia y si es de uso único por persona.
+- Puedo activar/desactivar un cupón existente.
+- El cupón `PRIMERVIAJE` inicial no depende de esta pantalla para existir — se puede cargar directo en la base al lanzar el sistema (ver T-07 en el Kanban); esta historia es para gestionar cupones *después* del lanzamiento.
+
+**Trazabilidad:** RF-27 · **Prioridad:** Baja
 
 ### HU-21 — Configurar el descuento por transferencia/efectivo
 **Como** administrador, **quiero** poder configurar el monto del descuento por pagar en transferencia o efectivo, **para** poder cambiarlo sin depender de una modificación de código.

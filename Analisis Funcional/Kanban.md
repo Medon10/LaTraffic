@@ -4,13 +4,13 @@
 | | |
 |---|---|
 | **Proyecto** | Aplicación web de reserva y venta de pasajes para traffic (combi) |
-| **Basado en** | Historias de Usuario v1 + Documento de Diseño (arquitectura) |
+| **Basado en** | Historias de Usuario v2 + Documento de Diseño (arquitectura) |
 | **Preparado por** | Mateo (desarrollador) |
 | **Fase del proceso** | 6 de 7 — Minuta → Requerimientos → HU → DER → Diseño → **Kanban** → Código |
 
 Acompaña a `kanban-backlog.csv`, pensado para importar directo a Trello, GitHub Projects o Notion (columnas: ID, Título, Tipo, Etapa, Prioridad, Relacionado, Estado — todas las tarjetas arrancan en "Por hacer").
 
-Tablero simple de 3 columnas: **Por hacer → En progreso → Hecho**.
+Tablero simple de 3 columnas, ya que trabajás solo: **Por hacer → En progreso → Hecho**. No hace falta más ceremonia que esa.
 
 ---
 
@@ -35,12 +35,14 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 | T-03 | Migraciones de base de datos (todas las tablas del esquema) | Técnica |
 | T-04 | Autenticación JWT + middleware de roles | Técnica |
 | T-05 | Cargar manualmente las cuentas de chofer y administrador | Técnica |
+| T-07 | Sembrar el cupón inicial PRIMERVIAJE directo en la base | Técnica |
 | HU-01 | Registrarme (DNI, contraseña, email) | HU |
 | HU-02 | Iniciar sesión | HU |
 | HU-04 | Ver viajes disponibles sin loguearme | HU |
 | HU-05 | Elegir sentido, fecha y puntos del viaje | HU |
 | HU-06 | Ver el precio antes de confirmar | HU |
 | HU-07 | Completar datos de la reserva | HU |
+| HU-22 | Ingresar código de cupón | HU |
 | T-06 | Integrar Mercado Pago (modo sandbox) | Técnica |
 | HU-08 | Pagar con Mercado Pago | HU |
 | HU-09 | Pagar por transferencia | HU |
@@ -67,6 +69,7 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 | HU-18 | Deshabilitar cuentas | HU |
 | HU-19 | Ver estadísticas | HU |
 | HU-20 | Editar horarios | HU |
+| HU-23 | Gestionar cupones de descuento (crear/editar más allá del PRIMERVIAJE inicial) | HU |
 | HU-21 | Configurar el descuento por transferencia/efectivo — **bloqueada**: falta que el cliente defina el monto (pendiente desde el Documento de Requisitos) | HU |
 
 ---
@@ -74,7 +77,9 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 ## Notas
 
 - El **diseño visual** ya definido (home minimalista + cabecera de confianza mínima) aplica de forma transversal a cada tarjeta de frontend — no es una tarjeta aparte, es el criterio con el que se construye cada pantalla.
+- Los paneles de **chofer** y **administrador** todavía no tienen bocetos propios (solo el flujo de compra del pasajero). Si querés, los armamos antes de empezar Etapa 2, o sobre la marcha.
 - HU-21 va a quedar frenada en "Por hacer" hasta que el cliente defina el monto del descuento — no la muevas a "En progreso" antes de eso.
+- El descuento de primera vez ahora se implementa como cupón (`PRIMERVIAJE`), no como una bandera automática — por eso se sumaron T-07 y HU-22 a la Etapa 1, y HU-23 a la Etapa 3.
 
 ---
 *Documento vivo: acompaña a `kanban-backlog.csv`, que es la fuente de verdad para importar al tablero real.*

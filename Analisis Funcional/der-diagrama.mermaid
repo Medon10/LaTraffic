@@ -5,6 +5,9 @@ erDiagram
     PARADA ||--o{ PASAJE : "origen"
     PARADA ||--o{ PASAJE : "destino"
     PASAJE ||--|| PAGO : genera
+    CUPON ||--o{ CUPONUSO : registra
+    USUARIO ||--o{ CUPONUSO : usa
+    PASAJE ||--o| CUPONUSO : aplica
 
     USUARIO {
         int id PK
@@ -17,7 +20,6 @@ erDiagram
         boolean activo
         boolean es_moroso "solo aplica a pasajero"
         int inasistencias_efectivo "solo aplica a pasajero"
-        boolean promo_primer_viaje_usada "solo aplica a pasajero"
         datetime fecha_registro
     }
 
@@ -69,4 +71,23 @@ erDiagram
         string comprobante_url
         datetime fecha_pago
         datetime fecha_expiracion_hold
+    }
+
+    CUPON {
+        int id PK
+        string codigo UK
+        string tipo "monto_fijo | porcentaje"
+        decimal valor
+        datetime fecha_inicio
+        datetime fecha_fin
+        boolean uso_unico_por_persona
+        boolean activo
+    }
+
+    CUPONUSO {
+        int id PK
+        int cupon_id FK
+        int usuario_id FK
+        int pasaje_id FK UK "unico: un pasaje aplica a lo sumo un cupon"
+        datetime fecha_uso
     }

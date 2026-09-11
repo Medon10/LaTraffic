@@ -4,11 +4,13 @@
 | | |
 |---|---|
 | **Proyecto** | Aplicación web de reserva y venta de pasajes para traffic (combi) |
-| **Basado en** | Documento de Requisitos v2 + Historias de Usuario v1 |
+| **Basado en** | Documento de Requisitos v3 + Historias de Usuario v2 |
 | **Preparado por** | Mateo (desarrollador) |
 | **Fase del proceso** | 4 de 7 — Minuta → Requerimientos → HU → **DER** → Diseño → Kanban → Código |
 
 Este documento acompaña a `der-diagrama.mermaid` con el detalle de cada entidad, las decisiones de modelado y los puntos a confirmar. Las entidades **Horario** y **Parada** son una propuesta del desarrollador (no fueron mencionadas explícitamente por el cliente); el resto surge directo de lo relevado.
+
+**Revisión:** se reemplazó el mecanismo de descuento de primera vez (antes una bandera `promo_primer_viaje_usada` en Usuario) por un sistema de **cupones** (`Cupon` / `CuponUso`), pensado para soportar cualquier promoción futura sin rediseñar el modelo cada vez.
 
 ---
 
@@ -28,10 +30,11 @@ Tabla única para los tres roles, con un campo `rol` que define permisos y panel
 | activo | boolean | Para deshabilitar cuentas (RF-18) |
 | es_moroso | boolean | Solo aplica a `pasajero`. Bloquea el pago en efectivo (RN-05) |
 | inasistencias_efectivo | int | Solo aplica a `pasajero`. Contador hacia el límite de 3 (RF-19) |
-| promo_primer_viaje_usada | boolean | Solo aplica a `pasajero`. Controla el descuento de primera vez (RN-02) |
 | fecha_registro | datetime | |
 
 > **Nota de seguridad:** el endpoint público de registro debe forzar siempre `rol = 'pasajero'` en el servidor y nunca leer ese campo desde el formulario que completa el usuario — así se evita que alguien se autoasigne el rol de administrador. Las cuentas de chofer/administrador se cargan directo en la base por el desarrollador, dado que van a ser 1-2 en total.
+>
+> **Cambio en esta revisión:** el campo `promo_primer_viaje_usada` se eliminó de acá — ese control ahora vive en `CuponUso` (secciones 1.7 y 1.8).
 
 ### 1.2 Horario — *propuesta*
 Plantilla recurrente: define el sentido, día de la semana y hora del viaje fijo. Es lo que edita el administrador (RF-23) sin tocar código.
@@ -54,6 +57,7 @@ Una fecha concreta generada a partir de un Horario. Es sobre esto que se reserva
 | fecha | date | |
 | hora | time | Copiada del Horario al generarse el viaje — si más adelante se edita el Horario (RF-23), no altera retroactivamente los viajes ya generados |
 | capacidad_total | int | 14 por defecto (Minuta §4) |
+| cupos_ocupados | int | Agregado en la fase de Diseño — contador para controlar la concurrencia (ver `diseno-arquitectura.md`) |
 | estado | enum: `programado` / `en_curso` / `finalizado` / `cancelado` | |
 
 ### 1.4 Parada — *propuesta*
@@ -82,7 +86,7 @@ La reserva en sí (nominativa — no existe un "boleto" aparte, ver Minuta §5).
 | documento_verificado | boolean, nullable | Solo relevante si es el primer viaje del usuario; por defecto `true` (RF-17) |
 | fecha_reserva | datetime | |
 
-> **Regla de validación (a nivel aplicación, no de base de datos):** cada Pasaje debe tener exactamente uno de `parada_origen_id` / `domicilio_origen` completo (no ambos, no ninguno, pero si el origen es Colón entonces no es necesario domicilio (el pasajero va a la traffic)), y lo mismo para destino.
+> **Regla de validación (a nivel aplicación, no de base de datos):** cada Pasaje debe tener exactamente uno de `parada_origen_id` / `domicilio_origen` completo (no ambos, no ninguno), y lo mismo para destino.
 
 ### 1.6 Pago
 Registro histórico de precio y estado de pago de cada Pasaje.
@@ -92,13 +96,40 @@ Registro histórico de precio y estado de pago de cada Pasaje.
 | id | PK | |
 | pasaje_id | FK → Pasaje (1:1) | Ver nota abajo sobre reintentos |
 | metodo | enum: `mercadopago` / `transferencia` / `efectivo` | |
-| monto | decimal | Precio final ya aplicado el descuento por método de pago |
+| monto | decimal | Precio final, ya aplicados el descuento por método de pago y el cupón si corresponde |
 | estado | enum: `pendiente` / `aprobado` / `rechazado` / `vencido` | |
 | comprobante_url | string, nullable | Solo transferencia |
 | fecha_pago | datetime, nullable | |
 | fecha_expiracion_hold | datetime, nullable | Solo transferencia — momento en que vence el hold de 4hs (RF-10) |
 
-> **Nota de diseño:** modelé Pago como 1:1 con Pasaje (no 1:N) — si una reserva vence o se rechaza, se asume que el pasajero inicia una reserva nueva en vez de reintentar sobre la misma. Es más simple de mantener (RNF-06) y evita casos raros de "reserva con dos pagos distintos".
+> **Nota de diseño:** modelé Pago como 1:1 con Pasaje (no 1:N) — si una reserva vence o se rechaza, se asume que el pasajero inicia una reserva nueva en vez de reintentar sobre la misma. Es más simple de mantener (RNF-06) y evita casos raros de "reserva con dos pagos distintos". Confirmame si esto no encaja con cómo lo pensás vos.
+
+### 1.7 Cupon — *nuevo en esta revisión*
+Un código de descuento genérico, reutilizable para cualquier promoción futura (no solo la de primer viaje).
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| id | PK | |
+| codigo | string, único | Ej. `PRIMERVIAJE` |
+| tipo | enum: `monto_fijo` / `porcentaje` | |
+| valor | decimal | Monto o porcentaje según `tipo` |
+| fecha_inicio | datetime, nullable | Vigencia — nullable si no tiene inicio definido |
+| fecha_fin | datetime, nullable | Vigencia — nullable si no vence |
+| uso_unico_por_persona | boolean | `true` para el cupón de primer viaje |
+| activo | boolean | Permite desactivar un cupón sin borrarlo |
+
+### 1.8 CuponUso — *nuevo en esta revisión*
+Registra cada vez que un cupón se aplicó a una reserva. Reemplaza la bandera `promo_primer_viaje_usada` que antes vivía en Usuario: en vez de "¿ya usó su descuento?", la pregunta pasa a ser "¿existe un CuponUso de este cupón para este usuario?".
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| id | PK | |
+| cupon_id | FK → Cupon | |
+| usuario_id | FK → Usuario | |
+| pasaje_id | FK → Pasaje, único | Un pasaje aplica a lo sumo un cupón |
+| fecha_uso | datetime | |
+
+> **Cómo reemplaza al mecanismo anterior:** para validar el cupón `PRIMERVIAJE` (uso único por persona) al confirmar una reserva, el service busca si ya existe un `CuponUso` con ese `cupon_id` y ese `usuario_id`. Si existe, rechaza. Es la misma regla de negocio (RN-02) con otro mecanismo de implementación — más genérico, porque sirve para cualquier cupón futuro sin tocar la tabla Usuario.
 
 ---
 
@@ -112,8 +143,21 @@ Registro histórico de precio y estado de pago de cada Pasaje.
 | Parada → Pasaje (origen) | 1 a N | Una parada puede ser origen de muchas reservas |
 | Parada → Pasaje (destino) | 1 a N | Una parada puede ser destino de muchas reservas |
 | Pasaje → Pago | 1 a 1 | Cada reserva tiene un único registro de pago |
+| Cupon → CuponUso | 1 a N | Un cupón puede usarse muchas veces (por distintas personas, o varias si no es de uso único) |
+| Usuario → CuponUso | 1 a N | Un usuario puede haber usado distintos cupones a lo largo del tiempo |
+| Pasaje → CuponUso | 1 a 0..1 | Una reserva usa a lo sumo un cupón |
 
 Si en el futuro hay más de un chofer, se podría agregar una relación entre Usuario (rol chofer) y Viaje para asignar quién maneja cada viaje; no hace falta ahora porque el cliente mencionó un solo chofer.
+
+---
+
+## 3. Puntos a confirmar
+
+1. **Pago 1:1 vs 1:N con Pasaje** (ver nota en la sección 1.6): ¿te parece bien que una reserva vencida/rechazada implique iniciar una reserva nueva, en vez de reintentar el pago sobre la misma?
+2. **Horario / Viaje**: separados para poder tener cupo y estado por fecha concreta sin perder la regla recurrente que edita el administrador (RF-23). Confirmar si esta separación cierra o si preferís simplificarla.
+3. **Parada**: catálogo de puntos fijos (Colón y pueblos intermedios). Confirmar si el nombre/alcance te cierra.
+
+**Resuelto en esta revisión:** Usuario y Empleado se fusionaron en una sola tabla `Usuario` con campo `rol` (pasajero / chofer / administrador). El mecanismo de descuento de primera vez pasó de una bandera en Usuario a un sistema de cupones (`Cupon` / `CuponUso`).
 
 ---
 *Documento vivo: acompaña a `der-diagrama.mermaid`, que se actualiza en conjunto.*
