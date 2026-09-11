@@ -8,6 +8,8 @@ import { ViajeSchema } from './viajes/viaje.entity.js';
 import { ParadaSchema } from './paradas/parada.entity.js';
 import { PasajeSchema } from './pasajes/pasaje.entity.js';
 import { PagoSchema } from './pagos/pago.entity.js';
+import { CuponSchema } from './cupones/cupon.entity.js';
+import { CuponUsoSchema } from './cupones/cupon-uso.entity.js';
 
 dotenv.config();
 
@@ -22,6 +24,8 @@ export default defineConfig({
     ParadaSchema,
     PasajeSchema,
     PagoSchema,
+    CuponSchema,
+    CuponUsoSchema,
   ],
 
   // Migraciones

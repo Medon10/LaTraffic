@@ -4,6 +4,7 @@ import { Usuario } from '../usuarios/usuario.entity.js';
 import { Viaje } from '../viajes/viaje.entity.js';
 import { Parada } from '../paradas/parada.entity.js';
 import { Pago } from '../pagos/pago.entity.js';
+import { CuponUso } from '../cupones/cupon-uso.entity.js';
 
 export const PasajeSchema = defineEntity({
   name: 'Pasaje',
@@ -20,6 +21,7 @@ export const PasajeSchema = defineEntity({
     documentoVerificado: p.boolean().nullable(),
     fechaReserva: p.datetime().default('now()'),
     pago: () => p.oneToOne(Pago).mappedBy('pasaje').nullable(),
+    cuponUso: () => p.oneToOne(CuponUso).mappedBy('pasaje').nullable(),
   },
   checks: [
     {

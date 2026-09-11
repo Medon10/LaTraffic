@@ -44,6 +44,11 @@ export enum EstadoPago {
   VENCIDO = 'vencido',
 }
 
+export enum TipoCupon {
+  MONTO_FIJO = 'monto_fijo',
+  PORCENTAJE = 'porcentaje',
+}
+
 // ────────────────────────────────────────────
 // Extensión de Request con datos de usuario autenticado
 // ────────────────────────────────────────────

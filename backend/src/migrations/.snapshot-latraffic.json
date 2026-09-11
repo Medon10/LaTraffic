@@ -5,6 +5,346 @@
   ],
   "tables": [
     {
+      "name": "cupon_usos",
+      "schema": "public",
+      "columns": {
+        "cupon_id": {
+          "name": "cupon_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "fecha_uso": {
+          "name": "fecha_uso",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": "'2026-09-11 14:34:45.721013-03'",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "pasaje_id": {
+          "name": "pasaje_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "usuario_id": {
+          "name": "usuario_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "pasaje_id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "cupon_usos_pasaje_id_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "cupon_usos_pkey",
+          "primary": true,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "cupon_id",
+            "usuario_id"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "idx_cupon_usos_cupon_usuario",
+          "primary": false,
+          "unique": false
+        }
+      ],
+      "checks": [],
+      "triggers": [],
+      "foreignKeys": {
+        "cupon_usos_cupon_id_foreign": {
+          "columnNames": [
+            "cupon_id"
+          ],
+          "constraintName": "cupon_usos_cupon_id_foreign",
+          "localTableName": "public.cupon_usos",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.cupones"
+        },
+        "cupon_usos_pasaje_id_foreign": {
+          "columnNames": [
+            "pasaje_id"
+          ],
+          "constraintName": "cupon_usos_pasaje_id_foreign",
+          "localTableName": "public.cupon_usos",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.pasajes"
+        },
+        "cupon_usos_usuario_id_foreign": {
+          "columnNames": [
+            "usuario_id"
+          ],
+          "constraintName": "cupon_usos_usuario_id_foreign",
+          "localTableName": "public.cupon_usos",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.usuarios"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "cupones",
+      "schema": "public",
+      "columns": {
+        "activo": {
+          "name": "activo",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "codigo": {
+          "name": "codigo",
+          "type": "varchar(50)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": 50,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "fecha_fin": {
+          "name": "fecha_fin",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "fecha_inicio": {
+          "name": "fecha_inicio",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "monto_fijo",
+            "porcentaje"
+          ],
+          "mappedType": "enum"
+        },
+        "uso_unico_por_persona": {
+          "name": "uso_unico_por_persona",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "valor": {
+          "name": "valor",
+          "type": "numeric(10,2)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 10,
+          "scale": 2,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "decimal"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "codigo"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "cupones_codigo_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "cupones_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [
+        {
+          "name": "cupones_tipo_check",
+          "expression": "\"tipo\" in ('monto_fijo', 'porcentaje')",
+          "definition": "check (\"tipo\" in ('monto_fijo', 'porcentaje'))",
+          "columnName": "tipo"
+        }
+      ],
+      "triggers": [],
+      "foreignKeys": {},
+      "comment": null
+    },
+    {
       "name": "horarios",
       "schema": "public",
       "columns": {
@@ -520,7 +860,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "'2026-09-10 13:48:40.011869-03'",
+          "default": "'2026-09-11 14:34:45.721013-03'",
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -815,7 +1155,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "'2026-09-10 13:48:40.011869-03'",
+          "default": "'2026-09-11 14:34:45.721013-03'",
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -888,23 +1228,6 @@
           "collation": null,
           "enumItems": [],
           "mappedType": "string"
-        },
-        "promo_primer_viaje_usada": {
-          "name": "promo_primer_viaje_usada",
-          "type": "boolean",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": "false",
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "boolean"
         },
         "rol": {
           "name": "rol",
