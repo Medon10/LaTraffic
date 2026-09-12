@@ -1,15 +1,45 @@
-import { FilterQuery, FindOptions, EntityManager, EntityName, RequiredEntityData, AnyEntity, EntityData, FromEntityType } from '@mikro-orm/core';
+import {
+  FilterQuery,
+  FindOptions,
+  EntityManager,
+  EntityName,
+  RequiredEntityData,
+  AnyEntity,
+  EntityData,
+  FromEntityType,
+  RequestContext,
+} from '@mikro-orm/core';
 
 /**
  * Repositorio base genérico.
  * Encapsula las operaciones CRUD comunes para cualquier entidad.
- * Los repositorios específicos de cada módulo extienden esta clase.
+ * Resuelve el EntityManager dinámicamente desde el RequestContext actual
+ * con fallback a la instancia inyectada en el constructor.
  */
 export class Repository<T extends AnyEntity> {
+  protected _em?: EntityManager;
+  protected readonly entityClass: EntityName<T>;
+
   constructor(
-    protected readonly em: EntityManager,
-    protected readonly entityClass: EntityName<T>
-  ) {}
+    em?: EntityManager,
+    entityClass?: EntityName<T>
+  ) {
+    this._em = em;
+    this.entityClass = entityClass!;
+  }
+
+  protected get em(): EntityManager {
+    const contextEm = RequestContext.getEntityManager() as EntityManager | undefined;
+    if (contextEm) {
+      return contextEm;
+    }
+    if (this._em) {
+      return this._em;
+    }
+    throw new Error(
+      'No se encontró un EntityManager disponible en el contexto ni configurado en el repositorio.'
+    );
+  }
 
   async findAll(options?: FindOptions<T>): Promise<T[]> {
     return this.em.find(this.entityClass, {} as FilterQuery<NoInfer<T>>, options);

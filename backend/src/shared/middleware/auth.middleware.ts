@@ -1,51 +1,96 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { AuthPayload, AuthRequest, Rol } from '../types/index.js';
+import { AuthRequest, Rol } from '../types/index.js';
 
 const TOKEN_SECRET = process.env.TOKEN_SECRET || 'dev_secret';
 
 /**
- * Verifica que el request tenga un JWT válido en el header Authorization.
- * Extrae usuario_id y rol, y los adjunta a req.usuario.
+ * Middleware que verifica el JWT desde la cookie httpOnly (usando cookie-parser).
+ * Valida la firma del token y extrae usuario_id y rol, adjuntándolos a req.usuario.
+ * Permite fallback opcional al header Authorization: Bearer.
  */
 export const verificarToken = (
   req: AuthRequest,
   res: Response,
   next: NextFunction
 ): void => {
-  const authHeader = req.headers.authorization;
+  // Leer el JWT prioritariamente desde la cookie 'token'
+  let token = req.cookies?.token || req.cookies?.jwt;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ message: 'Token no proporcionado' });
+  // Fallback a Authorization header si no está presente en la cookie
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    }
+  }
+
+  if (!token) {
+    res.status(401).json({
+      error: true,
+      message: 'Token de autenticación no proporcionado',
+    });
     return;
   }
 
-  const token = authHeader.split(' ')[1];
-
   try {
-    const decoded = jwt.verify(token, TOKEN_SECRET) as AuthPayload;
-    req.usuario = decoded;
+    const decoded = jwt.verify(token, TOKEN_SECRET) as any;
+    const usuarioId = decoded.usuario_id ?? decoded.usuarioId;
+    const rol = decoded.rol as Rol;
+
+    if (!usuarioId || !rol) {
+      res.status(401).json({
+        error: true,
+        message: 'Token inválido: faltan claims obligatorios',
+      });
+      return;
+    }
+
+    req.usuario = {
+      usuario_id: Number(usuarioId),
+      usuarioId: Number(usuarioId),
+      rol,
+    };
+
     next();
   } catch {
-    res.status(401).json({ message: 'Token inválido o expirado' });
+    res.status(401).json({
+      error: true,
+      message: 'Token inválido o expirado',
+    });
   }
 };
 
 /**
  * Middleware factory: restringe el acceso a los roles indicados.
- * Debe usarse DESPUÉS de verificarToken.
+ * Valida el rol contra los roles permitidos de cada ruta.
  *
- * Ejemplo: autorizar([Rol.ADMINISTRADOR])
+ * Ejemplos:
+ *   autorizar(Rol.ADMINISTRADOR)
+ *   autorizar([Rol.CHOFER, Rol.ADMINISTRADOR])
  */
-export const autorizar = (rolesPermitidos: Rol[]) => {
+export const autorizar = (
+  roles: Rol | Rol[],
+  ...moreRoles: Rol[]
+) => {
+  const rolesPermitidos: Rol[] = Array.isArray(roles)
+    ? roles
+    : [roles, ...moreRoles];
+
   return (req: AuthRequest, res: Response, next: NextFunction): void => {
     if (!req.usuario) {
-      res.status(401).json({ message: 'No autenticado' });
+      res.status(401).json({
+        error: true,
+        message: 'No autenticado',
+      });
       return;
     }
 
     if (!rolesPermitidos.includes(req.usuario.rol)) {
-      res.status(403).json({ message: 'No tenés permisos para esta acción' });
+      res.status(403).json({
+        error: true,
+        message: 'No tenés permisos para realizar esta acción',
+      });
       return;
     }
 

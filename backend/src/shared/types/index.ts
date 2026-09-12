@@ -54,6 +54,7 @@ export enum TipoCupon {
 // ────────────────────────────────────────────
 
 export interface AuthPayload {
+  usuario_id: number;
   usuarioId: number;
   rol: Rol;
 }
@@ -61,3 +62,17 @@ export interface AuthPayload {
 export interface AuthRequest extends Request {
   usuario?: AuthPayload;
 }
+
+export interface UsuarioResponse {
+  id: number;
+  dni: string | null;
+  nombre: string;
+  apellido: string;
+  email: string;
+  rol: Rol;
+  activo: boolean;
+  esMoroso: boolean;
+  inasistenciasEfectivo: number;
+  fechaRegistro: Date;
+}
+

@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { rateLimit } from 'express-rate-limit';
 import { RequestContext } from '@mikro-orm/core';
 import { MikroORM } from '@mikro-orm/postgresql';
@@ -22,6 +23,7 @@ import { choferRoutes } from './chofer/chofer.routes.js';
 import { adminRoutes } from './admin/admin.routes.js';
 
 const PORT = process.env.PORT || 3000;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 async function bootstrap() {
   let orm: MikroORM | null = null;
@@ -38,8 +40,14 @@ async function bootstrap() {
   const app = express();
 
   // ── Middlewares globales ──
-  app.use(cors());
+  app.use(
+    cors({
+      origin: FRONTEND_URL,
+      credentials: true,
+    })
+  );
   app.use(express.json());
+  app.use(cookieParser());
 
   // Rate limiting para endpoints de auth (protección contra fuerza bruta)
   const authLimiter = rateLimit({
