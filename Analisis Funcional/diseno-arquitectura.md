@@ -174,11 +174,15 @@ CREATE INDEX idx_cupon_usos_cupon_usuario ON cupon_usos(cupon_id, usuario_id);
 
 ## 5. Autenticación y autorización
 
-- **Login**: DNI (o email) + contraseña → devuelve un JWT con `usuario_id` y `rol` como claims.
-- **Middleware de autorización**: cada ruta protegida valida el JWT y chequea el `rol` contra los roles permitidos para esa ruta (ej. `/admin/*` solo acepta `rol = administrador`). El chequeo se hace siempre en el servidor, nunca confiando en lo que mande el frontend.
+- **Login**: DNI + contraseña → si son correctos, el servidor genera un JWT con `usuario_id` y `rol` como claims y lo setea en una **cookie httpOnly, Secure, SameSite=Lax** (vía `cookie-parser`), con expiración moderada (ej. 7 días). El token **no** se devuelve en el body de la respuesta.
+- **Logout**: `POST /auth/logout` limpia la cookie (la sobreescribe vencida).
+- **Middleware de autorización**: lee el JWT desde la cookie, valida su firma, y chequea el `rol` contra los roles permitidos para esa ruta. El chequeo se hace siempre en el servidor, nunca confiando en lo que mande el frontend.
+- **CORS**: si el frontend y el backend quedan en orígenes distintos, hace falta `credentials: true` en el backend y `credentials: 'include'` en cada fetch del frontend — sin esto, el navegador no envía ni acepta la cookie.
 - **Salvaguarda de "mass assignment"**: el endpoint `POST /auth/registro` (público) ignora cualquier campo `rol` que venga en el body y fuerza `rol = 'pasajero'` en el código del backend. Las cuentas de chofer/administrador se insertan directo en la base por vos.
 - **Contraseñas**: hasheadas con bcrypt (o argon2), nunca en texto plano.
 - **Recuperación de contraseña**: token de un solo uso enviado por email, con expiración corta (ej. 1 hora).
+- **CSRF**: `SameSite=Lax` ya mitiga la mayoría de los casos prácticos para el volumen de este proyecto. Un esquema de token CSRF aparte (double-submit) queda como mejora posible si en algún momento se necesita más rigor, pero no es necesario para el lanzamiento (RNF-06).
+- Se mantiene un solo JWT de vida moderada en vez de un esquema access+refresh token — la complejidad extra no se justifica para el volumen de usuarios de este proyecto.
 
 ---
 
