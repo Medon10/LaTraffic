@@ -1,17 +1,17 @@
 ID,Titulo,Tipo,Etapa,Prioridad,Relacionado,Estado
-T-01,"Setup del proyecto backend (carpetas, MikroORM + PostgreSQL)",Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Por hacer
-T-02,"Setup del proyecto frontend (carpetas, React + routing)",Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Por hacer
-T-03,Migraciones de base de datos (todas las tablas del esquema),Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Por hacer
-T-04,Autenticacion JWT + middleware de roles,Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Por hacer
-T-05,Cargar manualmente las cuentas de chofer y administrador,Tecnica,Etapa 1 - Fundacional,Media,der-documento,Por hacer
-T-07,Sembrar el cupon inicial PRIMERVIAJE directo en la base,Tecnica,Etapa 1 - Fundacional,Alta,der-documento,Por hacer
-HU-01,"Registrarme (DNI, contrasena, email)",HU,Etapa 1 - Fundacional,Alta,RF-02;RF-25;RN-01,Por hacer
-HU-02,Iniciar sesion,HU,Etapa 1 - Fundacional,Alta,RF-02;RF-05,Por hacer
-HU-04,Ver viajes disponibles sin loguearme,HU,Etapa 1 - Fundacional,Alta,RF-01;RF-03,Por hacer
-HU-05,"Elegir sentido, fecha y puntos del viaje",HU,Etapa 1 - Fundacional,Alta,RF-03,Por hacer
-HU-06,Ver el precio antes de confirmar,HU,Etapa 1 - Fundacional,Alta,RF-04,Por hacer
-HU-07,Completar datos de la reserva,HU,Etapa 1 - Fundacional,Alta,RF-05;RF-06,Por hacer
-HU-22,Ingresar codigo de cupon,HU,Etapa 1 - Fundacional,Alta,RF-26;RN-02,Por hacer
+T-01,"Setup del proyecto backend (carpetas, MikroORM + PostgreSQL)",Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Completado
+T-02,"Setup del proyecto frontend (carpetas, React + routing)",Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Completado
+T-03,Migraciones de base de datos (todas las tablas del esquema),Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Completado
+T-04,Autenticacion JWT + middleware de roles,Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Completado
+T-05,Cargar manualmente las cuentas de chofer y administrador,Tecnica,Etapa 1 - Fundacional,Media,der-documento,Completado
+T-07,Sembrar el cupon inicial PRIMERVIAJE directo en la base,Tecnica,Etapa 1 - Fundacional,Alta,der-documento,Completado
+HU-01,"Registrarme (DNI, contrasena, email)",HU,Etapa 1 - Fundacional,Alta,RF-02;RF-25;RN-01,Completado
+HU-02,Iniciar sesion,HU,Etapa 1 - Fundacional,Alta,RF-02;RF-05,Completado
+HU-04,Ver viajes disponibles sin loguearme,HU,Etapa 1 - Fundacional,Alta,RF-01;RF-03,Completado
+HU-05,"Elegir sentido, fecha y puntos del viaje",HU,Etapa 1 - Fundacional,Alta,RF-03,Completado
+HU-06,Ver el precio antes de confirmar,HU,Etapa 1 - Fundacional,Alta,RF-04,Completado
+HU-07,Completar datos de la reserva,HU,Etapa 1 - Fundacional,Alta,RF-05;RF-06,En progreso
+HU-22,Ingresar codigo de cupon,HU,Etapa 1 - Fundacional,Alta,RF-26;RN-02,En progreso
 T-06,Integrar Mercado Pago (modo sandbox),Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Por hacer
 HU-08,Pagar con Mercado Pago,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-08;RF-12,Por hacer
 HU-09,Pagar por transferencia,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-09;RF-10,Por hacer

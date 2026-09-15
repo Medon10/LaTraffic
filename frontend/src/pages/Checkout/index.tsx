@@ -34,10 +34,13 @@ export const CheckoutPage: React.FC = () => {
           </div>
 
           <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--outline)' }}>
+              Precio base
+            </div>
             <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--secondary)' }}>
               ${Number(precio).toLocaleString('es-AR')}
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--outline)' }}>total a pagar</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--outline)' }}>por butaca</div>
           </div>
         </div>
 

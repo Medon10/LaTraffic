@@ -17,6 +17,7 @@ interface SalidaSemanal {
   fechaISO: string;
   hora: string;
   butacasLibres: number;
+  precioBase: number;
 }
 
 // ── Fallback hardcodeado (usado si GET /paradas no está disponible) ──────────
@@ -54,6 +55,7 @@ function calcularProximasSalidas(sentido: SentidoViaje): SalidaSemanal[] {
         fechaISO,
         hora: horaFija,
         butacasLibres: salidas.length === 0 ? 6 : 11,
+        precioBase: 9500,
       });
     }
     cursor.setDate(cursor.getDate() + 1);
@@ -94,6 +96,7 @@ export const SeleccionViajePage: React.FC = () => {
   const [fechaISO, setFechaISO] = useState('');
   const salidaActiva =
     salidasDisponibles.find((s) => s.fechaISO === fechaISO) || salidasDisponibles[0];
+  const precioBase = salidaActiva?.precioBase ?? 9500;
 
   // ── Cargar paradas del backend ─────────────────────────────────────────────
   useEffect(() => {
@@ -154,7 +157,7 @@ export const SeleccionViajePage: React.FC = () => {
       hora: salidaActiva?.hora || '',
       paradaId: String(paradaSeleccionadaId),
       direccionRosario: direccionRosario.trim(),
-      precio: '9500',
+      precio: String(precioBase),
     });
 
     navigate(`/checkout?${params.toString()}`);
@@ -247,10 +250,21 @@ export const SeleccionViajePage: React.FC = () => {
                   Salida puntual {salidaActiva?.hora}
                 </div>
               </div>
-              <div>
-                <div className="departure-price">$9.500</div>
-                <div className="departure-price-sub">pasaje nominativo</div>
+              <div style={{ textAlign: 'right' }}>
+                <div className="departure-price-label">Precio base</div>
+                <div className="departure-price">${precioBase.toLocaleString('es-AR')}</div>
+                <div className="departure-price-sub">por pasajero</div>
               </div>
+            </div>
+
+            {/* Aclaración HU-06 y RF-04: el precio mostrado es el base; descuentos se aplican en pasos posteriores */}
+            <div className="departure-notice">
+              <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--secondary)', flexShrink: 0 }}>
+                info
+              </span>
+              <span>
+                <strong>Precio base:</strong> Los descuentos por cupón o por método de pago (transferencia o efectivo) se calculan y muestran en los pasos siguientes.
+              </span>
             </div>
 
             {salidasDisponibles.length > 1 && (
@@ -384,9 +398,26 @@ export const SeleccionViajePage: React.FC = () => {
             </div>
           </div>
 
+          {/* Resumen del precio base del viaje seleccionado (HU-06 / RF-04) */}
+          <div className="trip-price-summary">
+            <div>
+              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--outline)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Precio base del viaje
+              </div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--on-surface-variant)', marginTop: '2px' }}>
+                Descuentos por cupón o medio de pago se aplican en los siguientes pasos
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--secondary)' }}>
+                ${precioBase.toLocaleString('es-AR')}
+              </div>
+            </div>
+          </div>
+
           {/* CTA */}
           <button type="submit" className="btn-reserve-main">
-            <span>Confirmar y ver precio • $9.500</span>
+            <span>Continuar con la reserva • Precio base ${precioBase.toLocaleString('es-AR')}</span>
             <span className="material-symbols-outlined">arrow_forward</span>
           </button>
         </form>

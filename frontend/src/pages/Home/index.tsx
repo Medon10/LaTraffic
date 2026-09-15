@@ -78,8 +78,11 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--outline)' }}>
+                  Precio base
+                </div>
                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--secondary)' }}>$9.500</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--outline)' }}>pasaje individual</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--outline)' }}>por pasajero</div>
                 <div
                   style={{
                     marginTop: '4px',
@@ -126,8 +129,11 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--outline)' }}>
+                  Precio base
+                </div>
                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--secondary)' }}>$9.500</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--outline)' }}>pasaje individual</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--outline)' }}>por pasajero</div>
                 <div
                   style={{
                     marginTop: '4px',
