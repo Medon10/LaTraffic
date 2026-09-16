@@ -1,10 +1,18 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import type { SentidoViaje } from '../types/index.ts';
+import { validarCupon } from '../services/cupones.service.ts';
+import { ApiError } from '../shared/api.ts';
+
+// ── Tipos de estado del cupón ──────────────────────────────────────────────────
+
+export type CuponEstado = 'idle' | 'loading' | 'valido' | 'invalido';
 
 export function useCheckout() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  // ── Parámetros del viaje (desde URL) ────────────────────────────────────────
 
   const sentidoParam = searchParams.get('sentido');
   const sentido: SentidoViaje = sentidoParam === 'rosario-colon' ? 'rosario-colon' : 'colon-rosario';
@@ -32,9 +40,61 @@ export function useCheckout() {
     ? 'Calle, altura, piso o lugar (ej: Pellegrini 1450)'
     : 'Calle, altura, piso/depto (ej: San Lorenzo 1120)';
 
+  // ── Estado del formulario ────────────────────────────────────────────────────
+
   const [direccionRosario, setDireccionRosario] = useState(direccionRosarioParam);
   const [errorDir, setErrorDir] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // ── Estado del cupón (HU-22) ─────────────────────────────────────────────────
+
+  const [codigoCupon, setCodigoCupon] = useState('');
+  const [cuponEstado, setCuponEstado] = useState<CuponEstado>('idle');
+  const [cuponMensaje, setCuponMensaje] = useState('');
+  const [cuponId, setCuponId] = useState<number | null>(null);
+  const [descuentoCupon, setDescuentoCupon] = useState(0);
+
+  /** Precio final mostrado en UI: precio base menos el descuento del cupón */
+  const precioFinal = Math.max(0, precio - descuentoCupon);
+
+  /**
+   * Llama al backend para validar el cupón.
+   * Si es válido actualiza el descuento; si no, muestra el error inline
+   * sin bloquear el flujo de reserva (HU-22, criterio 3).
+   */
+  const handleAplicarCupon = async () => {
+    const codigo = codigoCupon.trim();
+    if (!codigo) return;
+
+    setCuponEstado('loading');
+    setCuponMensaje('');
+
+    try {
+      const resultado = await validarCupon(codigo, precio);
+      setCuponId(resultado.cuponId);
+      setDescuentoCupon(resultado.descuento);
+      setCuponEstado('valido');
+      setCuponMensaje(`Cupón "${resultado.codigo}" aplicado — ${formatPeso(resultado.descuento)} de descuento`);
+    } catch (err) {
+      setCuponEstado('invalido');
+      const mensaje =
+        err instanceof ApiError
+          ? err.message
+          : 'No pudimos validar el cupón. Revisá el código e intentá de nuevo.';
+      setCuponMensaje(mensaje);
+      setCuponId(null);
+      setDescuentoCupon(0);
+    }
+  };
+
+  /** Quita el cupón aplicado y vuelve al precio base. */
+  const handleQuitarCupon = () => {
+    setCodigoCupon('');
+    setCuponEstado('idle');
+    setCuponMensaje('');
+    setCuponId(null);
+    setDescuentoCupon(0);
+  };
 
   const redirectUrl = useMemo(() => {
     return `/checkout?${searchParams.toString()}`;
@@ -48,6 +108,7 @@ export function useCheckout() {
     }
     setLoading(true);
     // Aquí irá la llamada a la API de reservas (HU-08/09/10)
+    // cuponId queda disponible para incluirlo en el payload
     setTimeout(() => {
       navigate('/mis-reservas');
     }, 600);
@@ -61,10 +122,12 @@ export function useCheckout() {
     fecha,
     hora,
     precio,
+    precioFinal,
     paradaFija,
     paradaOrigenLabel,
     labelDireccion,
     placeholderDir,
+    // Form
     direccionRosario,
     setDireccionRosario,
     errorDir,
@@ -72,5 +135,20 @@ export function useCheckout() {
     loading,
     redirectUrl,
     handleConfirmar,
+    // Cupón (HU-22)
+    codigoCupon,
+    setCodigoCupon,
+    cuponEstado,
+    cuponMensaje,
+    cuponId,
+    descuentoCupon,
+    handleAplicarCupon,
+    handleQuitarCupon,
   };
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatPeso(amount: number): string {
+  return `$${Number(amount).toLocaleString('es-AR')}`;
 }

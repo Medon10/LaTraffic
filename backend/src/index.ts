@@ -21,6 +21,7 @@ import { pasajeRoutes } from './pasajes/pasaje.routes.js';
 import { pagoRoutes } from './pagos/pago.routes.js';
 import { choferRoutes } from './chofer/chofer.routes.js';
 import { adminRoutes } from './admin/admin.routes.js';
+import { cuponRoutes } from './cupones/cupon.routes.js';
 
 const PORT = process.env.PORT || 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -73,6 +74,7 @@ async function bootstrap() {
   app.use('/paradas', paradaRoutes);
   app.use('/pasajes', pasajeRoutes);
   app.use('/pagos', pagoRoutes);
+  app.use('/cupones', cuponRoutes);
   app.use('/chofer', choferRoutes);
   app.use('/admin', adminRoutes);
 

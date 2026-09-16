@@ -120,6 +120,166 @@ const AuthGate: React.FC<{ redirectUrl: string }> = ({ redirectUrl }) => {
   );
 };
 
+// ── Sección Cupón de Descuento (HU-22) ────────────────────────────────────────
+
+interface CuponSectionProps {
+  codigoCupon: string;
+  setCodigoCupon: (v: string) => void;
+  cuponEstado: 'idle' | 'loading' | 'valido' | 'invalido';
+  cuponMensaje: string;
+  descuentoCupon: number;
+  handleAplicarCupon: () => void;
+  handleQuitarCupon: () => void;
+}
+
+const CuponSection: React.FC<CuponSectionProps> = ({
+  codigoCupon,
+  setCodigoCupon,
+  cuponEstado,
+  cuponMensaje,
+  descuentoCupon,
+  handleAplicarCupon,
+  handleQuitarCupon,
+}) => {
+  const isLoading = cuponEstado === 'loading';
+  const isValido = cuponEstado === 'valido';
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAplicarCupon();
+    }
+  };
+
+  return (
+    <div
+      className="card"
+      style={{ marginBottom: '1rem', padding: '1rem 1.1rem' }}
+    >
+      {/* Encabezado */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.45rem',
+          marginBottom: '0.75rem',
+        }}
+      >
+        <span
+          className="material-symbols-outlined"
+          style={{ fontSize: '18px', color: 'var(--secondary)' }}
+        >
+          local_offer
+        </span>
+        <span
+          style={{
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: 'var(--secondary)',
+          }}
+        >
+          Cupón de descuento
+        </span>
+        <span
+          style={{
+            fontSize: '0.72rem',
+            color: 'var(--outline)',
+            fontWeight: 400,
+            marginLeft: '0.15rem',
+          }}
+        >
+          (opcional)
+        </span>
+      </div>
+
+      {/* Campo de entrada o chip de cupón aplicado */}
+      {isValido ? (
+        /* ── Chip: cupón aplicado ─── */
+        <div className="cupon-chip">
+          <div className="cupon-chip-info">
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: '18px' }}
+            >
+              check_circle
+            </span>
+            <span>{cuponMensaje}</span>
+          </div>
+          <button
+            type="button"
+            className="btn-quitar-cupon"
+            onClick={handleQuitarCupon}
+            aria-label="Quitar cupón"
+            id="btn-quitar-cupon"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+              close
+            </span>
+          </button>
+        </div>
+      ) : (
+        /* ── Fila: input + botón aplicar ─── */
+        <div className="cupon-field">
+          <input
+            id="input-cupon"
+            type="text"
+            className="cupon-input"
+            value={codigoCupon}
+            onChange={(e) => {
+              setCodigoCupon(e.target.value.toUpperCase());
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="Ej: PRIMERVIAJE"
+            maxLength={50}
+            disabled={isLoading}
+            autoComplete="off"
+            autoCapitalize="characters"
+            aria-label="Código de cupón de descuento"
+          />
+          <button
+            id="btn-aplicar-cupon"
+            type="button"
+            className="btn-aplicar-cupon"
+            onClick={handleAplicarCupon}
+            disabled={isLoading || !codigoCupon.trim()}
+          >
+            {isLoading ? (
+              <span className="material-symbols-outlined" style={{ fontSize: '16px', animation: 'spin 1s linear infinite' }}>
+                progress_activity
+              </span>
+            ) : (
+              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                arrow_forward
+              </span>
+            )}
+            {isLoading ? 'Validando…' : 'Aplicar'}
+          </button>
+        </div>
+      )}
+
+      {/* Mensaje de error inline (HU-22, criterio 3: no bloquea el flujo) */}
+      {cuponEstado === 'invalido' && (
+        <div className="cupon-error" style={{ marginTop: '0.5rem' }} role="alert">
+          <span className="material-symbols-outlined" style={{ fontSize: '16px', flexShrink: 0 }}>
+            error
+          </span>
+          <span>{cuponMensaje}</span>
+        </div>
+      )}
+
+      {/* Línea de ahorro debajo del chip */}
+      {isValido && descuentoCupon > 0 && (
+        <div className="price-discount-row" style={{ marginTop: '0.5rem' }}>
+          <span>Descuento aplicado</span>
+          <span>− ${Number(descuentoCupon).toLocaleString('es-AR')}</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ── Checkout Page ─────────────────────────────────────────────────────────────
 
 export const CheckoutPage: React.FC = () => {
@@ -135,6 +295,7 @@ export const CheckoutPage: React.FC = () => {
     fecha,
     hora,
     precio,
+    precioFinal,
     paradaFija,
     paradaOrigenLabel,
     labelDireccion,
@@ -145,7 +306,17 @@ export const CheckoutPage: React.FC = () => {
     setErrorDir,
     loading,
     handleConfirmar,
+    // Cupón
+    codigoCupon,
+    setCodigoCupon,
+    cuponEstado,
+    cuponMensaje,
+    descuentoCupon,
+    handleAplicarCupon,
+    handleQuitarCupon,
   } = checkout;
+
+  const hayDescuento = cuponEstado === 'valido' && descuentoCupon > 0;
 
   return (
     <div className="page-container">
@@ -249,11 +420,24 @@ export const CheckoutPage: React.FC = () => {
               style={{
                 fontSize: '1.35rem',
                 fontWeight: 800,
-                color: 'var(--secondary)',
+                color: hayDescuento ? 'var(--outline)' : 'var(--secondary)',
+                textDecoration: hayDescuento ? 'line-through' : 'none',
               }}
             >
               ${Number(precio).toLocaleString('es-AR')}
             </div>
+            {hayDescuento && (
+              <div
+                style={{
+                  fontSize: '1.1rem',
+                  fontWeight: 800,
+                  color: 'var(--success)',
+                  marginTop: '1px',
+                }}
+              >
+                ${Number(precioFinal).toLocaleString('es-AR')}
+              </div>
+            )}
             <div style={{ fontSize: '0.72rem', color: 'var(--outline)' }}>por butaca</div>
           </div>
         </div>
@@ -397,11 +581,26 @@ export const CheckoutPage: React.FC = () => {
           </div>
         </div>
 
+        {/* ── Cupón de descuento (HU-22) ─────────────────────────────────── */}
+        <CuponSection
+          codigoCupon={codigoCupon}
+          setCodigoCupon={setCodigoCupon}
+          cuponEstado={cuponEstado}
+          cuponMensaje={cuponMensaje}
+          descuentoCupon={descuentoCupon}
+          handleAplicarCupon={handleAplicarCupon}
+          handleQuitarCupon={handleQuitarCupon}
+        />
+
         {/* Resumen de precio y CTAs */}
         <PriceSummary
           title="Total a pagar"
-          subtitle="Descuentos por cupón o medio de pago en el paso de pago"
-          amount={precio}
+          subtitle={
+            hayDescuento
+              ? `Cupón aplicado — ahorrás $${Number(descuentoCupon).toLocaleString('es-AR')}`
+              : 'Descuentos adicionales por medio de pago en el paso siguiente'
+          }
+          amount={precioFinal}
           style={{ marginBottom: '1rem' }}
         />
 
@@ -422,7 +621,7 @@ export const CheckoutPage: React.FC = () => {
               </>
             ) : (
               <>
-                <span>Confirmar y Pagar · ${Number(precio).toLocaleString('es-AR')}</span>
+                <span>Confirmar y Pagar · ${Number(precioFinal).toLocaleString('es-AR')}</span>
                 <span className="material-symbols-outlined">arrow_forward</span>
               </>
             )}

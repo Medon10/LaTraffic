@@ -104,3 +104,150 @@
 .btn-reserve-main:active {
   transform: translateY(0);
 }
+
+/* ── Campo de Cupón (HU-22) ─────────────────────────────────────────────── */
+
+.cupon-field {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.cupon-input {
+  flex: 1;
+  height: 42px;
+  padding: 0 0.85rem;
+  border: 1.5px solid var(--surface-variant);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--on-surface);
+  background: var(--surface-container-lowest);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: border-color var(--transition-fast);
+  outline: none;
+}
+
+.cupon-input::placeholder {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--outline);
+  font-size: 0.85rem;
+}
+
+.cupon-input:focus {
+  border-color: var(--secondary);
+  background: #ffffff;
+}
+
+.cupon-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-aplicar-cupon {
+  height: 42px;
+  padding: 0 1rem;
+  background-color: var(--primary-container);
+  color: var(--on-primary-container);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.btn-aplicar-cupon:hover:not(:disabled) {
+  background-color: var(--secondary);
+  color: var(--on-secondary);
+}
+
+.btn-aplicar-cupon:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Chip de cupón válido aplicado */
+.cupon-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  background: var(--success-bg);
+  border: 1.5px solid var(--success);
+  border-radius: var(--radius-md);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.cupon-chip-info {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.cupon-chip-code {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--success);
+  background: rgba(21, 128, 61, 0.12);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  letter-spacing: 0.04em;
+}
+
+.btn-quitar-cupon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-quitar-cupon:hover {
+  opacity: 1;
+}
+
+/* Mensaje de error inline del cupón */
+.cupon-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--error-container);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--on-error-container);
+  font-weight: 500;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Línea de desglose de descuento en el resumen de precio */
+.price-discount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.35rem 1rem;
+  background: var(--success-bg);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--success);
+}
+

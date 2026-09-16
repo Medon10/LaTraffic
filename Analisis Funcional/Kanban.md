@@ -42,7 +42,7 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 | HU-05 | Elegir sentido, fecha y puntos del viaje | HU |
 | HU-06 | Ver el precio antes de confirmar | HU |
 | HU-07 | Completar datos de la reserva | HU |
-| HU-22 | Ingresar código de cupón | HU |
+| HU-22 | ✓ Ingresar código de cupón — **implementado** (endpoint `/cupones/validar`, campo en checkout, descuento inline) | HU |
 | T-06 | Integrar Mercado Pago (modo sandbox) | Técnica |
 | HU-08 | Pagar con Mercado Pago | HU |
 | HU-09 | Pagar por transferencia | HU |
