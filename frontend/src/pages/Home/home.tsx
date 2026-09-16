@@ -1,47 +1,16 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
-type SentidoViaje = 'colon-rosario' | 'rosario-colon';
-
-interface SalidaSemanal {
-  id: string;
-  fechaFormato: string;
-  fechaISO: string;
-  hora: string;
-  butacasLibres: number;
-}
-
-function calcularProximaSalida(sentido: SentidoViaje): SalidaSemanal | null {
-  const hoy = new Date();
-  const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-  const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-  const targetDia = sentido === 'colon-rosario' ? 5 : 0;
-  const horaFija = sentido === 'colon-rosario' ? '18:00 hs' : '21:30 hs';
-
-  let cursor = new Date(hoy);
-  for (let i = 0; i < 25; i++) {
-    if (cursor.getDay() === targetDia) {
-      const y = cursor.getFullYear();
-      const m = String(cursor.getMonth() + 1).padStart(2, '0');
-      const d = String(cursor.getDate()).padStart(2, '0');
-      return {
-        id: `${y}-${m}-${d}`,
-        fechaISO: `${y}-${m}-${d}`,
-        fechaFormato: `${diasSemana[targetDia]} ${cursor.getDate()} de ${meses[cursor.getMonth()]}`,
-        hora: horaFija,
-        butacasLibres: 6,
-      };
-    }
-    cursor.setDate(cursor.getDate() + 1);
-  }
-  return null;
-}
+import type { SentidoViaje } from '../../types/index.ts';
+import { useWeeklyDepartures } from '../../hooks/useWeeklyDepartures.ts';
+import './home.css';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
-  const salidaIda = useMemo(() => calcularProximaSalida('colon-rosario'), []);
-  const salidaVuelta = useMemo(() => calcularProximaSalida('rosario-colon'), []);
+  const salidasIda = useWeeklyDepartures('colon-rosario', 1);
+  const salidasVuelta = useWeeklyDepartures('rosario-colon', 1);
+  const salidaIda = salidasIda[0] ?? null;
+  const salidaVuelta = salidasVuelta[0] ?? null;
 
   const handleReservar = (sentido: SentidoViaje) => {
     navigate(`/seleccion-viaje?sentido=${sentido}`);

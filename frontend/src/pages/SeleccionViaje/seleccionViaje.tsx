@@ -1,68 +1,12 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-
-// ── Tipos ────────────────────────────────────────────────────────────────────
-
-type SentidoViaje = 'colon-rosario' | 'rosario-colon';
-
-interface Parada {
-  id: number;
-  nombre: string;
-  pueblo: string;
-}
-
-interface SalidaSemanal {
-  id: string;
-  fechaFormato: string;
-  fechaISO: string;
-  hora: string;
-  butacasLibres: number;
-  precioBase: number;
-}
-
-// ── Fallback hardcodeado (usado si GET /paradas no está disponible) ──────────
-const PARADAS_FALLBACK: Parada[] = [
-  { id: 1, nombre: 'Terminal / Base', pueblo: 'Colón' },
-  { id: 2, nombre: 'Parada sobre Ruta 8', pueblo: 'Hughes' },
-  { id: 3, nombre: 'Parada sobre Ruta 8', pueblo: 'Wheelwright' },
-];
-
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+import type { SentidoViaje, Parada } from '../../types/index.ts';
+import { viajesService, PARADAS_FALLBACK } from '../../services/viajes.service.ts';
+import { useWeeklyDepartures } from '../../hooks/useWeeklyDepartures.ts';
+import { StopField, PriceSummary } from '../../componentes/ui/index.ts';
+import './seleccionViaje.css';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-function calcularProximasSalidas(sentido: SentidoViaje): SalidaSemanal[] {
-  const salidas: SalidaSemanal[] = [];
-  const hoy = new Date();
-  const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-  const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-
-  const targetDia = sentido === 'colon-rosario' ? 5 : 0; // Viernes / Domingo
-  const horaFija = sentido === 'colon-rosario' ? '18:00 hs' : '21:30 hs';
-
-  let cursor = new Date(hoy);
-  let count = 0;
-  while (salidas.length < 2 && count < 25) {
-    if (cursor.getDay() === targetDia) {
-      const y = cursor.getFullYear();
-      const m = String(cursor.getMonth() + 1).padStart(2, '0');
-      const d = String(cursor.getDate()).padStart(2, '0');
-      const fechaISO = `${y}-${m}-${d}`;
-      const fechaFormato = `${diasSemana[targetDia]} ${cursor.getDate()} de ${meses[cursor.getMonth()]}`;
-      salidas.push({
-        id: fechaISO,
-        fechaFormato,
-        fechaISO,
-        hora: horaFija,
-        butacasLibres: salidas.length === 0 ? 6 : 11,
-        precioBase: 9500,
-      });
-    }
-    cursor.setDate(cursor.getDate() + 1);
-    count++;
-  }
-  return salidas;
-}
 
 function etiquetaParada(p: Parada): string {
   return `${p.pueblo} — ${p.nombre}`;
@@ -92,7 +36,7 @@ export const SeleccionViajePage: React.FC = () => {
   const [errorDireccion, setErrorDireccion] = useState(false);
 
   // Fecha
-  const salidasDisponibles = useMemo(() => calcularProximasSalidas(sentido), [sentido]);
+  const salidasDisponibles = useWeeklyDepartures(sentido, 2);
   const [fechaISO, setFechaISO] = useState('');
   const salidaActiva =
     salidasDisponibles.find((s) => s.fechaISO === fechaISO) || salidasDisponibles[0];
@@ -101,17 +45,12 @@ export const SeleccionViajePage: React.FC = () => {
   // ── Cargar paradas del backend ─────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
-    setLoadingParadas(true);
-    fetch(`${API_BASE}/paradas`)
-      .then((r) => r.json())
+    viajesService.getParadas()
       .then((data) => {
-        if (!cancelled && data.paradas && data.paradas.length > 0) {
-          setParadas(data.paradas);
-          setParadaSeleccionadaId(data.paradas[0].id);
+        if (!cancelled && data.length > 0) {
+          setParadas(data);
+          setParadaSeleccionadaId(data[0].id);
         }
-      })
-      .catch(() => {
-        // Silencioso — usa el fallback hardcodeado
       })
       .finally(() => {
         if (!cancelled) setLoadingParadas(false);
@@ -292,128 +231,88 @@ export const SeleccionViajePage: React.FC = () => {
         <form onSubmit={handleReservar}>
           <div className="trip-stops-group">
             {/* Campo Origen */}
-            <div className="stop-field-box" style={{ borderColor: (!mostrarParadaOrigen && errorDireccion) ? 'var(--error)' : undefined }}>
-              <div className="stop-field-header">
-                <span className="material-symbols-outlined">trip_origin</span>
-                <span>{labelOrigen}</span>
-              </div>
-
+            <StopField
+              icon="trip_origin"
+              label={labelOrigen}
+              hasError={!mostrarParadaOrigen && errorDireccion}
+              errorMessage={errorMsgDir}
+              note={mostrarParadaOrigen && esIntermedia(paradaSeleccionada) ? 'Punto de encuentro fijo al costado de la ruta (no es puerta a puerta).' : undefined}
+            >
               {mostrarParadaOrigen ? (
-                <>
-                  <select
-                    id="select-origen"
-                    value={paradaSeleccionadaId}
-                    onChange={(e) => setParadaSeleccionadaId(Number(e.target.value))}
-                    className="stop-select"
-                    disabled={loadingParadas}
-                  >
-                    {paradas.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {etiquetaParada(p)}
-                      </option>
-                    ))}
-                  </select>
-                  {esIntermedia(paradaSeleccionada) && (
-                    <div className="stop-note">
-                      <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>info</span>
-                      Punto de encuentro fijo al costado de la ruta (no es puerta a puerta).
-                    </div>
-                  )}
-                </>
+                <select
+                  id="select-origen"
+                  value={paradaSeleccionadaId}
+                  onChange={(e) => setParadaSeleccionadaId(Number(e.target.value))}
+                  className="stop-select"
+                  disabled={loadingParadas}
+                >
+                  {paradas.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {etiquetaParada(p)}
+                    </option>
+                  ))}
+                </select>
               ) : (
-                <>
-                  <input
-                    id="input-domicilio-origen"
-                    type="text"
-                    value={direccionRosario}
-                    onChange={(e) => {
-                      setDireccionRosario(e.target.value);
-                      if (errorDireccion) setErrorDireccion(false);
-                    }}
-                    placeholder={placeholderDir}
-                    className="stop-address-input"
-                    autoComplete="street-address"
-                  />
-                  {errorDireccion && (
-                    <div style={{ color: 'var(--error)', fontSize: '0.75rem', fontWeight: 600, marginTop: '4px' }}>
-                      {errorMsgDir}
-                    </div>
-                  )}
-                </>
+                <input
+                  id="input-domicilio-origen"
+                  type="text"
+                  value={direccionRosario}
+                  onChange={(e) => {
+                    setDireccionRosario(e.target.value);
+                    if (errorDireccion) setErrorDireccion(false);
+                  }}
+                  placeholder={placeholderDir}
+                  className="stop-address-input"
+                  autoComplete="street-address"
+                />
               )}
-            </div>
+            </StopField>
 
             {/* Campo Destino */}
-            <div className="stop-field-box" style={{ borderColor: (mostrarParadaOrigen && errorDireccion) ? 'var(--error)' : undefined }}>
-              <div className="stop-field-header">
-                <span className="material-symbols-outlined">
-                  {mostrarParadaDestino ? 'location_on' : 'home_pin'}
-                </span>
-                <span>{labelDestino}</span>
-              </div>
-
+            <StopField
+              icon={mostrarParadaDestino ? 'location_on' : 'home_pin'}
+              label={labelDestino}
+              hasError={mostrarParadaOrigen && errorDireccion}
+              errorMessage={errorMsgDir}
+              note={mostrarParadaDestino && esIntermedia(paradaSeleccionada) ? 'Descenso sobre la ruta en el punto de encuentro convenido.' : undefined}
+            >
               {mostrarParadaDestino ? (
-                <>
-                  <select
-                    id="select-destino"
-                    value={paradaSeleccionadaId}
-                    onChange={(e) => setParadaSeleccionadaId(Number(e.target.value))}
-                    className="stop-select"
-                    disabled={loadingParadas}
-                  >
-                    {paradas.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {etiquetaParada(p)}
-                      </option>
-                    ))}
-                  </select>
-                  {esIntermedia(paradaSeleccionada) && (
-                    <div className="stop-note">
-                      <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>info</span>
-                      Descenso sobre la ruta en el punto de encuentro convenido.
-                    </div>
-                  )}
-                </>
+                <select
+                  id="select-destino"
+                  value={paradaSeleccionadaId}
+                  onChange={(e) => setParadaSeleccionadaId(Number(e.target.value))}
+                  className="stop-select"
+                  disabled={loadingParadas}
+                >
+                  {paradas.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {etiquetaParada(p)}
+                    </option>
+                  ))}
+                </select>
               ) : (
-                <>
-                  <input
-                    id="input-domicilio-destino"
-                    type="text"
-                    value={direccionRosario}
-                    onChange={(e) => {
-                      setDireccionRosario(e.target.value);
-                      if (errorDireccion) setErrorDireccion(false);
-                    }}
-                    placeholder={placeholderDir}
-                    className="stop-address-input"
-                    autoComplete="street-address"
-                  />
-                  {errorDireccion && (
-                    <div style={{ color: 'var(--error)', fontSize: '0.75rem', fontWeight: 600, marginTop: '4px' }}>
-                      {errorMsgDir}
-                    </div>
-                  )}
-                </>
+                <input
+                  id="input-domicilio-destino"
+                  type="text"
+                  value={direccionRosario}
+                  onChange={(e) => {
+                    setDireccionRosario(e.target.value);
+                    if (errorDireccion) setErrorDireccion(false);
+                  }}
+                  placeholder={placeholderDir}
+                  className="stop-address-input"
+                  autoComplete="street-address"
+                />
               )}
-            </div>
+            </StopField>
           </div>
 
           {/* Resumen del precio base del viaje seleccionado (HU-06 / RF-04) */}
-          <div className="trip-price-summary">
-            <div>
-              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--outline)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Precio base del viaje
-              </div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--on-surface-variant)', marginTop: '2px' }}>
-                Descuentos por cupón o medio de pago se aplican en los siguientes pasos
-              </div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--secondary)' }}>
-                ${precioBase.toLocaleString('es-AR')}
-              </div>
-            </div>
-          </div>
+          <PriceSummary
+            title="Precio base del viaje"
+            subtitle="Descuentos por cupón o medio de pago se aplican en los siguientes pasos"
+            amount={precioBase}
+          />
 
           {/* CTA */}
           <button type="submit" className="btn-reserve-main">

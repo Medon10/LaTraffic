@@ -1,0 +1,57 @@
+/* Estilos de la página Mis Reservas */
+
+.skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.placeholder-box {
+  padding: 2rem 1rem;
+  background-color: var(--surface-container-low);
+  border: 1.5px dashed var(--outline-variant);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.muted-text {
+  font-size: 0.9rem;
+  color: var(--on-surface-variant);
+  line-height: 1.4;
+}
+
+/* Contenedor y tarjetas de reservas activas / pasadas */
+.reserva-item-card {
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--surface-variant);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all var(--transition-fast);
+}
+
+.reserva-item-card:hover {
+  border-color: var(--secondary-fixed-dim);
+  box-shadow: var(--shadow-sm);
+}
+
+.reserva-item-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-confirmada {
+  background-color: var(--success-bg);
+  color: var(--success);
+}
+
+.status-pendiente {
+  background-color: #fef9c3;
+  color: #854d0e;
+}

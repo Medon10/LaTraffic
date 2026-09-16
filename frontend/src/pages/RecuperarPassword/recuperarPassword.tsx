@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './recuperarPassword.css';
 
 export const RecuperarPasswordPage: React.FC = () => {
   return (

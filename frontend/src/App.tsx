@@ -1,13 +1,13 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { Layout } from './componentes/Layout';
-import { HomePage } from './pages/Home';
-import { LoginPage } from './pages/Login';
-import { RegistroPage } from './pages/Registro';
-import { RecuperarPasswordPage } from './pages/RecuperarPassword';
-import { SeleccionViajePage } from './pages/SeleccionViaje';
-import { CheckoutPage } from './pages/Checkout';
-import { MisReservasPage } from './pages/MisReservas';
+import { HomePage } from './pages/Home/home';
+import { LoginPage } from './pages/Login/login';
+import { RegistroPage } from './pages/Registro/registro';
+import { RecuperarPasswordPage } from './pages/RecuperarPassword/recuperarPassword';
+import { SeleccionViajePage } from './pages/SeleccionViaje/seleccionViaje';
+import { CheckoutPage } from './pages/Checkout/checkout';
+import { MisReservasPage } from './pages/MisReservas/misReservas';
 
 const NotFoundPage: React.FC = () => (
   <div className="page-container text-center">

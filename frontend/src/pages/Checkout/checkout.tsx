@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
-import { useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { isAuthenticated, getUser } from '../../shared/auth';
-
-// ── Helpers ────────────────────────────────────────────────────────────────────
-
-function formatPrice(value: string | number): string {
-  return Number(value).toLocaleString('es-AR');
-}
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { isAuthenticated, getUser } from '../../shared/auth.ts';
+import { useCheckout } from '../../hooks/useCheckout.ts';
+import { StopField, PriceSummary } from '../../componentes/ui/index.ts';
+import './checkout.css';
 
 // ── Auth Gate ─────────────────────────────────────────────────────────────────
 
@@ -123,111 +120,32 @@ const AuthGate: React.FC<{ redirectUrl: string }> = ({ redirectUrl }) => {
   );
 };
 
-// ── Checkout Form (usuario logueado) ──────────────────────────────────────────
+// ── Checkout Page ─────────────────────────────────────────────────────────────
 
 export const CheckoutPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const checkout = useCheckout();
 
-  // Datos del viaje provenientes de SeleccionViaje
-  const sentido = searchParams.get('sentido') || 'colon-rosario';
-  const origenParam = searchParams.get('origen') || '';
-  const destinoParam = searchParams.get('destino') || '';
-  const fecha = searchParams.get('fecha') || 'Próximo Viernes';
-  const hora = searchParams.get('hora') || '18:00 hs';
-  const precio = searchParams.get('precio') || '9500';
-  const direccionRosarioParam = searchParams.get('direccionRosario') || '';
-
-  // URL completa de esta página para usarla como redirect tras login
-  const currentUrl = `/checkout?${searchParams.toString()}`;
-
-  // ── Auth check ──────────────────────────────────────────────────────────────
   if (!isAuthenticated()) {
-    return <AuthGate redirectUrl={currentUrl} />;
+    return <AuthGate redirectUrl={checkout.redirectUrl} />;
   }
 
   const user = getUser();
-
-  return (
-    <CheckoutForm
-      sentido={sentido}
-      origenParam={origenParam}
-      destinoParam={destinoParam}
-      fecha={fecha}
-      hora={hora}
-      precio={precio}
-      direccionRosarioParam={direccionRosarioParam}
-      navigate={navigate}
-      user={user}
-    />
-  );
-};
-
-// ── CheckoutForm (inner component, solo renderiza si ya está autenticado) ─────
-
-interface CheckoutFormProps {
-  sentido: string;
-  origenParam: string;
-  destinoParam: string;
-  fecha: string;
-  hora: string;
-  precio: string;
-  direccionRosarioParam: string;
-  navigate: ReturnType<typeof useNavigate>;
-  user: ReturnType<typeof getUser>;
-}
-
-const CheckoutForm: React.FC<CheckoutFormProps> = ({
-  sentido,
-  origenParam,
-  destinoParam,
-  fecha,
-  hora,
-  precio,
-  direccionRosarioParam,
-  navigate,
-  user,
-}) => {
-  // En Colón→Rosario: origen es la parada (ya elegida), destino es dirección en Rosario
-  // En Rosario→Colón: origen es dirección en Rosario (ya elegida), destino es la parada
-  const esColonRosario = sentido === 'colon-rosario';
-
-  // Parada fija (viene de SeleccionViaje, solo se muestra — no se re-pregunta si ya vino)
-  // Si no vino en la URL (acceso directo), se pide en el formulario
-  const paradaFija = esColonRosario
-    ? origenParam   // Ej: "Colón — Terminal / Base"
-    : destinoParam; // Ej: "Colón — Parada sobre Ruta 8"
-
-  const paradaOrigenLabel = esColonRosario
-    ? 'Punto de subida (Punto Fijo)'
-    : 'Punto de bajada (Punto Fijo)';
-
-  // Si ya viene del flujo normal (SeleccionViaje → Checkout), la dirección está en el param
-  const [direccionRosario, setDireccionRosario] = useState(direccionRosarioParam);
-  const [errorDir, setErrorDir] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const labelDireccion = esColonRosario
-    ? 'Domicilio de destino en Rosario'
-    : 'Domicilio de partida en Rosario';
-
-  const placeholderDir = esColonRosario
-    ? 'Calle, altura, piso o lugar (ej: Pellegrini 1450)'
-    : 'Calle, altura, piso/depto (ej: San Lorenzo 1120)';
-
-  const handleConfirmar = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!direccionRosario.trim()) {
-      setErrorDir(true);
-      return;
-    }
-    setLoading(true);
-    // Aquí irá la llamada a la API de reservas (HU-08/09/10)
-    // Por ahora navega a mis-reservas como placeholder
-    setTimeout(() => {
-      navigate('/mis-reservas');
-    }, 600);
-  };
+  const {
+    esColonRosario,
+    fecha,
+    hora,
+    precio,
+    paradaFija,
+    paradaOrigenLabel,
+    labelDireccion,
+    placeholderDir,
+    direccionRosario,
+    setDireccionRosario,
+    errorDir,
+    setErrorDir,
+    loading,
+    handleConfirmar,
+  } = checkout;
 
   return (
     <div className="page-container">
@@ -237,7 +155,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         Revisá los datos de tu viaje y confirmá tu lugar.
       </p>
 
-      {/* ── Saludo personalizado al usuario logueado ── */}
+      {/* Saludo personalizado */}
       <div
         className="card"
         style={{
@@ -273,7 +191,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         </div>
       </div>
 
-      {/* ── Resumen del pasaje ── */}
+      {/* Resumen del pasaje */}
       <div className="card" style={{ borderLeft: '4px solid var(--secondary)' }}>
         <div
           style={{
@@ -334,7 +252,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 color: 'var(--secondary)',
               }}
             >
-              ${formatPrice(precio)}
+              ${Number(precio).toLocaleString('es-AR')}
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--outline)' }}>por butaca</div>
           </div>
@@ -362,12 +280,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         </div>
       </div>
 
-      {/* ── Formulario HU-07: solo parada y domicilio ── */}
+      {/* Formulario HU-07: solo parada y domicilio */}
       <form onSubmit={handleConfirmar} noValidate>
-        <div
-          className="booking-card"
-          style={{ marginBottom: '1rem' }}
-        >
+        <div className="booking-card" style={{ marginBottom: '1rem' }}>
           <div
             style={{
               fontSize: '0.75rem',
@@ -388,14 +303,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
           </div>
 
           <div className="trip-stops-group">
-            {/* ── Campo 1: Parada fija (no re-preguntada) ── */}
-            <div className="stop-field-box">
-              <div className="stop-field-header">
-                <span className="material-symbols-outlined">trip_origin</span>
-                <span>{paradaOrigenLabel}</span>
-              </div>
+            {/* Campo 1: Parada fija (no re-preguntada) */}
+            <StopField icon="trip_origin" label={paradaOrigenLabel}>
               {paradaFija ? (
-                // Viene del flujo normal → solo mostrar, no re-preguntar
                 <div
                   style={{
                     fontSize: '0.975rem',
@@ -407,7 +317,6 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   {paradaFija}
                 </div>
               ) : (
-                // Acceso directo al checkout sin pasar por SeleccionViaje
                 <div
                   style={{
                     fontSize: '0.875rem',
@@ -418,17 +327,15 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   No disponible — volvé a la selección de viaje.
                 </div>
               )}
-            </div>
+            </StopField>
 
-            {/* ── Campo 2: Domicilio en Rosario (editable, pre-llenado si vino del flujo) ── */}
-            <div
-              className="stop-field-box"
-              style={{ borderColor: errorDir ? 'var(--error)' : undefined }}
+            {/* Campo 2: Domicilio en Rosario */}
+            <StopField
+              icon="home_pin"
+              label={labelDireccion}
+              hasError={errorDir}
+              errorMessage="Ingresá el domicilio en Rosario para continuar."
             >
-              <div className="stop-field-header">
-                <span className="material-symbols-outlined">home_pin</span>
-                <span>{labelDireccion}</span>
-              </div>
               <input
                 id="input-domicilio-rosario"
                 type="text"
@@ -442,22 +349,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 autoComplete="street-address"
                 required
               />
-              {errorDir && (
-                <div
-                  style={{
-                    color: 'var(--error)',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    marginTop: '4px',
-                  }}
-                >
-                  Ingresá el domicilio en Rosario para continuar.
-                </div>
-              )}
-            </div>
+            </StopField>
           </div>
 
-          {/* Nota: no se piden nombre, apellido ni DNI (HU-07) */}
+          {/* Nota de datos personales */}
           <div
             style={{
               display: 'flex',
@@ -480,7 +375,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
           </div>
         </div>
 
-        {/* ── Métodos de pago (HU-08/09/10 — próxima iteración) ── */}
+        {/* Métodos de pago (HU-08/09/10 — próxima iteración) */}
         <div className="card" style={{ marginBottom: '1rem' }}>
           <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--primary)' }}>
             Método de Pago
@@ -502,33 +397,13 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
           </div>
         </div>
 
-        {/* ── Resumen de precio y CTAs ── */}
-        <div
-          className="trip-price-summary"
+        {/* Resumen de precio y CTAs */}
+        <PriceSummary
+          title="Total a pagar"
+          subtitle="Descuentos por cupón o medio de pago en el paso de pago"
+          amount={precio}
           style={{ marginBottom: '1rem' }}
-        >
-          <div>
-            <div
-              style={{
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                color: 'var(--outline)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
-              }}
-            >
-              Total a pagar
-            </div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--on-surface-variant)', marginTop: '2px' }}>
-              Descuentos por cupón o medio de pago en el paso de pago
-            </div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--secondary)' }}>
-              ${formatPrice(precio)}
-            </div>
-          </div>
-        </div>
+        />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
           <button
@@ -547,7 +422,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
               </>
             ) : (
               <>
-                <span>Confirmar y Pagar · ${formatPrice(precio)}</span>
+                <span>Confirmar y Pagar · ${Number(precio).toLocaleString('es-AR')}</span>
                 <span className="material-symbols-outlined">arrow_forward</span>
               </>
             )}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import './login.css';
 
 export const LoginPage: React.FC = () => {
   const [searchParams] = useSearchParams();
