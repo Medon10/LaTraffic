@@ -48,3 +48,34 @@ export const crearPasajeSchema = z
   });
 
 export type CrearPasajeDto = z.infer<typeof crearPasajeSchema>;
+
+/**
+ * Body opcional para POST /pasajes/:id/comprobante (HU-09).
+ *
+ * El pasajero puede subir la URL del comprobante si prefiere la web además de WhatsApp.
+ */
+export const subirComprobanteSchema = z
+  .object({
+    comprobante_url: z
+      .string()
+      .trim()
+      .min(1, 'La URL del comprobante no puede estar vacía')
+      .max(255, 'La URL del comprobante no puede superar los 255 caracteres')
+      .optional(),
+    comprobanteUrl: z
+      .string()
+      .trim()
+      .min(1, 'La URL del comprobante no puede estar vacía')
+      .max(255, 'La URL del comprobante no puede superar los 255 caracteres')
+      .optional(),
+  })
+  .refine((data) => Boolean(data.comprobante_url || data.comprobanteUrl), {
+    message: 'El campo comprobante_url es obligatorio',
+    path: ['comprobante_url'],
+  })
+  .transform((data) => ({
+    comprobante_url: (data.comprobante_url || data.comprobanteUrl)!,
+  }));
+
+export type SubirComprobanteDto = z.infer<typeof subirComprobanteSchema>;
+

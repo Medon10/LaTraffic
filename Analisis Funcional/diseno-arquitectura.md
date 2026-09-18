@@ -221,6 +221,25 @@ Para mantenerlo simple (RNF-06), se resuelve con una verificación **al momento 
 - Cada vez que se consulta el cupo disponible de un viaje (ej. al listar viajes o antes de crear una reserva), el backend primero revisa si hay `pasajes` en estado `pendiente_pago` con método `transferencia` cuyo `fecha_expiracion_hold` ya pasó. Si los hay, los marca como `vencida` y decrementa `cupos_ocupados` del viaje correspondiente, antes de responder.
 - Como refuerzo (opcional, no bloqueante para el lanzamiento), se puede sumar una tarea programada simple (`node-cron`, corriendo cada 10-15 minutos dentro del mismo proceso) que haga esta misma limpieza aunque nadie esté consultando el sitio en ese momento.
 
+### Implementación HU-09 — Flujo Híbrido (Web + WhatsApp) y limpieza lazy
+
+Se acordó el esquema híbrido (Opción 1):
+1. **Reserva con Hold en la web**:
+   - Al reservar seleccionando `transferencia`, se ejecuta la transacción con bloqueo de fila `LockMode.PESSIMISTIC_WRITE` (`SELECT ... FOR UPDATE`) sobre la combi (`Viaje`).
+   - El pasaje queda en `pendiente_pago`, el pago en `pendiente` y `fecha_expiracion_hold` se fija a 4 horas (`now() + 4h`).
+   - El endpoint `POST /pasajes` devuelve `fecha_expiracion_hold`, `datos_transferencia` (Alias, CBU, Titular, Banco) y un enlace directo a WhatsApp (`whatsapp_url`) con un mensaje pre-cargado: *"Hola! Acabo de reservar el pasaje #... para el viaje #... por un monto de $... Adjunto comprobante"*.
+2. **Envío del comprobante**:
+   - El pasajero envía el comprobante por WhatsApp al administrador con un solo clic.
+   - Como alternativa adicional en la web, se mantiene disponible `POST /pasajes/:id/comprobante` para subir la URL del comprobante si el pasajero prefiere adjuntarlo en la plataforma.
+3. **Validación manual del administrador en la app (HU-15)**:
+   - El administrador consulta `GET /admin/pagos/pendientes`.
+   - Revisa el comprobante en su WhatsApp (o web), verifica la acreditación en su homebanking y ejecuta `PATCH /admin/pagos/:id/validar`:
+     - Si aprueba: `pago.estado = 'aprobado'`, `pago.fechaPago = now()`, `pasaje.estado = 'confirmada'`.
+     - Si rechaza: `pago.estado = 'rechazado'`, `pasaje.estado = 'cancelada'`, y se decrementa `viaje.cupos_ocupados` liberando el asiento.
+4. **Limpieza Lazy (`liberarHoldsVencidos`)**:
+   - En `PasajeService.reservarPasaje()`: se ejecuta dentro de la transacción `FOR UPDATE` antes de comprobar `cuposLibres`. Si venció un hold, se libera de inmediato permitiendo la nueva reserva.
+   - En `ViajeService.consultarCupo()`, `obtenerPorId()`, `listar()`, en `PasajeService.misReservas()` y en `AdminService.listarPagosPendientes()`: se ejecuta la limpieza antes de calcular y devolver los datos.
+
 ---
 
 ## 8. Integración con Mercado Pago
@@ -262,9 +281,10 @@ Cuando el chofer pide la ruta del día (RF-16):
 | Auth | `POST /auth/recuperar-password` / `POST /auth/reset-password` | Público |
 | Viajes | `GET /viajes?sentido=&fecha=` | Público |
 | Viajes | `GET /viajes/:id` | Público |
-| Pasajes | `POST /pasajes` (crear reserva, acepta `codigo_cupon` opcional) | Pasajero |
+| Viajes | `GET /viajes/:id/cupo` (consulta de cupos en tiempo real con lazy cleanup) | Público |
+| Pasajes | `POST /pasajes` (crear reserva, devuelve WhatsApp y hold para transferencia) | Pasajero |
 | Pasajes | `GET /pasajes/mis-reservas` | Pasajero |
-| Pasajes | `POST /pasajes/:id/comprobante` (subir comprobante transferencia) | Pasajero |
+| Pasajes | `POST /pasajes/:id/comprobante` (subir comprobante transferencia en web) | Pasajero |
 | Pagos | `POST /pagos/mercadopago/preferencia` (crear preferencia MP, devuelve init_point) | Pasajero |
 | Pagos | `POST /pagos/mercadopago/webhook` | Mercado Pago (server-to-server) |
 | Chofer | `GET /chofer/viajes/:id/pasajeros` | Chofer |
@@ -272,7 +292,8 @@ Cuando el chofer pide la ruta del día (RF-16):
 | Chofer | `PATCH /chofer/pasajes/:id/documento` (marcar no verificado) | Chofer |
 | Admin | `GET /admin/usuarios` / `PATCH /admin/usuarios/:id/estado` | Administrador |
 | Admin | `PATCH /admin/usuarios/:id/reactivar-moroso` | Administrador |
-| Admin | `GET /admin/pagos/pendientes` / `PATCH /admin/pagos/:id/validar` | Administrador |
+| Admin | `GET /admin/pagos/pendientes` (listar transferencias pendientes de validar) | Administrador |
+| Admin | `PATCH /admin/pagos/:id/validar` (aprobar o rechazar transferencia) | Administrador |
 | Admin | `GET /admin/estadisticas` | Administrador |
 | Admin | `GET /admin/horarios` / `POST /admin/horarios` / `PATCH /admin/horarios/:id` | Administrador |
 | Admin | `PATCH /admin/config/descuento` | Administrador |

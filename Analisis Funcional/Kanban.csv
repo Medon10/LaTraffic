@@ -12,15 +12,15 @@ HU-05,"Elegir sentido, fecha y puntos del viaje",HU,Etapa 1 - Fundacional,Alta,R
 HU-06,Ver el precio antes de confirmar,HU,Etapa 1 - Fundacional,Alta,RF-04,Completado
 HU-07,Completar datos de la reserva,HU,Etapa 1 - Fundacional,Alta,RF-05;RF-06,En progreso
 HU-22,Ingresar codigo de cupon,HU,Etapa 1 - Fundacional,Alta,RF-26;RN-02,En progreso
-T-06,Integrar Mercado Pago (modo sandbox),Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Por hacer
-HU-08,Pagar con Mercado Pago,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-08;RF-12,Por hacer
-HU-09,Pagar por transferencia,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-09;RF-10,Por hacer
+T-06,Integrar Mercado Pago (modo sandbox),Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Completado
+HU-08,Pagar con Mercado Pago,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-08;RF-12,Completado
+HU-09,Pagar por transferencia,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-09;RF-10,Completado
 HU-10,Pagar en efectivo,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-11,Por hacer
 T-08,Integrar Google Maps API,Tecnica,Etapa 2 - Operar el primer viaje,Alta,diseno-arquitectura,Por hacer
 HU-12,Ver pasajeros del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,RF-15,Por hacer
 HU-13,Ver ruta optima del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,RF-16,Por hacer
 HU-14,Marcar documento no verificado (chofer),HU,Etapa 2 - Operar el primer viaje,Media,RF-17,Por hacer
-HU-15,Validar comprobantes de transferencia (administrador),HU,Etapa 2 - Operar el primer viaje,Alta,RF-21;RN-06,Por hacer
+HU-15,Validar comprobantes de transferencia (administrador),HU,Etapa 2 - Operar el primer viaje,Alta,RF-21;RN-06,Completado
 HU-03,Recuperar contrasena,HU,Etapa 3 - Gestion y pulido,Media,RF-25,Por hacer
 HU-11,Ver historial de viajes,HU,Etapa 3 - Gestion y pulido,Media,RF-13,Por hacer
 HU-16,Marcado automatico de moroso,HU,Etapa 3 - Gestion y pulido,Media,RF-19;RN-05,Por hacer

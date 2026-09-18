@@ -43,9 +43,9 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 | HU-06 | Ver el precio antes de confirmar | HU |
 | HU-07 | Completar datos de la reserva | HU |
 | HU-22 | ✓ Ingresar código de cupón — **implementado** (endpoint `/cupones/validar`, campo en checkout, descuento inline) | HU |
-| T-06 | Integrar Mercado Pago (modo sandbox) | Técnica |
-| HU-08 | Pagar con Mercado Pago | HU |
-| HU-09 | Pagar por transferencia | HU |
+| T-06 | ✓ Integrar Mercado Pago (modo sandbox) — **implementado** | Técnica |
+| HU-08 | ✓ Pagar con Mercado Pago — **implementado** (preferencias, webhook y control de cupos FOR UPDATE) | HU |
+| HU-09 | ✓ Pagar por transferencia — **implementado** (esquema híbrido Web + WhatsApp, hold 4h, comprobante web y limpieza lazy §7) | HU |
 | HU-10 | Pagar en efectivo | HU |
 
 ## Etapa 2 — Operar el primer viaje
@@ -56,7 +56,7 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 | HU-12 | Ver pasajeros del día (chofer) | HU |
 | HU-13 | Ver ruta óptima del día (chofer) | HU |
 | HU-14 | Marcar documento no verificado (chofer) | HU |
-| HU-15 | Validar comprobantes de transferencia (administrador) | HU |
+| HU-15 | ✓ Validar comprobantes de transferencia (administrador) — **implementado** (GET /admin/pagos/pendientes y PATCH /admin/pagos/:id/validar) | HU |
 
 ## Etapa 3 — Gestión y pulido
 
