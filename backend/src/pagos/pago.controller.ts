@@ -7,18 +7,26 @@ export class PagoController {
 
   /**
    * POST /pagos/mercadopago/preferencia
-   * Crea una preferencia de pago de Mercado Pago para el pasaje indicado.
    *
-   * Body: { pasaje_id: number, monto: number }
-   * Responde: { preference_id, init_point }
+   * Endpoint de **recuperación** idempotente: regenera el init_point de MP para
+   * un pasaje que ya existe en BD con estado pendiente_pago + método mercadopago.
+   *
+   * Casos de uso:
+   *  - El usuario cerró la pestaña antes de ser redirigido al checkout de MP.
+   *  - MP falló al crear la preferencia durante la reserva original.
+   *
+   * El monto se lee desde el Pago guardado en BD — no se acepta monto en el body.
+   *
+   * Body:  { pasaje_id: number }
+   * Resp:  { preference_id: string, init_point: string }
    */
   iniciarPagoMp = async (req: AuthRequest, res: Response): Promise<void> => {
-    const { pasaje_id, monto } = req.body as { pasaje_id: number; monto: number };
+    const { pasaje_id } = req.body as { pasaje_id: number };
     const usuarioId = req.usuario!.usuarioId;
 
-    const result = await this.pagoService.iniciarPagoMp(pasaje_id, usuarioId, monto);
+    const result = await this.pagoService.iniciarPagoMp(pasaje_id, usuarioId, 0 /* monto ignorado */);
 
-    res.status(201).json({
+    res.status(200).json({
       preference_id: result.preferenceId,
       init_point: result.initPoint,
     });
@@ -26,12 +34,13 @@ export class PagoController {
 
   /**
    * POST /pagos/mercadopago/webhook
-   * Recibe notificaciones de pago de Mercado Pago (server-to-server, sin autenticación JWT).
    *
-   * MP puede enviar el body en formato IPN legacy o Webhooks v2; el servicio
-   * maneja ambos formatos automáticamente.
+   * Endpoint público (server-to-server) que recibe las notificaciones de pago de MP.
+   * NO lleva JWT — MP no envía cookies ni tokens de usuario.
+   * La autenticidad se verifica mediante la firma HMAC-SHA256 (x-signature header).
    *
-   * Siempre responde 200 inmediatamente para evitar que MP reintente por timeout.
+   * Siempre responde 200 de inmediato para no exceder el timeout de MP (< 5s).
+   * El procesamiento real es asíncrono; los errores se loguean sin afectar la respuesta.
    */
   recibirWebhookMp = async (req: Request, res: Response): Promise<void> => {
     const xSignature = req.headers['x-signature'] as string | undefined;
@@ -40,7 +49,6 @@ export class PagoController {
     // Responder 200 primero (MP espera respuesta < 5s o reintenta)
     res.sendStatus(200);
 
-    // Procesar de forma asíncrona — los errores se loguean pero no afectan la respuesta
     this.pagoService
       .procesarWebhookMp(req.body, xSignature, xRequestId)
       .catch((err) => {

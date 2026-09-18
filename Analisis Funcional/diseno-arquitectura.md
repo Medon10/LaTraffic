@@ -204,6 +204,14 @@ COMMIT;
 
 El `FOR UPDATE` bloquea la fila del viaje durante la transacción, así que si dos personas reservan el último lugar al mismo tiempo, la segunda transacción espera a que termine la primera y ve el cupo ya actualizado — no se vende dos veces el mismo lugar.
 
+### Implementación HU-08
+
+- El lock se implementa con `LockMode.PESSIMISTIC_WRITE` de MikroORM (genera `SELECT ... FOR UPDATE` en PostgreSQL).
+- Todo el trabajo de BD (lock → verificar cupo → INSERT pasaje → INSERT pago → UPDATE cupos → registrar cupón) ocurre dentro de `em.transactional()` en `PasajeService.reservarPasaje()`.
+- La llamada a la API de Mercado Pago ocurre **después** del COMMIT para no alargar el lock con I/O de red externo.
+- Si MP falla después del COMMIT, el pasaje quedó creado en estado `pendiente_pago`. El usuario puede reintentar el pago desde "Mis Reservas" con el endpoint de recuperación `POST /pagos/mercadopago/preferencia` (idempotente).
+- Si el pago MP se **rechaza** en el webhook: el Pasaje pasa a `cancelada` y `cupos_ocupados` se decrementa, liberando el lugar para otro usuario.
+
 ---
 
 ## 7. Expiración del hold de transferencia (4 horas)
@@ -222,14 +230,15 @@ Para mantenerlo simple (RNF-06), se resuelve con una verificación **al momento 
 3. MP notifica al backend mediante un **webhook** cuando el pago se aprueba o rechaza.
 4. El backend recibe el webhook, actualiza `pagos.estado`, y si fue aprobado, confirma el `pasaje` de inmediato (RF-08).
 
-### Decisiones de implementación (T-06)
+### Decisiones de implementación (T-06 / HU-08)
 
 - **SDK**: `mercadopago` npm v2 — las clases `Preference` y `Payment` reemplazan la API antigua de `mp.preferences` y `mp.payment`.
 - **external_reference**: se usa `pasaje_id` (string) para correlacionar el pago recibido en el webhook con el registro en BD — no se genera ningún UUID extra.
-- **Endpoint adicional**: `POST /pagos/mercadopago/preferencia` (protegido, rol pasajero) — no estaba en la tabla de §10 pero es necesario para que el frontend inicie el flujo. Se agregó a la tabla de endpoints.
+- **Flujo unificado en `POST /pasajes`**: el endpoint ya no devuelve solo el pasaje_id; cuando el método es `mercadopago` devuelve también `init_point` y `preference_id`. El frontend redirige directo al checkout de MP sin un segundo request.
+- **Endpoint de recuperación**: `POST /pagos/mercadopago/preferencia` (protegido, rol pasajero) — para el caso en que el usuario perdió el `init_point` (cerró la pestaña, error de red). Lee el monto desde BD (no desde el body) para evitar manipulación de precios.
 - **Webhook — respuesta inmediata**: el handler responde `200` antes de procesar la notificación para evitar que MP reintente por timeout (< 5 s). El procesamiento real ocurre en background en el mismo proceso; si falla, se loguea pero no afecta la respuesta.
 - **Validación de firma**: si `MP_WEBHOOK_SECRET` está configurado, se valida la firma HMAC-SHA256 del header `x-signature` según la documentación de MP Webhooks v2. En sandbox sin secret configurado, la validación se omite.
-- **Idempotencia**: si el usuario recarga y pide una nueva preferencia para el mismo pasaje, el handler detecta que ya existe un `Pago` en BD con ese `pasaje_id` y llama a MP sin crear un registro duplicado.
+- **Cupo al rechazar**: cuando el webhook indica rechazo, el Pasaje pasa a `cancelada` y `cupos_ocupados` del Viaje se decrementa — el lugar queda libre para otro usuario.
 - **Sandbox vs producción**: el `MP_ACCESS_TOKEN` determina el entorno — no hay cambio de código, solo de variable de entorno.
 
 ---

@@ -1,12 +1,13 @@
 import { z } from 'zod';
 
 /**
- * Body esperado para POST /pagos/mercadopago/preferencia.
- * El frontend envía el pasaje_id y el monto a pagar (en ARS).
+ * Body para POST /pagos/mercadopago/preferencia — endpoint de recuperación.
+ *
+ * Solo recibe pasaje_id. El monto se obtiene del Pago ya guardado en BD
+ * (no se acepta monto desde el cliente para evitar manipulación).
  */
 export const iniciarPagoMpSchema = z.object({
   pasaje_id: z.number().int().positive(),
-  monto: z.number().positive(),
 });
 
 export type IniciarPagoMpDto = z.infer<typeof iniciarPagoMpSchema>;
