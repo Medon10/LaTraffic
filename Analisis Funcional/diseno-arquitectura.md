@@ -212,6 +212,13 @@ El `FOR UPDATE` bloquea la fila del viaje durante la transacción, así que si d
 - Si MP falla después del COMMIT, el pasaje quedó creado en estado `pendiente_pago`. El usuario puede reintentar el pago desde "Mis Reservas" con el endpoint de recuperación `POST /pagos/mercadopago/preferencia` (idempotente).
 - Si el pago MP se **rechaza** en el webhook: el Pasaje pasa a `cancelada` y `cupos_ocupados` se decrementa, liberando el lugar para otro usuario.
 
+### Implementación HU-10 — Pagar en efectivo y Control de Morosidad (RN-05)
+
+- **Control previo de morosidad (RN-05)**: Antes de ingresar a la transacción o bloquear recursos, se consulta el estado del usuario. Si `usuario.esMoroso === true` y seleccionó `metodoPago === 'efectivo'`, se bloquea la solicitud con HTTP 403 y mensaje claro: *"No podés elegir efectivo como método de pago porque tu cuenta figura como morosa por inasistencias previas. Por favor seleccioná Mercado Pago o transferencia bancaria."*. Si el usuario moroso elige Mercado Pago o transferencia, se le permite continuar normalmente.
+- **Descuento inmediato de cupo (RF-11)**: El pago en efectivo no tiene tiempo de hold ni período de expiración temporal (`fechaExpiracionHold = null`). Al confirmar la reserva dentro de la transacción con bloqueo `FOR UPDATE`, se incrementa `viaje.cuposOcupados += 1` de forma inmediata y definitiva.
+- **Estados resultantes**: El `Pasaje` queda en estado `pendiente_pago` y el `Pago` en estado `pendiente` con `metodo = 'efectivo'`, hasta el día del viaje cuando el pasajero abone físicamente en mano al chofer.
+- **Inmunidad a limpiezas lazy**: Al no poseer fecha de expiración ni método transferencia, las limpiezas de hold (§7) nunca tocan ni liberan reservas en efectivo.
+
 ---
 
 ## 7. Expiración del hold de transferencia (4 horas)

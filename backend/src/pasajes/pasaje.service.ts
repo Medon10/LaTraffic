@@ -4,6 +4,7 @@ import { MercadoPagoService } from '../pagos/mercadopago.service.js';
 import { Viaje } from '../viajes/viaje.entity.js';
 import { Pasaje } from '../pasajes/pasaje.entity.js';
 import { Pago } from '../pagos/pago.entity.js';
+import { Usuario } from '../usuarios/usuario.entity.js';
 import { MetodoPago, EstadoPago, EstadoPasaje } from '../shared/types/index.js';
 import { HttpError } from '../shared/middleware/error-handler.middleware.js';
 import { liberarHoldsVencidos } from './hold.service.js';
@@ -88,6 +89,21 @@ export class PasajeService {
   ): Promise<ReservarPasajeResult> {
     const em = this.getEm();
 
+    // ── Validar usuario y regla de morosidad para pago en efectivo (HU-10, RN-05) ──
+    const usuario = await em.findOne(Usuario, { id: usuarioId });
+    if (!usuario) {
+      throw new HttpError(404, 'Usuario no encontrado');
+    }
+    if (!usuario.activo) {
+      throw new HttpError(403, 'Tu cuenta se encuentra deshabilitada');
+    }
+    if (dto.metodoPago === 'efectivo' && usuario.esMoroso) {
+      throw new HttpError(
+        403,
+        'No podés elegir efectivo como método de pago porque tu cuenta figura como morosa por inasistencias previas. Por favor seleccioná Mercado Pago o transferencia bancaria.'
+      );
+    }
+
     // ── Validar el cupón ANTES de la transacción (solo lectura, no necesita lock) ──
     let cuponValidado: { cuponId: number; descuento: number; precioFinal: number } | null = null;
     let montoFinal = dto.monto;
@@ -130,7 +146,7 @@ export class PasajeService {
 
       // 4. Crear el Pasaje en estado pendiente_pago
       const pasaje = txEm.create(Pasaje, {
-        usuario: usuarioId as any,
+        usuario: usuario,
         viaje: viaje,
         paradaOrigen: dto.paradaOrigenId ? (dto.paradaOrigenId as any) : undefined,
         domicilioOrigen: dto.domicilioOrigen ?? null,

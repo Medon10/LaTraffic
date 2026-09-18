@@ -20,3 +20,12 @@ Esto asegura que:
 2. Se implementa la limpieza lazy de holds vencidos (§7) en `PasajeService.reservarPasaje()` (dentro del lock FOR UPDATE para liberar cupos de inmediato a nuevos pasajeros), en consultas de viajes (`ViajeService`), en reservas (`misReservas`) y en el listado de transferencias del administrador.
 3. Se implementan los endpoints de administración: `GET /admin/pagos/pendientes` y `PATCH /admin/pagos/:id/validar` (aprobar confirma el pasaje y fija fechaPago; rechazar cancela el pasaje y libera el cupo).
 4. Se mantiene disponible `POST /pasajes/:id/comprobante` como canal web alternativo si el usuario desea adjuntar el comprobante en la plataforma.
+
+## 2026-09-18: HU-10 — Pagar en efectivo y Control de Morosidad (RN-05)
+**Contexto**: Se implementa el flujo de reserva con pago en efectivo (RF-11). Por ser un método diferido sin cobro anticipado, se debe descontar el cupo de inmediato al confirmar sin ventana de espera, pero garantizando el cumplimiento de la regla de negocio RN-05: aquellos usuarios marcados como morosos (`es_moroso = true`, típicamente tras 3 inasistencias) no deben tener permitido seleccionar efectivo.
+
+**Decisión**:
+1. En `PasajeService.reservarPasaje()`, antes de abrir la transacción de base de datos o adquirir bloqueos, se consulta la entidad del usuario. Si `usuario.esMoroso === true` y `metodoPago === 'efectivo'`, se interrumpe la ejecución arrojando `HttpError(403)` con el mensaje: *"No podés elegir efectivo como método de pago porque tu cuenta figura como morosa por inasistencias previas. Por favor seleccioná Mercado Pago o transferencia bancaria."*.
+2. Si el usuario moroso selecciona Mercado Pago o transferencia bancaria, la validación no bloquea y puede operar con normalidad.
+3. Al reservar en efectivo, el cupo se incrementa de inmediato (`viaje.cuposOcupados += 1`) dentro del lock `FOR UPDATE` y `fechaExpiracionHold` queda en `null`. No caduca por el mecanismo lazy de holds.
+

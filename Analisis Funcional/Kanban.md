@@ -46,7 +46,7 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 | T-06 | ✓ Integrar Mercado Pago (modo sandbox) — **implementado** | Técnica |
 | HU-08 | ✓ Pagar con Mercado Pago — **implementado** (preferencias, webhook y control de cupos FOR UPDATE) | HU |
 | HU-09 | ✓ Pagar por transferencia — **implementado** (esquema híbrido Web + WhatsApp, hold 4h, comprobante web y limpieza lazy §7) | HU |
-| HU-10 | Pagar en efectivo | HU |
+| HU-10 | ✓ Pagar en efectivo — **implementado** (descuento inmediato de cupo RF-11 y bloqueo por morosidad RN-05) | HU |
 
 ## Etapa 2 — Operar el primer viaje
 
