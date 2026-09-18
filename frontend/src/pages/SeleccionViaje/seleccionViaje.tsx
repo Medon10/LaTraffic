@@ -123,7 +123,7 @@ export const SeleccionViajePage: React.FC = () => {
       {/* Encabezado */}
       <div>
         <div className="badge" style={{ marginBottom: '0.4rem' }}>
-          Reservar Butaca
+          Reservar Asiento
         </div>
         <h1 style={{ fontSize: '1.5rem' }}>Elegí tu viaje</h1>
         <p className="subtitle" style={{ marginTop: '0.25rem' }}>
@@ -178,7 +178,7 @@ export const SeleccionViajePage: React.FC = () => {
                 <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
                   airline_seat_recline_extra
                 </span>
-                {salidaActiva?.butacasLibres} butacas libres
+                {salidaActiva?.asientosLibres} asientos libres
               </span>
             </div>
 

@@ -11,7 +11,7 @@ export interface SalidaSemanal {
   fechaFormato: string;
   fechaISO: string;
   hora: string;
-  butacasLibres: number;
+  asientosLibres: number;
   precioBase: number;
 }
 

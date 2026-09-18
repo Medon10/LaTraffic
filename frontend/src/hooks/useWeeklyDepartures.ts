@@ -26,7 +26,7 @@ export function calcularProximasSalidas(sentido: SentidoViaje, cantidad: number 
         fechaFormato,
         fechaISO,
         hora: horaFija,
-        butacasLibres: salidas.length === 0 ? 6 : 11,
+        asientosLibres: salidas.length === 0 ? 6 : 11,
         precioBase: 9500,
       });
     }

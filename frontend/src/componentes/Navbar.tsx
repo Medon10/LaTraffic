@@ -52,10 +52,7 @@ export const Navbar: React.FC = () => {
           {loggedIn ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
               <Link to="/mis-reservas" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--primary)', fontWeight: 600, fontSize: '0.85rem' }}>
-                <div className="user-avatar-fallback">
-                  {user?.nombre ? user.nombre.charAt(0).toUpperCase() : 'U'}
-                </div>
-                <span className="desktop-only-text" style={{ fontSize: '0.85rem' }}>{user?.nombre}</span>
+                <span>{user?.nombre}</span>
               </Link>
               <button
                 onClick={handleLogout}

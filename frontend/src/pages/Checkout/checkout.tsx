@@ -381,7 +381,7 @@ export const CheckoutPage: React.FC = () => {
                 letterSpacing: '0.05em',
               }}
             >
-              Viaje programado · 1 butaca
+              Viaje programado · 1 asiento
             </div>
             <div
               style={{
@@ -438,7 +438,7 @@ export const CheckoutPage: React.FC = () => {
                 ${Number(precioFinal).toLocaleString('es-AR')}
               </div>
             )}
-            <div style={{ fontSize: '0.72rem', color: 'var(--outline)' }}>por butaca</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--outline)' }}>por asiento</div>
           </div>
         </div>
 

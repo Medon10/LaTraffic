@@ -67,7 +67,7 @@ export const HomePage: React.FC = () => {
                   }}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>airline_seat_recline_extra</span>
-                  {salidaIda.butacasLibres} butacas
+                  {salidaIda.asientosLibres} asientos
                 </div>
               </div>
             </div>
@@ -76,7 +76,7 @@ export const HomePage: React.FC = () => {
               className="btn-reserve-main"
               onClick={() => handleReservar('colon-rosario')}
             >
-              <span>Reservar Butaca — Colón a Rosario</span>
+              <span>Reservar Asiento — Colón a Rosario</span>
               <span className="material-symbols-outlined">arrow_forward</span>
             </button>
           </div>
@@ -118,7 +118,7 @@ export const HomePage: React.FC = () => {
                   }}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>airline_seat_recline_extra</span>
-                  {salidaVuelta.butacasLibres} butacas
+                  {salidaVuelta.asientosLibres} asientos
                 </div>
               </div>
             </div>
@@ -128,7 +128,7 @@ export const HomePage: React.FC = () => {
               style={{ backgroundColor: 'var(--primary)' }}
               onClick={() => handleReservar('rosario-colon')}
             >
-              <span>Reservar Butaca — Rosario a Colón</span>
+              <span>Reservar Asiento — Rosario a Colón</span>
               <span className="material-symbols-outlined">arrow_forward</span>
             </button>
           </div>
@@ -159,45 +159,6 @@ export const HomePage: React.FC = () => {
         </a>
       </section>
 
-      {/* Estrategia de Confianza */}
-      <section className="local-trust-section" aria-label="Información del servicio">
-        <h3 className="local-trust-title">
-          <span className="material-symbols-outlined" style={{ color: 'var(--secondary)' }}>verified</span>
-          Un servicio local pensado para nuestra gente
-        </h3>
-
-        <div className="local-trust-grid">
-          <div className="local-trust-item">
-            <div className="local-trust-icon">
-              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>location_city</span>
-            </div>
-            <div>
-              <h4>Somos de Colón</h4>
-              <p>Choferes conocidos de la comunidad y trato familiar. Viajá seguro con gente que conocés.</p>
-            </div>
-          </div>
-
-          <div className="local-trust-item">
-            <div className="local-trust-icon">
-              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>door_front</span>
-            </div>
-            <div>
-              <h4>Puerta a Puerta Real en Rosario</h4>
-              <p>Te dejamos o buscamos en la puerta de tu domicilio, departamento, facultad o sanatorio, sin caminar de noche.</p>
-            </div>
-          </div>
-
-          <div className="local-trust-item">
-            <div className="local-trust-icon">
-              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>schedule</span>
-            </div>
-            <div>
-              <h4>Horarios Fijos y Salidas Puntuales</h4>
-              <p>Sabemos exactamente cuándo salimos y cuándo llegamos, sin rodeos innecesarios.</p>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
