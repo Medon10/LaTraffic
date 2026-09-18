@@ -146,7 +146,8 @@ CREATE TABLE pagos (
   estado VARCHAR(20) NOT NULL DEFAULT 'pendiente',
   comprobante_url VARCHAR(255),
   fecha_pago TIMESTAMP,
-  fecha_expiracion_hold TIMESTAMP
+  fecha_expiracion_hold TIMESTAMP,
+  mp_payment_id VARCHAR(100)             -- ID del pago en Mercado Pago (recibido en el webhook; nulo hasta confirmación)
 );
 
 CREATE TABLE cupones (
@@ -221,6 +222,16 @@ Para mantenerlo simple (RNF-06), se resuelve con una verificación **al momento 
 3. MP notifica al backend mediante un **webhook** cuando el pago se aprueba o rechaza.
 4. El backend recibe el webhook, actualiza `pagos.estado`, y si fue aprobado, confirma el `pasaje` de inmediato (RF-08).
 
+### Decisiones de implementación (T-06)
+
+- **SDK**: `mercadopago` npm v2 — las clases `Preference` y `Payment` reemplazan la API antigua de `mp.preferences` y `mp.payment`.
+- **external_reference**: se usa `pasaje_id` (string) para correlacionar el pago recibido en el webhook con el registro en BD — no se genera ningún UUID extra.
+- **Endpoint adicional**: `POST /pagos/mercadopago/preferencia` (protegido, rol pasajero) — no estaba en la tabla de §10 pero es necesario para que el frontend inicie el flujo. Se agregó a la tabla de endpoints.
+- **Webhook — respuesta inmediata**: el handler responde `200` antes de procesar la notificación para evitar que MP reintente por timeout (< 5 s). El procesamiento real ocurre en background en el mismo proceso; si falla, se loguea pero no afecta la respuesta.
+- **Validación de firma**: si `MP_WEBHOOK_SECRET` está configurado, se valida la firma HMAC-SHA256 del header `x-signature` según la documentación de MP Webhooks v2. En sandbox sin secret configurado, la validación se omite.
+- **Idempotencia**: si el usuario recarga y pide una nueva preferencia para el mismo pasaje, el handler detecta que ya existe un `Pago` en BD con ese `pasaje_id` y llama a MP sin crear un registro duplicado.
+- **Sandbox vs producción**: el `MP_ACCESS_TOKEN` determina el entorno — no hay cambio de código, solo de variable de entorno.
+
 ---
 
 ## 9. Integración con Google Maps
@@ -245,6 +256,7 @@ Cuando el chofer pide la ruta del día (RF-16):
 | Pasajes | `POST /pasajes` (crear reserva, acepta `codigo_cupon` opcional) | Pasajero |
 | Pasajes | `GET /pasajes/mis-reservas` | Pasajero |
 | Pasajes | `POST /pasajes/:id/comprobante` (subir comprobante transferencia) | Pasajero |
+| Pagos | `POST /pagos/mercadopago/preferencia` (crear preferencia MP, devuelve init_point) | Pasajero |
 | Pagos | `POST /pagos/mercadopago/webhook` | Mercado Pago (server-to-server) |
 | Chofer | `GET /chofer/viajes/:id/pasajeros` | Chofer |
 | Chofer | `GET /chofer/viajes/:id/ruta` | Chofer |

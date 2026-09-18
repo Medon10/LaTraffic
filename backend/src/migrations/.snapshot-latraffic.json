@@ -36,7 +36,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "'2026-09-14 20:53:01.540358-03'",
+          "default": "now()",
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -593,6 +593,23 @@
           "enumItems": [],
           "mappedType": "decimal"
         },
+        "mp_payment_id": {
+          "name": "mp_payment_id",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 100,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
         "pasaje_id": {
           "name": "pasaje_id",
           "type": "int",
@@ -860,7 +877,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "'2026-09-14 20:53:01.540358-03'",
+          "default": "now()",
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -987,15 +1004,13 @@
       "checks": [
         {
           "name": "chk_pasajes_destino",
-          "expression": "(parada_destino_id IS NOT NULL) <> (domicilio_destino IS NOT NULL)",
-          "definition": "CHECK (((parada_destino_id IS NOT NULL) <> (domicilio_destino IS NOT NULL)))",
-          "columnName": "domicilio_destino"
+          "expression": "(\"parada_destino_id\" is not null) != (\"domicilio_destino\" is not null)",
+          "definition": "check ((\"parada_destino_id\" is not null) != (\"domicilio_destino\" is not null))"
         },
         {
           "name": "chk_pasajes_origen",
-          "expression": "(parada_origen_id IS NOT NULL) <> (domicilio_origen IS NOT NULL)",
-          "definition": "CHECK (((parada_origen_id IS NOT NULL) <> (domicilio_origen IS NOT NULL)))",
-          "columnName": "domicilio_origen"
+          "expression": "(\"parada_origen_id\" is not null) != (\"domicilio_origen\" is not null)",
+          "definition": "check ((\"parada_origen_id\" is not null) != (\"domicilio_origen\" is not null))"
         },
         {
           "name": "pasajes_estado_check",
@@ -1100,7 +1115,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "unique": true,
+          "unique": false,
           "length": 20,
           "precision": null,
           "scale": null,
@@ -1155,7 +1170,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "'2026-09-14 20:53:01.540358-03'",
+          "default": "now()",
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -1253,15 +1268,13 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "dni"
-          ],
+          "columnNames": [],
           "composite": false,
           "constraint": false,
           "keyName": "uq_usuarios_dni_pasajero",
           "primary": false,
-          "unique": true,
-          "where": "rol = 'pasajero'::text"
+          "unique": false,
+          "expression": "create unique index \"uq_usuarios_dni_pasajero\" on \"usuarios\" (\"dni\") where \"rol\" = 'pasajero'"
         },
         {
           "columnNames": [

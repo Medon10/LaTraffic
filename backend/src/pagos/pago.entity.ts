@@ -14,6 +14,11 @@ export const PagoSchema = defineEntity({
     comprobanteUrl: p.string().length(255).nullable(),
     fechaPago: p.datetime().nullable(),
     fechaExpiracionHold: p.datetime().nullable(),
+    /**
+     * ID del pago en Mercado Pago (recibido en el webhook).
+     * Nulo hasta que MP confirme el pago (aprobado o rechazado).
+     */
+    mpPaymentId: p.string().length(100).nullable(),
   },
 });
 
