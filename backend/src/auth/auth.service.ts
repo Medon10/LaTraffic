@@ -60,6 +60,7 @@ export class AuthService {
       activo: true,
       esMoroso: false,
       inasistenciasEfectivo: 0,
+      fechaRegistro: new Date(),
     } as any);
 
     // 5. Emitir JWT con usuario_id y rol como claims

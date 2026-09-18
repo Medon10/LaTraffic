@@ -11,7 +11,7 @@ export const CuponUsoSchema = defineEntity({
     cupon: () => p.manyToOne(Cupon),
     usuario: () => p.manyToOne(Usuario),
     pasaje: () => p.oneToOne(Pasaje).owner(),
-    fechaUso: p.datetime().default('now()'),
+    fechaUso: p.datetime().onCreate(() => new Date()).defaultRaw('now()'),
   },
   indexes: [
     {

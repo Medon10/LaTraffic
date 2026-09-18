@@ -1,10 +1,33 @@
-import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { getUser, isAuthenticated, logout } from '../shared/auth.ts';
+import React, { useState, useEffect } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { getUser, isAuthenticated, type UsuarioSession } from '../shared/auth.ts';
+import { authService } from '../services/auth.service.ts';
 
 export const Navbar: React.FC = () => {
-  const user = getUser();
-  const loggedIn = isAuthenticated();
+  const location = useLocation();
+  const [user, setUser] = useState<UsuarioSession | null>(() => getUser());
+  const [loggedIn, setLoggedIn] = useState<boolean>(() => isAuthenticated());
+
+  // Actualizar ante cambios de ruta
+  useEffect(() => {
+    setUser(getUser());
+    setLoggedIn(isAuthenticated());
+  }, [location]);
+
+  // Actualizar en tiempo real ante login / logout
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setUser(getUser());
+      setLoggedIn(isAuthenticated());
+    };
+    window.addEventListener('auth-change', handleAuthChange);
+    return () => window.removeEventListener('auth-change', handleAuthChange);
+  }, []);
+
+  const handleLogout = async () => {
+    await authService.logout();
+    window.location.href = '/login';
+  };
 
   return (
     <header className="app-header">
@@ -35,10 +58,7 @@ export const Navbar: React.FC = () => {
                 <span className="desktop-only-text" style={{ fontSize: '0.85rem' }}>{user?.nombre}</span>
               </Link>
               <button
-                onClick={() => {
-                  logout();
-                  window.location.href = '/login';
-                }}
+                onClick={handleLogout}
                 className="btn btn-outline"
                 style={{ padding: '0.35rem 0.65rem', fontSize: '0.8rem' }}
                 title="Cerrar sesión"

@@ -50,6 +50,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
   };
 
   const response = await fetch(url, {
+    credentials: 'include',
     ...customConfig,
     headers,
   });

@@ -183,6 +183,7 @@ CREATE INDEX idx_cupon_usos_cupon_usuario ON cupon_usos(cupon_id, usuario_id);
 - **Recuperación de contraseña**: token de un solo uso enviado por email, con expiración corta (ej. 1 hora).
 - **CSRF**: `SameSite=Lax` ya mitiga la mayoría de los casos prácticos para el volumen de este proyecto. Un esquema de token CSRF aparte (double-submit) queda como mejora posible si en algún momento se necesita más rigor, pero no es necesario para el lanzamiento (RNF-06).
 - Se mantiene un solo JWT de vida moderada en vez de un esquema access+refresh token — la complejidad extra no se justifica para el volumen de usuarios de este proyecto.
+- **Estado en el Frontend**: En lugar de usar un gestor de estado global complejo (como Redux o Zustand), el estado de autenticación se maneja guardando metadatos (no sensibles) del usuario en `localStorage` y despachando un evento custom `auth-change` al objeto `window` cada vez que el usuario inicia o cierra sesión. Los componentes (como el `Navbar`) escuchan este evento para actualizar la UI reactivamente de manera sencilla.
 
 ---
 

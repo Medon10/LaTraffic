@@ -97,7 +97,8 @@ export function useCheckout() {
   };
 
   const redirectUrl = useMemo(() => {
-    return `/checkout?${searchParams.toString()}`;
+    const qs = searchParams.toString();
+    return qs ? `/checkout?${qs}` : '/checkout';
   }, [searchParams]);
 
   const handleConfirmar = (e: React.FormEvent) => {

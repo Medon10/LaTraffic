@@ -19,7 +19,7 @@ export const PasajeSchema = defineEntity({
     domicilioDestino: p.string().length(255).nullable(),
     estado: p.enum(() => EstadoPasaje).default(EstadoPasaje.PENDIENTE_PAGO),
     documentoVerificado: p.boolean().nullable(),
-    fechaReserva: p.datetime().default('now()'),
+    fechaReserva: p.datetime().onCreate(() => new Date()).defaultRaw('now()'),
     pago: () => p.oneToOne(Pago).mappedBy('pasaje').nullable(),
     cuponUso: () => p.oneToOne(CuponUso).mappedBy('pasaje').nullable(),
   },

@@ -16,7 +16,7 @@ export const UsuarioSchema = defineEntity({
     activo: p.boolean().default(true),
     esMoroso: p.boolean().default(false),
     inasistenciasEfectivo: p.integer().default(0),
-    fechaRegistro: p.datetime().default('now()'),
+    fechaRegistro: p.datetime().onCreate(() => new Date()).defaultRaw('now()'),
     pasajes: () => p.oneToMany(Pasaje).mappedBy('usuario'),
   },
   indexes: [

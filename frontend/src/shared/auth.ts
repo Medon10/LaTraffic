@@ -34,10 +34,16 @@ export function getUser(): UsuarioSession | null {
 
 export function setUser(user: UsuarioSession): void {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('auth-change'));
+  }
 }
 
 export function removeUser(): void {
   localStorage.removeItem(USER_KEY);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('auth-change'));
+  }
 }
 
 export function logout(): void {
@@ -46,7 +52,7 @@ export function logout(): void {
 }
 
 export function isAuthenticated(): boolean {
-  return Boolean(getToken());
+  return Boolean(getUser() || getToken());
 }
 
 export function hasRole(role: 'pasajero' | 'chofer' | 'administrador'): boolean {
