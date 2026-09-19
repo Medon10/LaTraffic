@@ -4,6 +4,7 @@ import { MercadoPagoService } from '../pagos/mercadopago.service.js';
 import { Viaje } from '../viajes/viaje.entity.js';
 import { Pasaje } from '../pasajes/pasaje.entity.js';
 import { Pago } from '../pagos/pago.entity.js';
+import { Parada } from '../paradas/parada.entity.js';
 import { Usuario } from '../usuarios/usuario.entity.js';
 import { MetodoPago, EstadoPago, EstadoPasaje } from '../shared/types/index.js';
 import { HttpError } from '../shared/middleware/error-handler.middleware.js';
@@ -121,7 +122,9 @@ export class PasajeService {
     let pasajeId: number;
     const fechaExpiracionHold =
       dto.metodoPago === 'transferencia'
-        ? new Date(Date.now() + 4 * 60 * 60 * 1000)
+        ? new Date(Date.now() + 4 * 60 * 60 * 1000) // 4 horas para transferencia
+        : dto.metodoPago === 'mercadopago'
+        ? new Date(Date.now() + 30 * 60 * 1000) // 30 minutos para checkout de Mercado Pago
         : null;
 
     await em.transactional(async (txEm) => {
@@ -145,15 +148,22 @@ export class PasajeService {
       }
 
       // 4. Crear el Pasaje en estado pendiente_pago
+      const paradaOrigen = dto.paradaOrigenId
+        ? txEm.getReference(Parada, dto.paradaOrigenId)
+        : undefined;
+      const paradaDestino = dto.paradaDestinoId
+        ? txEm.getReference(Parada, dto.paradaDestinoId)
+        : undefined;
+
       const pasaje = txEm.create(Pasaje, {
-        usuario: usuario,
-        viaje: viaje,
-        paradaOrigen: dto.paradaOrigenId ? (dto.paradaOrigenId as any) : undefined,
+        usuario,
+        viaje,
+        paradaOrigen,
         domicilioOrigen: dto.domicilioOrigen ?? null,
-        paradaDestino: dto.paradaDestinoId ? (dto.paradaDestinoId as any) : undefined,
+        paradaDestino,
         domicilioDestino: dto.domicilioDestino ?? null,
         estado: EstadoPasaje.PENDIENTE_PAGO,
-      } as any);
+      });
       txEm.persist(pasaje);
       await txEm.flush();
       pasajeId = pasaje.id;
@@ -166,12 +176,12 @@ export class PasajeService {
       };
 
       const pago = txEm.create(Pago, {
-        pasaje: pasaje,
+        pasaje,
         metodo: metodoPagoMap[dto.metodoPago],
-        monto: montoFinal,
+        monto: montoFinal.toFixed(2),
         estado: EstadoPago.PENDIENTE,
         fechaExpiracionHold,
-      } as any);
+      });
       txEm.persist(pago);
 
       // 6. Incrementar cupos_ocupados

@@ -13,7 +13,7 @@ export const CuponUsoSchema = defineEntity({
     pasaje: () => p.oneToOne(Pasaje).owner(),
     fechaUso: p.datetime().onCreate(() => new Date()).defaultRaw('now()'),
   },
-  indexes: [
+  uniques: [
     {
       name: 'idx_cupon_usos_cupon_usuario',
       properties: ['cupon', 'usuario'],

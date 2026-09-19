@@ -1,6 +1,13 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+// ── Validación de variables de entorno críticas ──
+const tokenSecret = process.env.TOKEN_SECRET;
+if (!tokenSecret || tokenSecret.trim().length < 32) {
+  console.error('✗ ERROR FATAL: La variable de entorno TOKEN_SECRET es obligatoria y debe tener al menos 32 caracteres.');
+  throw new Error('La variable de entorno TOKEN_SECRET es obligatoria y debe tener al menos 32 caracteres.');
+}
+
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';

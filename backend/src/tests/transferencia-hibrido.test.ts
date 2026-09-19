@@ -71,6 +71,60 @@ describe('HU-09: Flujo Híbrido Web + WhatsApp, Hold de 4h, Validación Admin y 
     assert.equal(flushCalled, true);
   });
 
+  it('liberarHoldsVencidos: libera holds vencidos de Mercado Pago (hold 30m caducado)', async () => {
+    let flushCalled = false;
+    const ahora = new Date();
+    const fechaVencidaMP = new Date(ahora.getTime() - 1000 * 60 * 35); // 35 minutos atrás (> 30 min hold)
+    const fechaVigenteMP = new Date(ahora.getTime() + 1000 * 60 * 15); // 15 minutos adelante
+
+    const mockViaje = {
+      id: 20,
+      capacidadTotal: 14,
+      cuposOcupados: 6,
+    };
+
+    const pasajeVencidoMP = {
+      id: 10,
+      estado: EstadoPasaje.PENDIENTE_PAGO,
+      viaje: mockViaje,
+      pago: {
+        id: 201,
+        metodo: MetodoPago.MERCADOPAGO,
+        estado: EstadoPago.PENDIENTE,
+        fechaExpiracionHold: fechaVencidaMP,
+      },
+    };
+
+    const pasajeVigenteMP = {
+      id: 11,
+      estado: EstadoPasaje.PENDIENTE_PAGO,
+      viaje: mockViaje,
+      pago: {
+        id: 202,
+        metodo: MetodoPago.MERCADOPAGO,
+        estado: EstadoPago.PENDIENTE,
+        fechaExpiracionHold: fechaVigenteMP,
+      },
+    };
+
+    const mockEm: any = {
+      find: async () => [pasajeVencidoMP, pasajeVigenteMP],
+      flush: async () => {
+        flushCalled = true;
+      },
+    };
+
+    const resultado = await liberarHoldsVencidos(mockEm, 20, mockViaje as any);
+
+    assert.equal(resultado.liberados, 1);
+    assert.deepEqual(resultado.pasajesIds, [10]);
+    assert.equal(pasajeVencidoMP.estado, EstadoPasaje.VENCIDA);
+    assert.equal(pasajeVencidoMP.pago.estado, EstadoPago.VENCIDO);
+    assert.equal(mockViaje.cuposOcupados, 5); // 6 - 1 = 5
+    assert.equal(pasajeVigenteMP.estado, EstadoPasaje.PENDIENTE_PAGO);
+    assert.equal(flushCalled, true);
+  });
+
   it('Reserva por transferencia: genera datos bancarios y URL de WhatsApp con mensaje pre-armado (Opción 1)', () => {
     const pasajeId = 45;
     const viajeId = 12;

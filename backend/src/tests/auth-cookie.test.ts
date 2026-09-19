@@ -1,3 +1,10 @@
+import dotenv from 'dotenv';
+dotenv.config();
+process.env.TOKEN_SECRET =
+  process.env.TOKEN_SECRET && process.env.TOKEN_SECRET.length >= 32
+    ? process.env.TOKEN_SECRET
+    : 'test_secret_traffic_min_32_characters_long_super_secure!';
+
 import test, { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import express, { Request, Response } from 'express';
@@ -233,7 +240,7 @@ describe('Módulo auth/: Cookies HttpOnly, RBAC y Salvaguarda de Mass-Assignment
     const tokenMatch = setCookie.match(/token=([^;]+)/);
     assert.ok(tokenMatch);
     const token = tokenMatch[1];
-    const decoded: any = jwt.verify(token, process.env.TOKEN_SECRET || 'dev_secret');
+    const decoded: any = jwt.verify(token, process.env.TOKEN_SECRET!);
     assert.ok(decoded.usuario_id, 'Claim usuario_id debe existir en el JWT');
     assert.equal(decoded.rol, Rol.PASAJERO, 'Claim rol debe ser pasajero');
   });

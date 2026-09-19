@@ -610,7 +610,12 @@ export const CheckoutPage: React.FC = () => {
             type="submit"
             className="btn-reserve-main"
             disabled={loading}
-            style={{ opacity: loading ? 0.75 : 1 }}
+            aria-disabled={loading}
+            style={{
+              opacity: loading ? 0.7 : 1,
+              pointerEvents: loading ? 'none' : 'auto',
+              cursor: loading ? 'not-allowed' : 'pointer',
+            }}
           >
             {loading ? (
               <>

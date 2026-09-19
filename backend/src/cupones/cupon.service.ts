@@ -3,6 +3,9 @@ import { TipoCupon } from '../shared/types/index.js';
 import { HttpError } from '../shared/middleware/error-handler.middleware.js';
 import { CuponRepository, CuponUsoRepository } from './cupon.repository.js';
 import { CuponUso } from './cupon-uso.entity.js';
+import { Cupon } from './cupon.entity.js';
+import { Usuario } from '../usuarios/usuario.entity.js';
+import { Pasaje } from '../pasajes/pasaje.entity.js';
 
 export interface CuponValidado {
   cuponId: number;
@@ -93,9 +96,9 @@ export class CuponService {
     em: EntityManager
   ): Promise<void> {
     const uso = em.create(CuponUso, {
-      cupon: cuponId as any,
-      usuario: usuarioId as any,
-      pasaje: pasajeId as any,
+      cupon: em.getReference(Cupon, cuponId),
+      usuario: em.getReference(Usuario, usuarioId),
+      pasaje: em.getReference(Pasaje, pasajeId),
       fechaUso: new Date(),
     });
     em.persist(uso);

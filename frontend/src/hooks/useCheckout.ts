@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import type { SentidoViaje } from '../types/index.ts';
 import { validarCupon } from '../services/cupones.service.ts';
@@ -42,6 +42,7 @@ export function useCheckout() {
 
   // ── Estado del formulario ────────────────────────────────────────────────────
 
+  const isSubmittingRef = useRef(false);
   const [direccionRosario, setDireccionRosario] = useState(direccionRosarioParam);
   const [errorDir, setErrorDir] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -101,18 +102,30 @@ export function useCheckout() {
     return qs ? `/checkout?${qs}` : '/checkout';
   }, [searchParams]);
 
-  const handleConfirmar = (e: React.FormEvent) => {
+  const handleConfirmar = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Bloqueo síncrono inmediato: si ya está procesando, ignora cualquier click posterior
+    if (isSubmittingRef.current || loading) return;
+
     if (!direccionRosario.trim()) {
       setErrorDir(true);
       return;
     }
+
+    isSubmittingRef.current = true;
     setLoading(true);
-    // Aquí irá la llamada a la API de reservas (HU-08/09/10)
-    // cuponId queda disponible para incluirlo en el payload
-    setTimeout(() => {
+
+    try {
+      // Llamada a la API de reservas (HU-08/09/10)
+      // cuponId queda disponible para incluirlo en el payload
+      await new Promise((resolve) => setTimeout(resolve, 600));
       navigate('/mis-reservas');
-    }, 600);
+    } catch (err) {
+      console.error('Error al confirmar reserva:', err);
+    } finally {
+      setLoading(false);
+      isSubmittingRef.current = false;
+    }
   };
 
   return {

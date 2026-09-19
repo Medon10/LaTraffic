@@ -2,7 +2,7 @@ import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { AuthRequest, Rol } from '../types/index.js';
 
-const TOKEN_SECRET = process.env.TOKEN_SECRET || 'dev_secret';
+const TOKEN_SECRET = process.env.TOKEN_SECRET!;
 
 /**
  * Middleware que verifica el JWT desde la cookie httpOnly (usando cookie-parser).

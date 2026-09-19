@@ -11,8 +11,8 @@ export interface LiberarHoldsResult {
 /**
  * Limpieza lazy de holds vencidos según diseno-arquitectura.md §7.
  *
- * Busca reservas de pasajes en estado 'pendiente_pago' con método 'transferencia'
- * cuya 'fecha_expiracion_hold' ya haya caducado (fechaExpiracionHold < now()).
+ * Busca reservas de pasajes en estado 'pendiente_pago' con método 'transferencia' (hold 4h)
+ * o 'mercadopago' (hold 30m) cuya 'fecha_expiracion_hold' ya haya caducado (fechaExpiracionHold < now()).
  *
  * Para cada reserva vencida:
  *  1. Pasa el Pasaje a estado 'vencida'.
@@ -51,7 +51,7 @@ export async function liberarHoldsVencidos(
     const pago = p.pago;
     return (
       pago &&
-      pago.metodo === MetodoPago.TRANSFERENCIA &&
+      (pago.metodo === MetodoPago.TRANSFERENCIA || pago.metodo === MetodoPago.MERCADOPAGO) &&
       pago.fechaExpiracionHold &&
       pago.fechaExpiracionHold < ahora
     );

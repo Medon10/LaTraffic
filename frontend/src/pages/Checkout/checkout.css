@@ -105,6 +105,14 @@
   transform: translateY(0);
 }
 
+.btn-reserve-main:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
+}
+
 /* ── Campo de Cupón (HU-22) ─────────────────────────────────────────────── */
 
 .cupon-field {

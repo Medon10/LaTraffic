@@ -6,7 +6,7 @@ import { Rol, UsuarioResponse } from '../shared/types/index.js';
 import { HttpError } from '../shared/middleware/error-handler.middleware.js';
 import { RegistroDto, LoginDto } from './auth.schema.js';
 
-const TOKEN_SECRET = process.env.TOKEN_SECRET || 'dev_secret';
+const TOKEN_SECRET = process.env.TOKEN_SECRET!;
 const TOKEN_EXPIRES_IN = process.env.TOKEN_EXPIRES_IN || '24h';
 const BCRYPT_SALT_ROUNDS = 10;
 
