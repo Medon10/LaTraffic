@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { isAuthenticated, getUser } from '../../shared/auth.ts';
 import { useCheckout } from '../../hooks/useCheckout.ts';
 import { StopField, PriceSummary } from '../../componentes/ui/index.ts';
+import { MapaPicker } from '../../componentes/MapaPicker.tsx';
 import './checkout.css';
 
 // ── Auth Gate ─────────────────────────────────────────────────────────────────
@@ -301,9 +302,8 @@ export const CheckoutPage: React.FC = () => {
     labelDireccion,
     placeholderDir,
     direccionRosario,
-    setDireccionRosario,
+    handleDireccionChange,
     errorDir,
-    setErrorDir,
     loading,
     handleConfirmar,
     // Cupón
@@ -513,25 +513,23 @@ export const CheckoutPage: React.FC = () => {
               )}
             </StopField>
 
-            {/* Campo 2: Domicilio en Rosario */}
+            {/* Campo 2: Domicilio en Rosario — map picker (T-09) */}
             <StopField
               icon="home_pin"
               label={labelDireccion}
               hasError={errorDir}
               errorMessage="Ingresá el domicilio en Rosario para continuar."
             >
-              <input
-                id="input-domicilio-rosario"
-                type="text"
-                className="stop-address-input"
-                value={direccionRosario}
-                onChange={(e) => {
-                  setDireccionRosario(e.target.value);
-                  if (errorDir) setErrorDir(false);
-                }}
+              <MapaPicker
+                inputId="input-domicilio-rosario"
+                label={labelDireccion}
                 placeholder={placeholderDir}
-                autoComplete="street-address"
-                required
+                value={direccionRosario}
+                onChange={(result) => {
+                  handleDireccionChange(result);
+                }}
+                hasError={errorDir}
+                errorMessage="Ingresá el domicilio en Rosario para continuar."
               />
             </StopField>
           </div>

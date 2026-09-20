@@ -118,14 +118,12 @@ export class ChoferService {
         const lng = Number(p.longitud);
 
         if (!isNaN(lat) && !isNaN(lng)) {
-          // Parada fija con coordenadas → máxima precisión
           const key = `coords:${lat},${lng}`;
           if (!seen.has(key)) {
             seen.add(key);
             waypoints.push({ tipo: 'coords', label: p.nombre, lat, lng });
           }
         } else {
-          // Parada sin coords → fallback al nombre como dirección
           const key = `address:${p.nombre}`;
           if (!seen.has(key)) {
             seen.add(key);
@@ -133,14 +131,25 @@ export class ChoferService {
           }
         }
       } else if (pasaje.domicilioOrigen) {
-        const key = `address:${pasaje.domicilioOrigen.trim().toLowerCase()}`;
-        if (!seen.has(key)) {
-          seen.add(key);
-          waypoints.push({
-            tipo: 'address',
-            label: pasaje.domicilioOrigen,
-            address: pasaje.domicilioOrigen,
-          });
+        // Preferir coords del map picker (T-09) sobre el string de dirección
+        const lat = Number(pasaje.latOrigen);
+        const lng = Number(pasaje.lonOrigen);
+        if (!isNaN(lat) && !isNaN(lng) && pasaje.latOrigen != null) {
+          const key = `coords:${lat},${lng}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            waypoints.push({ tipo: 'coords', label: pasaje.domicilioOrigen, lat, lng });
+          }
+        } else {
+          const key = `address:${pasaje.domicilioOrigen.trim().toLowerCase()}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            waypoints.push({
+              tipo: 'address',
+              label: pasaje.domicilioOrigen,
+              address: pasaje.domicilioOrigen,
+            });
+          }
         }
       }
 
@@ -164,14 +173,25 @@ export class ChoferService {
           }
         }
       } else if (pasaje.domicilioDestino) {
-        const key = `address:${pasaje.domicilioDestino.trim().toLowerCase()}`;
-        if (!seen.has(key)) {
-          seen.add(key);
-          waypoints.push({
-            tipo: 'address',
-            label: pasaje.domicilioDestino,
-            address: pasaje.domicilioDestino,
-          });
+        // Preferir coords del map picker (T-09) sobre el string de dirección
+        const lat = Number(pasaje.latDestino);
+        const lng = Number(pasaje.lonDestino);
+        if (!isNaN(lat) && !isNaN(lng) && pasaje.latDestino != null) {
+          const key = `coords:${lat},${lng}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            waypoints.push({ tipo: 'coords', label: pasaje.domicilioDestino, lat, lng });
+          }
+        } else {
+          const key = `address:${pasaje.domicilioDestino.trim().toLowerCase()}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            waypoints.push({
+              tipo: 'address',
+              label: pasaje.domicilioDestino,
+              address: pasaje.domicilioDestino,
+            });
+          }
         }
       }
     }

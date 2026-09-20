@@ -1,0 +1,265 @@
+/* ── MapaPicker — T-09 ───────────────────────────────────────────────────── */
+
+.mapa-picker-root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.mapa-picker-root.has-error .mapa-picker-input-row {
+  border-color: var(--error);
+  background-color: var(--error-container);
+}
+
+/* ── Fila de input ────────────────────────────────────────────────────────── */
+
+.mapa-picker-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: none;
+  border-bottom: none;
+}
+
+.mapa-picker-search-icon {
+  font-size: 18px;
+  color: var(--outline);
+  flex-shrink: 0;
+}
+
+.mapa-picker-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-size: 0.975rem;
+  font-weight: 600;
+  color: var(--on-surface);
+  font-family: inherit;
+  outline: none;
+  padding: 0;
+  min-width: 0;
+}
+
+.mapa-picker-input::placeholder {
+  font-weight: 400;
+  color: var(--outline);
+  font-size: 0.875rem;
+}
+
+.mapa-picker-input:disabled {
+  color: var(--outline);
+  cursor: not-allowed;
+}
+
+/* Botón de toggle del mapa */
+.mapa-picker-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--surface-variant);
+  background: var(--surface-container-low);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.mapa-picker-toggle-btn:hover {
+  border-color: var(--secondary);
+  color: var(--secondary);
+  background: var(--surface-container);
+}
+
+.mapa-picker-toggle-btn.active {
+  background: var(--secondary);
+  color: var(--on-secondary);
+  border-color: var(--secondary);
+}
+
+/* ── Panel del mapa ───────────────────────────────────────────────────────── */
+
+.mapa-picker-panel {
+  margin-top: 0.6rem;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1.5px solid var(--secondary);
+  box-shadow: var(--shadow-md);
+  animation: mapa-slide-down 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes mapa-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scaleY(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+.mapa-picker-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.75rem;
+  background: linear-gradient(135deg, var(--surface-container-low) 0%, #ffffff 100%);
+  font-size: 0.73rem;
+  color: var(--on-surface-variant);
+  font-weight: 500;
+  border-bottom: 1px solid var(--surface-variant);
+}
+
+.mapa-picker-map {
+  width: 100%;
+  height: 260px;
+  background: var(--surface-container);
+}
+
+.mapa-picker-confirm-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: var(--secondary);
+  color: var(--on-secondary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.mapa-picker-confirm-btn:hover {
+  background: #005070;
+}
+
+/* ── Chip de ubicación seleccionada ──────────────────────────────────────── */
+
+.mapa-picker-selected-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  margin-top: 0.45rem;
+  background: var(--surface-container-low);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--surface-variant);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.mapa-picker-selected-text {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mapa-picker-clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--outline);
+  padding: 0;
+  flex-shrink: 0;
+  transition: color var(--transition-fast);
+}
+
+.mapa-picker-clear-btn:hover {
+  color: var(--error);
+}
+
+/* ── Error ────────────────────────────────────────────────────────────────── */
+
+.mapa-picker-error {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--on-error-container);
+  font-weight: 500;
+}
+
+/* ── Fallback (sin API Key) ───────────────────────────────────────────────── */
+
+.mapa-picker-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.mapa-picker-fallback.has-error .mapa-picker-input-plain {
+  border-color: var(--error);
+}
+
+.mapa-picker-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--on-surface-variant);
+}
+
+.mapa-picker-input-plain {
+  width: 100%;
+  background: transparent;
+  border: 1.5px solid var(--surface-variant);
+  border-radius: var(--radius-md);
+  font-size: 0.975rem;
+  font-weight: 600;
+  color: var(--on-surface);
+  font-family: inherit;
+  outline: none;
+  padding: 0.55rem 0.75rem;
+  transition: border-color var(--transition-fast);
+}
+
+.mapa-picker-input-plain:focus {
+  border-color: var(--secondary);
+}
+
+/* ── Estilos para el dropdown de Autocomplete de Google ──────────────────── */
+
+.pac-container {
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border: 1.5px solid var(--surface-variant) !important;
+  font-family: var(--font-family) !important;
+  margin-top: 4px;
+  z-index: 9999 !important;
+}
+
+.pac-item {
+  padding: 0.55rem 0.85rem !important;
+  font-size: 0.875rem !important;
+  cursor: pointer;
+  border-top: 1px solid var(--surface-container) !important;
+}
+
+.pac-item:hover,
+.pac-item-selected {
+  background: var(--surface-container-low) !important;
+}
+
+.pac-item-query {
+  font-weight: 700 !important;
+  color: var(--on-surface) !important;
+  font-size: 0.875rem !important;
+}
+
+.pac-matched {
+  color: var(--secondary) !important;
+}

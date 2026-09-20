@@ -16,8 +16,14 @@ export interface ReservarPasajeDto {
   monto: number;
   paradaOrigenId?: number;
   domicilioOrigen?: string;
+  /** Coordenadas del domicilio de origen seleccionadas con el map picker (T-09). */
+  latOrigen?: number;
+  lonOrigen?: number;
   paradaDestinoId?: number;
   domicilioDestino?: string;
+  /** Coordenadas del domicilio de destino seleccionadas con el map picker (T-09). */
+  latDestino?: number;
+  lonDestino?: number;
   codigoCupon?: string;
 }
 
@@ -160,8 +166,15 @@ export class PasajeService {
         viaje,
         paradaOrigen,
         domicilioOrigen: dto.domicilioOrigen ?? null,
+        // Coordenadas del domicilio de origen (map picker T-09; null si no vienen)
+        // MikroORM mapea decimal → string; convertimos number a string con suficiente precisión.
+        latOrigen: dto.latOrigen != null ? dto.latOrigen.toFixed(7) : null,
+        lonOrigen: dto.lonOrigen != null ? dto.lonOrigen.toFixed(7) : null,
         paradaDestino,
         domicilioDestino: dto.domicilioDestino ?? null,
+        // Coordenadas del domicilio de destino (map picker T-09; null si no vienen)
+        latDestino: dto.latDestino != null ? dto.latDestino.toFixed(7) : null,
+        lonDestino: dto.lonDestino != null ? dto.lonDestino.toFixed(7) : null,
         estado: EstadoPasaje.PENDIENTE_PAGO,
       });
       txEm.persist(pasaje);

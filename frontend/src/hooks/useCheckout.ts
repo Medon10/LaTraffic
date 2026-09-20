@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import type { SentidoViaje } from '../types/index.ts';
 import { validarCupon } from '../services/cupones.service.ts';
 import { ApiError } from '../shared/api.ts';
+import type { MapaPickerResult } from '../componentes/MapaPicker.tsx';
 
 // ── Tipos de estado del cupón ──────────────────────────────────────────────────
 
@@ -44,8 +45,28 @@ export function useCheckout() {
 
   const isSubmittingRef = useRef(false);
   const [direccionRosario, setDireccionRosario] = useState(direccionRosarioParam);
+  /** Coordenadas del domicilio seleccionado con el map picker (T-09). */
+  const [latDomicilio, setLatDomicilio] = useState<number | null>(null);
+  const [lonDomicilio, setLonDomicilio] = useState<number | null>(null);
   const [errorDir, setErrorDir] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  /**
+   * Handler unificado para el MapaPicker:
+   * actualiza la dirección en texto y las coordenadas.
+   * Si lat/lng son 0 (limpiado o fallback sin mapa), los trata como nulos.
+   */
+  const handleDireccionChange = (result: MapaPickerResult) => {
+    setDireccionRosario(result.direccion);
+    if (result.direccion && result.lat !== 0 && result.lng !== 0) {
+      setLatDomicilio(result.lat);
+      setLonDomicilio(result.lng);
+    } else {
+      setLatDomicilio(null);
+      setLonDomicilio(null);
+    }
+    if (errorDir) setErrorDir(false);
+  };
 
   // ── Estado del cupón (HU-22) ─────────────────────────────────────────────────
 
@@ -144,6 +165,9 @@ export function useCheckout() {
     // Form
     direccionRosario,
     setDireccionRosario,
+    latDomicilio,
+    lonDomicilio,
+    handleDireccionChange,
     errorDir,
     setErrorDir,
     loading,

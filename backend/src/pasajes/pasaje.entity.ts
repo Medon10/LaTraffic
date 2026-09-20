@@ -15,8 +15,14 @@ export const PasajeSchema = defineEntity({
     viaje: () => p.manyToOne(Viaje).index('idx_pasajes_viaje'),
     paradaOrigen: () => p.manyToOne(Parada).nullable(),
     domicilioOrigen: p.string().length(255).nullable(),
+    /** Coordenadas del domicilio de origen (T-09: map picker). Null si se usó parada fija. */
+    latOrigen: p.decimal().precision(10).scale(7).nullable(),
+    lonOrigen: p.decimal().precision(10).scale(7).nullable(),
     paradaDestino: () => p.manyToOne(Parada).nullable(),
     domicilioDestino: p.string().length(255).nullable(),
+    /** Coordenadas del domicilio de destino (T-09: map picker). Null si se usó parada fija. */
+    latDestino: p.decimal().precision(10).scale(7).nullable(),
+    lonDestino: p.decimal().precision(10).scale(7).nullable(),
     estado: p.enum(() => EstadoPasaje).default(EstadoPasaje.PENDIENTE_PAGO),
     documentoVerificado: p.boolean().nullable(),
     fechaReserva: p.datetime().onCreate(() => new Date()).defaultRaw('now()'),
@@ -37,3 +43,4 @@ export const PasajeSchema = defineEntity({
 
 export class Pasaje extends PasajeSchema.class {}
 PasajeSchema.setClass(Pasaje);
+
