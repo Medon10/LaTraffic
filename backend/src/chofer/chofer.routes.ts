@@ -17,8 +17,14 @@ router.use(verificarToken, autorizar(Rol.CHOFER));
  */
 router.get('/viajes/:id/ruta', (req, res, next) => controller.getRuta(req, res, next));
 
-// Rutas pendientes de implementación (HU-12, HU-13, HU-14):
-// GET   /chofer/viajes/:id/pasajeros
+/**
+ * GET /chofer/viajes/:id/pasajeros  (HU-12)
+ * Lista los pasajeros confirmados con origen/destino.
+ * No expone email, método de pago ni datos financieros.
+ */
+router.get('/viajes/:id/pasajeros', (req, res, next) => controller.getPasajeros(req, res, next));
+
+// Rutas pendientes de implementación (HU-13, HU-14):
 // PATCH /chofer/pasajes/:id/documento
 
 export { router as choferRoutes };

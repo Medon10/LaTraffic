@@ -30,6 +30,28 @@ export interface RutaViajeResult {
   mensaje?: string;
 }
 
+// ── HU-12: Lista de pasajeros del viaje para el chofer ──────────────────────
+
+export interface PasajeroChofer {
+  pasajeId: number;
+  nombre: string;
+  apellido: string;
+  /** Parada fija o domicilio de origen. */
+  origen: string;
+  /** Parada fija o domicilio de destino. */
+  destino: string;
+  /** Solo se expone si el pasajero pagó en efectivo (sin datos de tarjeta/MP). */
+  estadoPasaje: string;
+}
+
+export interface PasajerosViajeResult {
+  viajeId: number;
+  fecha: string;
+  sentido: string;
+  totalConfirmados: number;
+  pasajeros: PasajeroChofer[];
+}
+
 /**
  * ChoferService — T-08 (diseno-arquitectura.md §9)
  *
@@ -217,6 +239,70 @@ export class ChoferService {
         address: p.address,
       })),
       ruta,
+    };
+  }
+
+  /**
+   * HU-12 — Lista de pasajeros confirmados de un viaje.
+   *
+   * Retorna nombre, apellido, origen y destino de cada pasajero.
+   * NO expone: email, método de pago, hash de contraseña ni ningún
+   * otro dato sensible del usuario o de su transacción.
+   *
+   * @param viajeId - ID del viaje a consultar.
+   */
+  async obtenerPasajeros(viajeId: number): Promise<PasajerosViajeResult> {
+    const em = this.getEm();
+
+    const viaje = await em.findOne(
+      Viaje,
+      { id: viajeId },
+      {
+        populate: [
+          'horario',
+          'pasajes',
+          'pasajes.usuario',
+          'pasajes.paradaOrigen',
+          'pasajes.paradaDestino',
+        ],
+      }
+    );
+
+    if (!viaje) {
+      throw new HttpError(404, 'Viaje no encontrado');
+    }
+
+    const pasajesConfirmados = viaje.pasajes
+      .getItems()
+      .filter((p) => p.estado === EstadoPasaje.CONFIRMADA);
+
+    const pasajeros: PasajeroChofer[] = pasajesConfirmados.map((pasaje) => {
+      // Determinar label de origen
+      const origen = pasaje.paradaOrigen
+        ? pasaje.paradaOrigen.nombre
+        : (pasaje.domicilioOrigen ?? 'Sin especificar');
+
+      // Determinar label de destino
+      const destino = pasaje.paradaDestino
+        ? pasaje.paradaDestino.nombre
+        : (pasaje.domicilioDestino ?? 'Sin especificar');
+
+      return {
+        pasajeId: pasaje.id,
+        nombre: pasaje.usuario.nombre,
+        apellido: pasaje.usuario.apellido,
+        origen,
+        destino,
+        estadoPasaje: pasaje.estado,
+      };
+    });
+
+    return {
+      viajeId,
+      fecha: viaje.fecha,
+      sentido: viaje.horario.sentido,
+      totalConfirmados: pasajeros.length,
+      pasajeros,
     };
   }
 }

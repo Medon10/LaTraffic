@@ -26,4 +26,26 @@ export class ChoferController {
       next(err);
     }
   }
+
+  /**
+   * GET /chofer/viajes/:id/pasajeros  (HU-12)
+   *
+   * Lista los pasajeros confirmados del viaje con su punto de origen/parada
+   * y destino. NO expone email, método de pago ni datos financieros.
+   */
+  async getPasajeros(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const viajeId = parseInt(req.params['id'] as string, 10);
+      if (isNaN(viajeId) || viajeId <= 0) {
+        res.status(400).json({ error: true, message: 'El ID del viaje debe ser un número entero positivo.' });
+        return;
+      }
+
+      const resultado = await choferService.obtenerPasajeros(viajeId);
+
+      res.status(200).json({ error: false, data: resultado });
+    } catch (err) {
+      next(err);
+    }
+  }
 }

@@ -8,6 +8,7 @@ import { RecuperarPasswordPage } from './pages/RecuperarPassword/recuperarPasswo
 import { SeleccionViajePage } from './pages/SeleccionViaje/seleccionViaje';
 import { CheckoutPage } from './pages/Checkout/checkout';
 import { MisReservasPage } from './pages/MisReservas/misReservas';
+import { PanelChoferPage } from './pages/PanelChofer/panelChofer';
 
 const NotFoundPage: React.FC = () => (
   <div className="page-container text-center">
@@ -32,6 +33,8 @@ export const App: React.FC = () => {
           <Route path="/seleccion-viaje" element={<SeleccionViajePage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/mis-reservas" element={<MisReservasPage />} />
+          {/* Panel del chofer (HU-12) */}
+          <Route path="/chofer/pasajeros" element={<PanelChoferPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

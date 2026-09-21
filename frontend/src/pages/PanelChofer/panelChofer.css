@@ -1,0 +1,347 @@
+/* ── Panel Chofer — HU-12 ────────────────────────────────────────────────── */
+
+.panel-chofer {
+  gap: 1.5rem;
+}
+
+/* Header ─────────────────────────────────────────────────────────────────── */
+
+.chofer-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.chofer-header .badge {
+  background: linear-gradient(135deg, #00658d22 0%, #41befd22 100%);
+  color: var(--secondary);
+  border: 1px solid rgba(0, 101, 141, 0.18);
+}
+
+/* Form ───────────────────────────────────────────────────────────────────── */
+
+.chofer-form {
+  gap: 0.85rem;
+}
+
+.chofer-form__label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+
+.chofer-form__label .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--secondary);
+}
+
+.chofer-form__row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.chofer-form__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.65rem 1rem;
+  border: 1.5px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  font-family: var(--font-family);
+  font-size: 1rem;
+  color: var(--on-surface);
+  background-color: var(--surface-container-lowest);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  -moz-appearance: textfield;
+}
+
+.chofer-form__input::-webkit-outer-spin-button,
+.chofer-form__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.chofer-form__input:focus {
+  outline: none;
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(0, 101, 141, 0.12);
+}
+
+.chofer-form__input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Spinner ─────────────────────────────────────────────────────────────────── */
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Alert ──────────────────────────────────────────────────────────────────── */
+
+.chofer-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.chofer-alert--error {
+  background-color: var(--error-container);
+  color: var(--on-error-container);
+}
+
+.chofer-alert .material-symbols-outlined {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+/* Resultado ──────────────────────────────────────────────────────────────── */
+
+.chofer-resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Resumen ─────────────────────────────────────────────────────────────────── */
+
+.chofer-resumen {
+  background: linear-gradient(135deg, #031635 0%, #0a2a55 100%);
+  border: none;
+  color: #fff;
+}
+
+.chofer-resumen__grid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.chofer-resumen__item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 120px;
+}
+
+.chofer-resumen__item > .material-symbols-outlined {
+  font-size: 22px;
+  opacity: 0.7;
+  color: var(--secondary-fixed-dim);
+  flex-shrink: 0;
+}
+
+.chofer-resumen__item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.chofer-resumen__label {
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+
+.chofer-resumen__value {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.chofer-resumen__value--highlight {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--secondary-container);
+}
+
+/* Lista de pasajeros ────────────────────────────────────────────────────── */
+
+.chofer-lista {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+}
+
+/* Tarjeta de cada pasajero ─────────────────────────────────────────────── */
+
+.chofer-pasajero {
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.chofer-pasajero:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Header del pasajero: número + nombre + estado */
+.chofer-pasajero__header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.chofer-pasajero__num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00658d 0%, #41befd 100%);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.chofer-pasajero__header > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.chofer-pasajero__nombre {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Badges de estado */
+.chofer-pasajero__estado {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.18rem 0.55rem;
+  border-radius: var(--radius-full);
+}
+
+.estado-confirmada {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.estado-completada {
+  background-color: var(--surface-container-high);
+  color: var(--on-surface-variant);
+}
+
+.estado-no-show {
+  background-color: var(--error-container);
+  color: var(--on-error-container);
+}
+
+.estado-otro {
+  background-color: var(--surface-container);
+  color: var(--on-surface-variant);
+}
+
+/* Ruta: origen → destino ─────────────────────────────────────────────────── */
+
+.chofer-pasajero__ruta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding-left: 0.2rem;
+}
+
+.chofer-pasajero__punto {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.chofer-pasajero__punto .material-symbols-outlined {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.chofer-pasajero__punto--origen .material-symbols-outlined {
+  color: var(--secondary);
+}
+
+.chofer-pasajero__punto--destino .material-symbols-outlined {
+  color: #e55c00;
+}
+
+.chofer-pasajero__punto > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.chofer-pasajero__punto-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--on-surface-variant);
+  opacity: 0.75;
+}
+
+.chofer-pasajero__punto-valor {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+
+.chofer-pasajero__linea {
+  margin-left: 9px;
+  width: 1px;
+  height: 12px;
+  background: linear-gradient(to bottom, var(--secondary), #e55c00);
+  opacity: 0.35;
+}
+
+/* Empty state ─────────────────────────────────────────────────────────────── */
+
+.chofer-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--on-surface-variant);
+}
+
+.chofer-empty__icon {
+  font-size: 48px;
+  opacity: 0.35;
+}
+
+.chofer-empty p {
+  font-size: 0.95rem;
+}
