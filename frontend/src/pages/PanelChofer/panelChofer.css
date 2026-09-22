@@ -1,4 +1,4 @@
-/* ── Panel Chofer — HU-12 ────────────────────────────────────────────────── */
+/* ── Panel Chofer — HU-12 / HU-13 ───────────────────────────────────────── */
 
 .panel-chofer {
   gap: 1.5rem;
@@ -55,7 +55,7 @@
   color: var(--on-surface);
   background-color: var(--surface-container-lowest);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-  -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .chofer-form__input::-webkit-outer-spin-button,
@@ -92,7 +92,7 @@
   to { transform: rotate(360deg); }
 }
 
-/* Alert ──────────────────────────────────────────────────────────────────── */
+/* Alerts ─────────────────────────────────────────────────────────────────── */
 
 .chofer-alert {
   display: flex;
@@ -109,21 +109,89 @@
   color: var(--on-error-container);
 }
 
+.chofer-alert--info {
+  background-color: var(--surface-container);
+  color: var(--on-surface-variant);
+  border: 1px solid var(--outline-variant);
+}
+
 .chofer-alert .material-symbols-outlined {
   font-size: 20px;
   flex-shrink: 0;
 }
 
-/* Resultado ──────────────────────────────────────────────────────────────── */
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
 
-.chofer-resultado {
+.chofer-tabs {
   display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  animation: fadeIn 0.3s ease;
+  gap: 0.5rem;
+  background-color: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 0.3rem;
 }
 
-/* Resumen ─────────────────────────────────────────────────────────────────── */
+.chofer-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.chofer-tab .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.chofer-tab:hover:not(.chofer-tab--active) {
+  background-color: var(--surface-container);
+  color: var(--on-surface);
+}
+
+.chofer-tab--active {
+  background-color: var(--surface-container-lowest);
+  color: var(--secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.chofer-tab__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  background: linear-gradient(135deg, #00658d 0%, #41befd 100%);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+}
+
+/* Tab panels */
+.chofer-panel {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+  animation: fadeIn 0.22s ease;
+}
+
+.chofer-panel--visible {
+  display: flex;
+}
+
+/* ── Resumen del viaje ───────────────────────────────────────────────────── */
 
 .chofer-resumen {
   background: linear-gradient(135deg, #031635 0%, #0a2a55 100%);
@@ -142,7 +210,7 @@
   align-items: center;
   gap: 0.6rem;
   flex: 1;
-  min-width: 120px;
+  min-width: 110px;
 }
 
 .chofer-resumen__item > .material-symbols-outlined {
@@ -172,12 +240,170 @@
 }
 
 .chofer-resumen__value--highlight {
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--secondary-container);
 }
 
-/* Lista de pasajeros ────────────────────────────────────────────────────── */
+/* ── Botón Google Maps ───────────────────────────────────────────────────── */
+
+.btn-maps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+  color: #fff;
+  box-shadow: 0 3px 12px rgba(26, 115, 232, 0.35);
+  transition: all var(--transition-fast);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-maps:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(26, 115, 232, 0.45);
+}
+
+.btn-maps .material-symbols-outlined {
+  font-size: 20px;
+}
+
+/* ── Timeline de ruta ────────────────────────────────────────────────────── */
+
+.ruta-timeline {
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem 0;
+  position: relative;
+}
+
+/* Nodos extremos (origen / destino) */
+.ruta-timeline__extremo {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.15rem 0;
+}
+
+/* Paradas intermedias */
+.ruta-timeline__parada {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  position: relative;
+  padding: 0.15rem 0;
+}
+
+/* Línea vertical entre nodos */
+.ruta-timeline__conector {
+  position: relative;
+  left: 10px;
+  width: 2px;
+  height: 28px;
+  background: linear-gradient(to bottom, var(--secondary), #e55c00);
+  opacity: 0.3;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-left: -0.85rem + 10px;
+}
+
+/* Dots */
+.ruta-timeline__dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2.5px solid transparent;
+}
+
+.ruta-timeline__dot--origen {
+  background: var(--secondary);
+  border-color: rgba(0, 101, 141, 0.3);
+  box-shadow: 0 0 0 4px rgba(0, 101, 141, 0.12);
+}
+
+.ruta-timeline__dot--parada {
+  background: #fff;
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(0, 101, 141, 0.1);
+}
+
+.ruta-timeline__dot--destino {
+  background: #e55c00;
+  border-color: rgba(229, 92, 0, 0.3);
+  box-shadow: 0 0 0 4px rgba(229, 92, 0, 0.12);
+}
+
+/* Info de cada nodo */
+.ruta-timeline__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  padding-bottom: 0.35rem;
+}
+
+.ruta-timeline__etiqueta {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--on-surface-variant);
+  opacity: 0.7;
+}
+
+.ruta-timeline__nombre {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.ruta-timeline__coords,
+.ruta-timeline__address {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--on-surface-variant);
+  margin-top: 0.1rem;
+}
+
+.ruta-timeline__coords {
+  color: var(--secondary);
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+.ruta-timeline__coords:hover {
+  opacity: 0.75;
+  text-decoration: underline;
+}
+
+.ruta-timeline__coords .material-symbols-outlined,
+.ruta-timeline__address .material-symbols-outlined {
+  font-size: 14px;
+}
+
+/* Encapsular toda la timeline en un card */
+.ruta-timeline {
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--surface-variant);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem 1.25rem 0.75rem;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Lista de pasajeros ──────────────────────────────────────────────────── */
 
 .chofer-lista {
   list-style: none;
@@ -188,8 +414,7 @@
   margin: 0;
 }
 
-/* Tarjeta de cada pasajero ─────────────────────────────────────────────── */
-
+/* Tarjeta de cada pasajero */
 .chofer-pasajero {
   gap: 1rem;
   padding: 1rem 1.25rem;
@@ -201,7 +426,6 @@
   box-shadow: var(--shadow-md);
 }
 
-/* Header del pasajero: número + nombre + estado */
 .chofer-pasajero__header {
   display: flex;
   align-items: center;
@@ -237,7 +461,6 @@
   color: var(--primary);
 }
 
-/* Badges de estado */
 .chofer-pasajero__estado {
   font-size: 0.7rem;
   font-weight: 600;
@@ -247,28 +470,12 @@
   border-radius: var(--radius-full);
 }
 
-.estado-confirmada {
-  background-color: #dcfce7;
-  color: #15803d;
-}
+.estado-confirmada { background-color: #dcfce7; color: #15803d; }
+.estado-completada { background-color: var(--surface-container-high); color: var(--on-surface-variant); }
+.estado-no-show    { background-color: var(--error-container); color: var(--on-error-container); }
+.estado-otro       { background-color: var(--surface-container); color: var(--on-surface-variant); }
 
-.estado-completada {
-  background-color: var(--surface-container-high);
-  color: var(--on-surface-variant);
-}
-
-.estado-no-show {
-  background-color: var(--error-container);
-  color: var(--on-error-container);
-}
-
-.estado-otro {
-  background-color: var(--surface-container);
-  color: var(--on-surface-variant);
-}
-
-/* Ruta: origen → destino ─────────────────────────────────────────────────── */
-
+/* Ruta origen → destino del pasajero */
 .chofer-pasajero__ruta {
   display: flex;
   flex-direction: column;
@@ -288,13 +495,8 @@
   margin-top: 2px;
 }
 
-.chofer-pasajero__punto--origen .material-symbols-outlined {
-  color: var(--secondary);
-}
-
-.chofer-pasajero__punto--destino .material-symbols-outlined {
-  color: #e55c00;
-}
+.chofer-pasajero__punto--origen .material-symbols-outlined { color: var(--secondary); }
+.chofer-pasajero__punto--destino .material-symbols-outlined { color: #e55c00; }
 
 .chofer-pasajero__punto > div {
   display: flex;
@@ -325,7 +527,7 @@
   opacity: 0.35;
 }
 
-/* Empty state ─────────────────────────────────────────────────────────────── */
+/* ── Empty state ─────────────────────────────────────────────────────────── */
 
 .chofer-empty {
   display: flex;
@@ -344,4 +546,11 @@
 
 .chofer-empty p {
   font-size: 0.95rem;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
