@@ -9,6 +9,7 @@ import { SeleccionViajePage } from './pages/SeleccionViaje/seleccionViaje';
 import { CheckoutPage } from './pages/Checkout/checkout';
 import { MisReservasPage } from './pages/MisReservas/misReservas';
 import { PanelChoferPage } from './pages/PanelChofer/panelChofer';
+import { PanelAdminPage } from './pages/PanelAdmin/panelAdmin';
 
 const NotFoundPage: React.FC = () => (
   <div className="page-container text-center">
@@ -35,6 +36,8 @@ export const App: React.FC = () => {
           <Route path="/mis-reservas" element={<MisReservasPage />} />
           {/* Panel del chofer (HU-12) */}
           <Route path="/chofer/pasajeros" element={<PanelChoferPage />} />
+          {/* Panel del administrador (HU-15) */}
+          <Route path="/admin/pagos" element={<PanelAdminPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
