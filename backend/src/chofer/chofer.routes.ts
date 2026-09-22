@@ -24,7 +24,11 @@ router.get('/viajes/:id/ruta', (req, res, next) => controller.getRuta(req, res, 
  */
 router.get('/viajes/:id/pasajeros', (req, res, next) => controller.getPasajeros(req, res, next));
 
-// Rutas pendientes de implementación (HU-13, HU-14):
-// PATCH /chofer/pasajes/:id/documento
+/**
+ * PATCH /chofer/pasajes/:id/documento  (HU-14, RF-17)
+ * Marca documento_verificado = false en el pasaje indicado.
+ * Sin payload requerido ni lógica automática adicional.
+ */
+router.patch('/pasajes/:id/documento', (req, res, next) => controller.patchDocumento(req, res, next));
 
 export { router as choferRoutes };

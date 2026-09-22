@@ -1,5 +1,6 @@
 import { EntityManager, RequestContext } from '@mikro-orm/core';
 import { Viaje } from '../viajes/viaje.entity.js';
+import { Pasaje } from '../pasajes/pasaje.entity.js';
 import { EstadoPasaje } from '../shared/types/index.js';
 import { HttpError } from '../shared/middleware/error-handler.middleware.js';
 import {
@@ -304,5 +305,31 @@ export class ChoferService {
       totalConfirmados: pasajeros.length,
       pasajeros,
     };
+  }
+
+  /**
+   * HU-14 — Marca documento_verificado = false en un pasaje (RF-17).
+   *
+   * El chofer puede registrar que el documento del pasajero no pudo ser
+   * verificado durante el abordaje. No dispara ninguna lógica automática;
+   * solo persiste la excepción para que el administrador la consulte.
+   *
+   * @param pasajeId - ID del pasaje a actualizar.
+   */
+  async marcarDocumentoNoVerificado(
+    pasajeId: number
+  ): Promise<{ pasajeId: number; documentoVerificado: false }> {
+    const em = this.getEm();
+
+    const pasaje = await em.findOne(Pasaje, { id: pasajeId });
+
+    if (!pasaje) {
+      throw new HttpError(404, 'Pasaje no encontrado');
+    }
+
+    pasaje.documentoVerificado = false;
+    await em.flush();
+
+    return { pasajeId: pasaje.id, documentoVerificado: false };
   }
 }

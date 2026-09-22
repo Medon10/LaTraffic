@@ -48,4 +48,27 @@ export class ChoferController {
       next(err);
     }
   }
+
+  /**
+   * PATCH /chofer/pasajes/:id/documento  (HU-14, RF-17)
+   *
+   * Marca documento_verificado = false en el pasaje indicado.
+   * No dispara ninguna lógica automática; solo registra la excepción
+   * para que el administrador pueda consultarla.
+   */
+  async patchDocumento(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const pasajeId = parseInt(req.params['id'] as string, 10);
+      if (isNaN(pasajeId) || pasajeId <= 0) {
+        res.status(400).json({ error: true, message: 'El ID del pasaje debe ser un número entero positivo.' });
+        return;
+      }
+
+      const resultado = await choferService.marcarDocumentoNoVerificado(pasajeId);
+
+      res.status(200).json({ error: false, data: resultado });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
