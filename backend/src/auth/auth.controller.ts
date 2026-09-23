@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
+import { EntityManager } from '@mikro-orm/core';
+import { RequestContext } from '@mikro-orm/core';
 import { AuthService } from './auth.service.js';
 import { AuthRequest } from '../shared/types/index.js';
-import { RegistroDto, LoginDto } from './auth.schema.js';
+import { RegistroDto, LoginDto, RecuperarPasswordDto, ResetPasswordDto } from './auth.schema.js';
 
 const COOKIE_NAME = 'token';
 const COOKIE_MAX_AGE = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
@@ -89,6 +91,37 @@ export class AuthController {
     res.status(200).json({
       error: false,
       usuario: perfil,
+    });
+  };
+
+  /**
+   * POST /auth/recuperar-password
+   * Genera un token de un solo uso y lo envía por email al pasajero (HU-03).
+   * Siempre responde 200 aunque el email no exista, por seguridad.
+   */
+  recuperarPassword = async (req: Request, res: Response): Promise<void> => {
+    const datos: RecuperarPasswordDto = req.body;
+    const em = RequestContext.getEntityManager() as EntityManager;
+    await this.authService.recuperarPassword(datos, em);
+
+    res.status(200).json({
+      error: false,
+      message: 'Si el email existe en el sistema, recibirás un enlace de recuperación en los próximos minutos.',
+    });
+  };
+
+  /**
+   * POST /auth/reset-password
+   * Valida el token y actualiza la contraseña del usuario (HU-03).
+   */
+  resetPassword = async (req: Request, res: Response): Promise<void> => {
+    const datos: ResetPasswordDto = req.body;
+    const em = RequestContext.getEntityManager() as EntityManager;
+    await this.authService.resetPassword(datos, em);
+
+    res.status(200).json({
+      error: false,
+      message: 'Contraseña actualizada exitosamente. Ya podés iniciar sesión con tu nueva contraseña.',
     });
   };
 }

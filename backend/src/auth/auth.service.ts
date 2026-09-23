@@ -1,14 +1,23 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import { EntityManager } from '@mikro-orm/core';
 import { UsuarioRepository } from '../usuarios/usuario.repository.js';
 import { Usuario } from '../usuarios/usuario.entity.js';
+import { PasswordResetToken } from './password-reset-token.entity.js';
 import { Rol, UsuarioResponse } from '../shared/types/index.js';
 import { HttpError } from '../shared/middleware/error-handler.middleware.js';
-import { RegistroDto, LoginDto } from './auth.schema.js';
+import { RegistroDto, LoginDto, RecuperarPasswordDto, ResetPasswordDto } from './auth.schema.js';
+import { EmailService } from './email.service.js';
 
 const TOKEN_SECRET = process.env.TOKEN_SECRET!;
 const TOKEN_EXPIRES_IN = process.env.TOKEN_EXPIRES_IN || '24h';
 const BCRYPT_SALT_ROUNDS = 10;
+const PASSWORD_RESET_EXPIRES_MINUTES = parseInt(
+  process.env.PASSWORD_RESET_EXPIRES_MINUTES || '60',
+  10
+);
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 export interface AuthResult {
   usuario: UsuarioResponse;
@@ -17,7 +26,8 @@ export interface AuthResult {
 
 export class AuthService {
   constructor(
-    private readonly usuarioRepo: UsuarioRepository = new UsuarioRepository()
+    private readonly usuarioRepo: UsuarioRepository = new UsuarioRepository(),
+    private readonly emailService: EmailService = new EmailService()
   ) {}
 
   /**
@@ -134,6 +144,82 @@ export class AuthService {
       TOKEN_SECRET,
       { expiresIn: TOKEN_EXPIRES_IN as any }
     );
+  }
+
+  /**
+   * Solicita la recuperación de contraseña (HU-03).
+   *
+   * Seguridad: siempre responde 200 aunque el email no exista,
+   * para no revelar si una cuenta está registrada en el sistema.
+   */
+  async recuperarPassword(datos: RecuperarPasswordDto, em: EntityManager): Promise<void> {
+    const usuario = await this.usuarioRepo.findByEmail(datos.email);
+
+    // Si el usuario no existe, salimos silenciosamente (no revelamos si el email existe)
+    if (!usuario) {
+      return;
+    }
+
+    // 1. Generar token criptográfico aleatorio de 32 bytes (64 caracteres hex)
+    const tokenCrudo = crypto.randomBytes(32).toString('hex');
+
+    // 2. Hashear el token con SHA-256 antes de guardarlo en BD
+    const tokenHash = crypto.createHash('sha256').update(tokenCrudo).digest('hex');
+
+    // 3. Calcular fecha de expiración
+    const fechaExpiracion = new Date(
+      Date.now() + PASSWORD_RESET_EXPIRES_MINUTES * 60 * 1000
+    );
+
+    // 4. Invalida tokens anteriores del mismo usuario (evitar acumulación)
+    await em.nativeUpdate(
+      PasswordResetToken,
+      { usuario: usuario.id, usado: false },
+      { usado: true }
+    );
+
+    // 5. Persistir el nuevo token hasheado
+    const resetToken = em.create(PasswordResetToken, {
+      tokenHash,
+      usuario,
+      fechaExpiracion,
+      usado: false,
+    });
+    em.persist(resetToken);
+    await em.flush();
+
+    // 6. Construir el link y enviar email (o imprimirlo en consola en modo dev)
+    const resetLink = `${FRONTEND_URL}/reset-password?token=${tokenCrudo}`;
+    await this.emailService.enviarRecuperacionPassword(usuario.email, resetLink);
+  }
+
+  /**
+   * Resetea la contraseña usando el token de un solo uso (HU-03).
+   */
+  async resetPassword(datos: ResetPasswordDto, em: EntityManager): Promise<void> {
+    // 1. Hashear el token recibido para comparar contra lo que hay en BD
+    const tokenHash = crypto.createHash('sha256').update(datos.token).digest('hex');
+
+    // 2. Buscar el token: debe existir, no estar usado y no haber expirado
+    const ahora = new Date();
+    const resetToken = await em.findOne(
+      PasswordResetToken,
+      { tokenHash, usado: false },
+      { populate: ['usuario'] }
+    );
+
+    if (!resetToken || resetToken.fechaExpiracion <= ahora) {
+      throw new HttpError(400, 'El token de recuperación es inválido o ya expiró');
+    }
+
+    // 3. Actualizar la contraseña del usuario
+    const nuevoHash = await bcrypt.hash(datos.nuevaPassword, BCRYPT_SALT_ROUNDS);
+    resetToken.usuario.passwordHash = nuevoHash;
+
+    // 4. Marcar el token como usado (un solo uso)
+    resetToken.usado = true;
+
+    await em.flush();
   }
 
   /**

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { AuthController } from './auth.controller.js';
-import { registroSchema, loginSchema } from './auth.schema.js';
+import { registroSchema, loginSchema, recuperarPasswordSchema, resetPasswordSchema } from './auth.schema.js';
 import { validate } from '../shared/middleware/validate.middleware.js';
 import { verificarToken } from '../shared/middleware/auth.middleware.js';
 import { asyncHandler } from '../shared/utils/index.js';
@@ -49,6 +49,29 @@ router.get(
   '/me',
   verificarToken,
   asyncHandler(authController.me)
+);
+
+/**
+ * POST /auth/recuperar-password
+ * Solicitud de recuperación de contraseña (HU-03).
+ * Público. Genera token de un solo uso y lo envía por email.
+ * Siempre responde 200 para no revelar si el email existe.
+ */
+router.post(
+  '/recuperar-password',
+  validate(recuperarPasswordSchema),
+  asyncHandler(authController.recuperarPassword)
+);
+
+/**
+ * POST /auth/reset-password
+ * Resetear la contraseña con el token recibido (HU-03).
+ * Público. Valida el token, actualiza el hash y lo invalida.
+ */
+router.post(
+  '/reset-password',
+  validate(resetPasswordSchema),
+  asyncHandler(authController.resetPassword)
 );
 
 export { router as authRoutes };

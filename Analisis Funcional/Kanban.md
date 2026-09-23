@@ -52,17 +52,17 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 
 | ID | Tarjeta | Tipo |
 |---|---|---|
-| T-08 | Integrar Google Maps API | Técnica |
-| HU-12 | Ver pasajeros del día (chofer) | HU |
-| HU-13 | Ver ruta óptima del día (chofer) | HU |
-| HU-14 | Marcar documento no verificado (chofer) | HU |
+| T-08 | ✓ Integrar Google Maps API — **implementado** (Directions API con waypoint optimization, `GOOGLE_MAPS_API_KEY`, fallback 503 sin key) | Técnica |
+| HU-12 | ✓ Ver pasajeros del día (chofer) — **implementado** (`GET /chofer/viajes/:id/pasajeros`, filtra confirmados y efectivo) | HU |
+| HU-13 | ✓ Ver ruta óptima del día (chofer) — **implementado** (`GET /chofer/viajes/:id/ruta`, ruta optimizada + maps_url) | HU |
+| HU-14 | ✓ Marcar documento no verificado (chofer) — **implementado** (`PATCH /chofer/pasajes/:id/documento`, marca informativa) | HU |
 | HU-15 | ✓ Validar comprobantes de transferencia (administrador) — **implementado** (GET /admin/pagos/pendientes y PATCH /admin/pagos/:id/validar) | HU |
 
 ## Etapa 3 — Gestión y pulido
 
 | ID | Tarjeta | Tipo |
 |---|---|---|
-| HU-03 | Recuperar contraseña | HU |
+| HU-03 | ✓ Recuperar contraseña — **implementado** (token SHA-256, tabla `password_reset_tokens`, modo consola + nodemailer SMTP) | HU |
 | HU-11 | Ver historial de viajes | HU |
 | HU-16 | Marcado automático de moroso | HU |
 | HU-17 | Reactivar a un pasajero moroso | HU |

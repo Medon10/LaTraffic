@@ -16,12 +16,12 @@ T-06,Integrar Mercado Pago (modo sandbox),Tecnica,Etapa 1 - Fundacional,Alta,dis
 HU-08,Pagar con Mercado Pago,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-08;RF-12,Completado
 HU-09,Pagar por transferencia,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-09;RF-10,Completado
 HU-10,Pagar en efectivo,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-11;RN-05,Completado
-T-08,Integrar Google Maps API,Tecnica,Etapa 2 - Operar el primer viaje,Alta,diseno-arquitectura,Por hacer
-HU-12,Ver pasajeros del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,RF-15,Por hacer
-HU-13,Ver ruta optima del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,RF-16,Por hacer
-HU-14,Marcar documento no verificado (chofer),HU,Etapa 2 - Operar el primer viaje,Media,RF-17,Por hacer
+T-08,Integrar Google Maps API,Tecnica,Etapa 2 - Operar el primer viaje,Alta,diseno-arquitectura,Completado
+HU-12,Ver pasajeros del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,RF-15,Completado
+HU-13,Ver ruta optima del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,RF-16,Completado
+HU-14,Marcar documento no verificado (chofer),HU,Etapa 2 - Operar el primer viaje,Media,RF-17,Completado
 HU-15,Validar comprobantes de transferencia (administrador),HU,Etapa 2 - Operar el primer viaje,Alta,RF-21;RN-06,Completado
-HU-03,Recuperar contrasena,HU,Etapa 3 - Gestion y pulido,Media,RF-25,Por hacer
+HU-03,Recuperar contrasena,HU,Etapa 3 - Gestion y pulido,Media,RF-25,Completado
 HU-11,Ver historial de viajes,HU,Etapa 3 - Gestion y pulido,Media,RF-13,Por hacer
 HU-16,Marcado automatico de moroso,HU,Etapa 3 - Gestion y pulido,Media,RF-19;RN-05,Por hacer
 HU-17,Reactivar a un pasajero moroso,HU,Etapa 3 - Gestion y pulido,Media,RF-20,Por hacer

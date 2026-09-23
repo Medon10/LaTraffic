@@ -29,3 +29,41 @@ Esto asegura que:
 2. Si el usuario moroso selecciona Mercado Pago o transferencia bancaria, la validación no bloquea y puede operar con normalidad.
 3. Al reservar en efectivo, el cupo se incrementa de inmediato (`viaje.cuposOcupados += 1`) dentro del lock `FOR UPDATE` y `fechaExpiracionHold` queda en `null`. No caduca por el mecanismo lazy de holds.
 
+## 2026-09-18 al 2026-09-23: T-08/T-09 — Integración Google Maps (RF-16, HU-13)
+**Contexto**: El chofer necesita ver la ruta óptima del día con el orden de paradas calculado automáticamente (RF-16, HU-13).
+
+**Decisión**:
+1. El servicio `GoogleMapsService` en `src/chofer/googlemaps.service.ts` encapsula las llamadas a la Directions API con `optimize_waypoints=true`.
+2. Si `GOOGLE_MAPS_API_KEY` no está configurada, el endpoint `GET /chofer/viajes/:id/ruta` devuelve HTTP 503 con mensaje claro en vez de crashear.
+3. Los domicilios de Rosario (texto libre) se envían como `address` a la API de Maps; las paradas fijas de ruta (pueblos intermedios) se envían con sus coordenadas (`lat`/`lng`) si están cargadas en la tabla `paradas`.
+4. El endpoint devuelve tanto el `maps_url` (link para abrir en Google Maps del celular) como el orden optimizado de paradas con sus posiciones.
+
+## 2026-09-19 al 2026-09-23: HU-12, HU-14 — Ver pasajeros del día y marcar documento no verificado (Chofer)
+**Contexto**: El chofer necesita ver quiénes viajan ese día y poder marcar excepciones de verificación de DNI (HU-12, HU-14).
+
+**Decisión**:
+1. `GET /chofer/viajes/:id/pasajeros` devuelve solo información operativa: nombre, apellido, origen, destino y estado del pasaje. No expone datos de pagos ni estadísticas (RNF-02).
+2. El endpoint solo muestra pasajes en estado `confirmada` o `pendiente_pago` (efectivo) — los cancelados y vencidos se filtran.
+3. `PATCH /chofer/pasajes/:id/documento` permite marcar `documentoVerificado = false` (la marca es informativa, no bloquea ni genera alertas automáticas, según HU-14).
+4. Por defecto, `documentoVerificado` nace como `null` (no verificado explícitamente en ningún sentido); el chofer solo actúa para registrar la excepción negativa.
+
+## 2026-09-23: HU-15 — Validar comprobantes de transferencia (Administrador)
+**Contexto**: El administrador necesita aprobar o rechazar transferencias dentro de las 4 horas del hold (HU-15, RF-21).
+
+**Decisión**:
+1. `GET /admin/pagos/pendientes` ejecuta la limpieza lazy de holds vencidos antes de devolver resultados, para que el admin solo vea transferencias que todavía están vigentes.
+2. `PATCH /admin/pagos/:id/validar` acepta `{ accion: 'aprobar' | 'rechazar' }`. Al aprobar: `pago.estado = 'aprobado'`, `pasaje.estado = 'confirmada'`, `pago.fechaPago = now()`. Al rechazar: `pago.estado = 'rechazado'`, `pasaje.estado = 'cancelada'`, se decrementa `viaje.cuposOcupados`.
+3. El panel frontend de administración implementado en `/frontend/src/pages/AdminPagos/` muestra el listado con countdown de expiración y permite aprobar/rechazar con un click.
+
+## 2026-09-23: HU-03 — Recuperación de contraseña — Token SHA-256, almacenamiento seguro, modo consola
+**Contexto**: Implementar la recuperación de contraseña (HU-03, RF-25). El proveedor de email SMTP no está definido todavía; se necesita que el flujo sea completo y testeable sin SMTP configurado.
+
+**Decisión**:
+1. **Token criptográfico**: se genera con `crypto.randomBytes(32).toString('hex')` (nativo de Node.js, 64 caracteres hex). No se agrega ninguna dependencia extra para esto.
+2. **Almacenamiento seguro**: el token crudo nunca se persiste en la BD. Solo se guarda su hash SHA-256 (`crypto.createHash('sha256').update(token).digest('hex')`). Esto protege contra la exfiltración de tokens si la BD es comprometida.
+3. **Tabla `password_reset_tokens`**: campos `token_hash` (VARCHAR 64, UNIQUE), `usuario_id` FK, `fecha_expiracion`, `usado` (BOOLEAN). Un token marcado como usado no puede reutilizarse aunque no haya expirado.
+4. **Invalidación de tokens previos**: al solicitar un nuevo reset, los tokens anteriores del mismo usuario se marcan como `usado = true` para evitar acumulación y confusión.
+5. **Modo consola (fallback)**: si `EMAIL_HOST` no está configurado en `.env`, el `EmailService` imprime el link de reset en los logs del servidor en vez de intentar conectarse a un SMTP. Permite testear el flujo completo localmente sin ninguna configuración de email.
+6. **Modo SMTP**: cuando `EMAIL_HOST` se configure, el `EmailService` usa nodemailer y el envío es transparente sin cambios de código.
+7. **Seguridad anti-enumeración**: `POST /auth/recuperar-password` siempre responde 200 aunque el email no exista, para no revelar qué emails están registrados en el sistema.
+8. **Expiración**: configurable con `PASSWORD_RESET_EXPIRES_MINUTES` (default: 60 minutos).

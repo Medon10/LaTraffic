@@ -31,6 +31,7 @@ La separación en capas dentro del backend (routes → services → ORM) es la m
 | Base de datos | PostgreSQL | Buen soporte de transacciones y locks (necesario para el control de cupo, sección 7) |
 | Validación de datos | Zod | Ya usado en VacationMatch para validación centralizada |
 | Autenticación | JWT | Consistente con el patrón ya usado (variable `TOKEN_SECRET`) |
+| Email | Nodemailer (SMTP) con fallback a consola | HU-03 — recuperación de contraseña. Sin SMTP configurado, el link se imprime en los logs del servidor |
 | Frontend | React + TypeScript | Ya usado en VacationMatch |
 | Pagos | SDK de Mercado Pago | Definido por el cliente (Minuta §7) |
 | Mapas / rutas | Google Maps API (Directions, con optimización de waypoints) | RF-16 |
@@ -169,6 +170,16 @@ CREATE TABLE cupon_usos (
   fecha_uso TIMESTAMP NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_cupon_usos_cupon_usuario ON cupon_usos(cupon_id, usuario_id);
+
+CREATE TABLE password_reset_tokens (
+  id SERIAL PRIMARY KEY,
+  token_hash VARCHAR(64) UNIQUE NOT NULL,   -- hash SHA-256 del token crudo; el token crudo nunca se persiste
+  usuario_id INT NOT NULL REFERENCES usuarios(id),
+  fecha_expiracion TIMESTAMP NOT NULL,
+  usado BOOLEAN NOT NULL DEFAULT false,      -- true una vez usado; impide reutilización
+  fecha_creacion TIMESTAMP NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_prt_usuario ON password_reset_tokens(usuario_id);
 ```
 
 ---
@@ -181,7 +192,12 @@ CREATE INDEX idx_cupon_usos_cupon_usuario ON cupon_usos(cupon_id, usuario_id);
 - **CORS**: si el frontend y el backend quedan en orígenes distintos, hace falta `credentials: true` en el backend y `credentials: 'include'` en cada fetch del frontend — sin esto, el navegador no envía ni acepta la cookie.
 - **Salvaguarda de "mass assignment"**: el endpoint `POST /auth/registro` (público) ignora cualquier campo `rol` que venga en el body y fuerza `rol = 'pasajero'` en el código del backend. Las cuentas de chofer/administrador se insertan directo en la base por vos.
 - **Contraseñas**: hasheadas con bcrypt (o argon2), nunca en texto plano.
-- **Recuperación de contraseña**: token de un solo uso enviado por email, con expiración corta (ej. 1 hora).
+- **Recuperación de contraseña (HU-03)**: implementada en `POST /auth/recuperar-password` y `POST /auth/reset-password`.
+  - El token es criptográfico aleatorio de 32 bytes (64 hex). Solo se persiste su **hash SHA-256** en la tabla `password_reset_tokens` — el token crudo jamas toca la BD.
+  - El endpoint de solicitud siempre responde 200 aunque el email no exista (anti-enumeración de cuentas).
+  - El token expira en 1 hora (configurable con `PASSWORD_RESET_EXPIRES_MINUTES`). Es de un solo uso: se marca `usado = true` al consumirse.
+  - Solicitar un nuevo reset invalida los tokens anteriores del mismo usuario.
+  - El email se envía con nodemailer (SMTP). Si `EMAIL_HOST` no está configurado, el link se imprime en los logs del servidor (modo consola, para desarrollo local).
 - **CSRF**: `SameSite=Lax` ya mitiga la mayoría de los casos prácticos para el volumen de este proyecto. Un esquema de token CSRF aparte (double-submit) queda como mejora posible si en algún momento se necesita más rigor, pero no es necesario para el lanzamiento (RNF-06).
 - Se mantiene un solo JWT de vida moderada en vez de un esquema access+refresh token — la complejidad extra no se justifica para el volumen de usuarios de este proyecto.
 - **Estado en el Frontend**: En lugar de usar un gestor de estado global complejo (como Redux o Zustand), el estado de autenticación se maneja guardando metadatos (no sensibles) del usuario en `localStorage` y despachando un evento custom `auth-change` al objeto `window` cada vez que el usuario inicia o cierra sesión. Los componentes (como el `Navbar`) escuchan este evento para actualizar la UI reactivamente de manera sencilla.

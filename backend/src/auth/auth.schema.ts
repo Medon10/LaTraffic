@@ -53,3 +53,32 @@ export const loginSchema = z.object({
 });
 
 export type LoginDto = z.infer<typeof loginSchema>;
+
+/**
+ * Esquema para solicitar la recuperación de contraseña (HU-03).
+ * Solo requiere el email — el sistema busca el usuario internamente.
+ */
+export const recuperarPasswordSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email('El formato del email no es válido')
+    .toLowerCase(),
+});
+
+export type RecuperarPasswordDto = z.infer<typeof recuperarPasswordSchema>;
+
+/**
+ * Esquema para resetear la contraseña con el token recibido por email (HU-03).
+ */
+export const resetPasswordSchema = z.object({
+  token: z
+    .string()
+    .length(64, 'El token no tiene el formato esperado'),
+  nuevaPassword: z
+    .string()
+    .min(6, 'La contraseña debe tener al menos 6 caracteres')
+    .max(100, 'La contraseña no puede exceder los 100 caracteres'),
+});
+
+export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;
