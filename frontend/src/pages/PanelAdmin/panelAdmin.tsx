@@ -312,7 +312,15 @@ const TarjetaPago: React.FC<{
 
 type EstadoCarga = 'idle' | 'loading' | 'success' | 'error';
 
-export const PanelAdminPage: React.FC = () => {
+/**
+ * Sección "Transferencias pendientes" del panel de administrador (HU-15).
+ * Vive dentro de AdminLayout — renderizada bajo /admin/transferencias.
+ *
+ * Nota: este componente se llamaba PanelAdminPage antes del shell (commit de
+ * septiembre 2026). Se renombró a TransferenciasPage al migrar a AdminLayout
+ * para mantener la convención de nombres de secciones.
+ */
+export const TransferenciasPage: React.FC = () => {
   const [estado, setEstado] = useState<EstadoCarga>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [pagos, setPagos] = useState<PagoPendiente[]>([]);
@@ -372,7 +380,7 @@ export const PanelAdminPage: React.FC = () => {
   const cantProcesados = Object.keys(procesados).length;
 
   return (
-    <div className="page-container panel-admin">
+    <div className="panel-admin">
       {/* ── Header ── */}
       <div className="admin-header">
         <span className="badge">Panel Admin</span>

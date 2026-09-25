@@ -1,6 +1,10 @@
-/* ── Panel Administrador — HU-15 ─────────────────────────────────────────── */
+/* ── Panel Administrador — Sección Transferencias (HU-15) ──────────────────── */
+/* Vive dentro de AdminLayout → admin-content. El selector .panel-admin se     */
+/* aplica sobre el wrapper de la sección, no sobre el page-container global.   */
 
 .panel-admin {
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
 }
 

@@ -77,3 +77,21 @@ Esto asegura que:
 2. Se agrega `viaje.horario` al `populate` de `PasajeService.misReservas()` para que el sentido esté disponible sin una query extra.
 3. El campo `sentido` es la cadena cruda del enum backend (`colon_rosario` / `rosario_colon`); el frontend lo traduce a etiqueta legible con un mapa local.
 4. El filtro futuras/pasadas se resuelve íntegramente en el frontend comparando `fecha_viaje` con la fecha actual; no se agrega filtrado en el endpoint para no duplicar lógica ni romper el contrato existente.
+
+## 2026-09-24: Shell del Panel de Administrador (HU-15 a HU-23)
+
+**Contexto**: La pantalla de validación de comprobantes (HU-15, `PanelAdminPage`) existía como una página aislada en `/admin/pagos`, sin layout compartido ni protección de ruta real en el frontend. Al empezar a agregar más secciones admin (morosos, cuentas, estadísticas, horarios, cupones — HU-16 a HU-23), se necesitaba un shell navegable con protección de rol consistente.
+
+**Decisión**:
+
+1. **`AdminGuard` (nuevo — `componentes/AdminGuard.tsx`)**: Componente React que envuelve todas las rutas `/admin/*`. Lee el estado de sesión desde `localStorage` (patrón existente: `getUser()` + `isAuthenticated()`) y escucha el evento `auth-change`. Sin sesión → redirige a `/login` preservando `state.from` para volver después del login. Con sesión pero rol distinto de `'administrador'` → redirige a `/403`. Este guard es UX (evita flash); la autorización real sigue siendo responsabilidad del backend (`verificarToken + autorizar(Rol.ADMINISTRADOR)` en `admin.routes.ts`, T-04).
+
+2. **`AdminLayout` (nuevo — `pages/PanelAdmin/AdminLayout.tsx`)**: Wrapper con sidebar izquierdo fijo en desktop (256 px) y colapsable vía overlay en móvil. Topbar visible solo en mobile. Sin Navbar/Footer globales — el panel admin tiene su propio chrome. Usa `<Outlet />` de react-router para renderizar la sección activa. Maneja el logout vía `authService.logout()` (ya limpia cookie + localStorage + dispara `auth-change`).
+
+3. **Migración de `PanelAdminPage` → `TransferenciasPage`**: El componente de validación de comprobantes se renombró para seguir la convención de secciones (`<NombreSeccion>Page`). Se quitó `page-container` del div raíz (el `admin-content` del layout ya provee el padding). Sin cambios en lógica.
+
+4. **Placeholders (`AdminPlaceholder.tsx`)**: Componente genérico con ícono, badge de HU y descripción de la sección. Las secciones futuras (morosos, cuentas, estadísticas, horarios, cupones) se declaran como rutas en `App.tsx` con `<AdminPlaceholder>` — tienen URL funcional pero sin lógica de negocio. Se completan en HU-16 a HU-23.
+
+5. **Routing (`App.tsx`)**: Las rutas `/admin/*` se definen como hijas de `<AdminGuard><AdminLayout /></AdminGuard>`. La ruta índice `/admin` redirige a `/admin/transferencias`. La URL legacy `/admin/pagos` redirige a `/admin/transferencias` con `<Navigate replace>`.
+
+6. **Por qué no usar un `<ProtectedRoute>` genérico**: Se optó por un guard específico para admin (`AdminGuard`) en lugar de un componente genérico de `ProtectedRoute` parametrizado por rol. Razón: el panel admin tiene su propio layout (sin Navbar global), lo que ya obliga a un wrapper dedicado. Unificar guard + layout en un solo árbol de rutas es más claro que combinar un ProtectedRoute genérico con un AdminLayout separado.
