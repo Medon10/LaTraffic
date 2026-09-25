@@ -9,36 +9,40 @@ import { getUser, isAuthenticated } from '../shared/auth.ts';
  * - Con sesión pero rol !== 'administrador' → redirige a /403.
  * - Con sesión y rol correcto → renderiza los children.
  *
- * La comprobación se hace en cliente ADEMÁS de la validación en el servidor
- * (el backend ya usa verificarToken + autorizar(Rol.ADMINISTRADOR) en cada
- * endpoint). El guard de cliente es solo UX: evita el flash de pantalla vacía
- * y redirige rápido sin esperar el primer fetch.
+ * El guard lee de localStorage de forma síncrona (no hay estado de carga
+ * asíncrono). La autorización real sigue siendo responsabilidad del backend
+ * (verificarToken + autorizar(Rol.ADMINISTRADOR) en admin.routes.ts, T-04).
  */
 export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const location = useLocation();
 
-  // Derivar el estado de auth en cada render para que reaccione al evento
-  // 'auth-change' emitido desde auth.ts en setUser/removeUser.
-  const [authState, setAuthState] = useState(() => ({
-    autenticado: isAuthenticated(),
-    rol: getUser()?.rol ?? null,
-  }));
-
-  useEffect(() => {
-    const sync = () => {
-      setAuthState({
-        autenticado: isAuthenticated(),
-        rol: getUser()?.rol ?? null,
-      });
+  // Función helper para obtener el estado actual de auth desde localStorage
+  const leerEstadoAuth = () => {
+    const user = getUser();
+    return {
+      autenticado: isAuthenticated(),
+      rol: user?.rol ?? null,
     };
+  };
+
+  const [authState, setAuthState] = useState(leerEstadoAuth);
+
+  // Sincronizar ante cambios de sesión (login / logout desde otra pestaña o
+  // desde el mismo componente via auth-change).
+  useEffect(() => {
+    // Re-leer al montar (por si el estado en localStorage cambió entre el
+    // primer render y el montaje del efecto).
+    setAuthState(leerEstadoAuth());
+
+    const sync = () => setAuthState(leerEstadoAuth());
     window.addEventListener('auth-change', sync);
     return () => window.removeEventListener('auth-change', sync);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!authState.autenticado) {
-    // Redirigir al login conservando la ruta de destino para volver después
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

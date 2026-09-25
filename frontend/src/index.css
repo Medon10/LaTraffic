@@ -286,6 +286,28 @@ button {
   font-weight: 700;
 }
 
+/* Botón / Chip Administrador en Header */
+.btn-admin-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--secondary);
+  background-color: rgba(0, 101, 141, 0.08);
+  border: 1.5px solid rgba(0, 101, 141, 0.25);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.btn-admin-chip:hover {
+  background-color: rgba(0, 101, 141, 0.16);
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
 /* Bottom Navigation (Mobile) */
 .bottom-nav {
   position: fixed;

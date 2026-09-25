@@ -57,8 +57,12 @@ export const adminService = {
    * Requiere rol administrador.
    */
   async getPagosPendientes(): Promise<PagoPendiente[]> {
-    const res = await api.get<PagosPendientesResponse>('/admin/pagos/pendientes');
-    return res.data;
+    // El backend devuelve el array directamente (sin wrapper {error, data}).
+    const res = await api.get<PagoPendiente[] | PagosPendientesResponse>('/admin/pagos/pendientes');
+    // Defensivo: soporta tanto array directo como el formato wrapped {data: []}.
+    if (Array.isArray(res)) return res;
+    if (res && Array.isArray((res as PagosPendientesResponse).data)) return (res as PagosPendientesResponse).data;
+    return [];
   },
 
   /**

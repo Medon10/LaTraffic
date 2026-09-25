@@ -1,21 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../../services/auth.service.ts';
-import { isAuthenticated } from '../../shared/auth.ts';
+import { getUser, isAuthenticated } from '../../shared/auth.ts';
 import { ApiError } from '../../shared/api.ts';
 import './login.css';
 
 export const LoginPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const redirect = searchParams.get('redirect') || '/';
-  const fromCheckout = redirect.startsWith('/checkout');
+  const location = useLocation();
+
+  // Destino post-login: prioridad → state.from (puesto por AdminGuard) →
+  // query param ?redirect= → / (home por defecto)
+  const fromState = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
+  const redirect = fromState || searchParams.get('redirect') || null;
+  const fromCheckout = redirect?.startsWith('/checkout') ?? false;
+
+  // Función que decide el destino final tras login exitoso
+  const destino = (rolUsuario?: string) => {
+    if (redirect) return redirect;
+    // Si es admin y no hay ruta específica, mandar directo al panel
+    if (rolUsuario === 'administrador') return '/admin';
+    return '/';
+  };
 
   useEffect(() => {
     if (isAuthenticated()) {
-      navigate(redirect, { replace: true });
+      const rol = getUser()?.rol;
+      navigate(destino(rol), { replace: true });
     }
-  }, [redirect, navigate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [dni, setDni] = useState('');
   const [password, setPassword] = useState('');
@@ -38,8 +53,8 @@ export const LoginPage: React.FC = () => {
 
     setLoading(true);
     try {
-      await authService.login({ dni: dni.trim(), password });
-      navigate(redirect, { replace: true });
+      const usuario = await authService.login({ dni: dni.trim(), password });
+      navigate(destino(usuario.rol), { replace: true });
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 401) {

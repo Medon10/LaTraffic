@@ -1,6 +1,7 @@
 /* ── Panel Administrador — Layout Shell ────────────────────────────────────── */
+/* Paleta: mismas variables CSS del sistema (--primary, --secondary, etc.)      */
 
-/* ── Estructura principal ────────────────────────────────────────────────── */
+/* ── Estructura principal ─────────────────────────────────────────────────── */
 
 .admin-shell {
   display: flex;
@@ -10,8 +11,9 @@
 
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
 
+/* Siempre position: fixed — más robusto que sticky en flex */
 .admin-sidebar {
-  width: 256px;
+  width: 252px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -23,41 +25,35 @@
   height: 100vh;
   z-index: 300;
   overflow-y: auto;
+  /* Oculto por transform en móvil */
+  transform: translateX(-100%);
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
 }
 
-/* En móvil el sidebar se oculta con transform */
-@media (max-width: 767px) {
+/* En desktop siempre visible */
+@media (min-width: 768px) {
   .admin-sidebar {
-    transform: translateX(-100%);
-    box-shadow: none;
-  }
-
-  .admin-sidebar--abierto {
     transform: translateX(0);
-    box-shadow: var(--shadow-lg);
+    box-shadow: none;
   }
 }
 
-/* En desktop el sidebar siempre está visible */
-@media (min-width: 768px) {
-  .admin-sidebar {
-    transform: translateX(0) !important;
-    position: sticky;
-    height: 100vh;
-  }
+/* En móvil: abierto */
+.admin-sidebar--abierto {
+  transform: translateX(0);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Overlay oscuro detrás del sidebar en móvil */
 .admin-sidebar-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(17, 28, 44, 0.45);
+  background-color: rgba(3, 22, 53, 0.45);
   z-index: 299;
-  animation: fadeIn 150ms ease;
+  animation: adminFadeIn 150ms ease;
 }
 
-@keyframes fadeIn {
+@keyframes adminFadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
@@ -78,12 +74,12 @@
   width: 38px;
   height: 38px;
   border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
+  box-shadow: 0 2px 8px rgba(3, 22, 53, 0.3);
 }
 
 .admin-sidebar__brand-icon .material-symbols-outlined {
@@ -102,11 +98,11 @@
 .admin-sidebar__brand-sub {
   display: block;
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #7c3aed;
-  opacity: 0.8;
+  letter-spacing: 0.07em;
+  color: var(--secondary);
+  opacity: 0.85;
 }
 
 /* ── Perfil del administrador ─────────────────────────────────────────── */
@@ -115,7 +111,7 @@
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  padding: 0.65rem 1.25rem;
+  padding: 0.65rem 0.85rem;
   margin: 0 0.75rem;
   border-radius: var(--radius-lg);
   background-color: var(--surface-container-low);
@@ -125,21 +121,20 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #7c3aed22 0%, #a78bfa44 100%);
-  border: 2px solid rgba(124, 58, 237, 0.3);
+  background: linear-gradient(135deg, var(--secondary-fixed) 0%, var(--secondary-container) 100%);
+  border: 2px solid rgba(0, 101, 141, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  color: #7c3aed;
+  color: var(--on-secondary-container);
   flex-shrink: 0;
 }
 
 .admin-sidebar__perfil-info {
   display: flex;
   flex-direction: column;
-  gap: 0;
   overflow: hidden;
 }
 
@@ -154,11 +149,10 @@
 
 .admin-sidebar__perfil-rol {
   font-size: 0.68rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #7c3aed;
-  opacity: 0.75;
+  letter-spacing: 0.07em;
+  color: var(--secondary);
 }
 
 /* ── Divider ──────────────────────────────────────────────────────────── */
@@ -186,7 +180,7 @@
   display: contents;
 }
 
-/* Link activo / normal */
+/* Link base */
 .admin-sidebar__link {
   display: flex;
   align-items: center;
@@ -210,19 +204,20 @@
   color: var(--primary);
 }
 
+/* Link activo */
 .admin-sidebar__link--activo {
-  background-color: rgba(124, 58, 237, 0.1);
-  color: #6d28d9;
+  background-color: rgba(0, 101, 141, 0.1);
+  color: var(--secondary);
   font-weight: 600;
 }
 
 .admin-sidebar__link--activo .admin-sidebar__icono {
-  color: #7c3aed;
+  color: var(--secondary);
 }
 
 /* Link deshabilitado (placeholder) */
 .admin-sidebar__link--deshabilitado {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: default;
 }
 
@@ -276,7 +271,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
+  transition: background-color var(--transition-fast);
   text-align: left;
 }
 
@@ -290,21 +285,24 @@
 
 /* ── Área principal ───────────────────────────────────────────────────── */
 
+/* En mobile: sin margen (sidebar es overlay) */
 .admin-main {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  /* Margen a la izquierda del sidebar en desktop */
+  width: 100%;
 }
 
+/* En desktop: compensar el sidebar fijo */
 @media (min-width: 768px) {
   .admin-main {
-    margin-left: 256px;
+    margin-left: 252px;
+    width: calc(100% - 252px);
   }
 }
 
-/* ── Topbar (solo móvil) ──────────────────────────────────────────────── */
+/* ── Topbar (visible solo en móvil) ──────────────────────────────────── */
 
 .admin-topbar {
   display: flex;
@@ -317,6 +315,7 @@
   position: sticky;
   top: 0;
   z-index: 200;
+  flex-shrink: 0;
 }
 
 @media (min-width: 768px) {
@@ -366,14 +365,14 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #7c3aed22 0%, #a78bfa44 100%);
-  border: 2px solid rgba(124, 58, 237, 0.3);
+  background: linear-gradient(135deg, var(--secondary-fixed) 0%, var(--secondary-container) 100%);
+  border: 2px solid rgba(0, 101, 141, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #7c3aed;
+  color: var(--on-secondary-container);
 }
 
 /* ── Contenido principal ──────────────────────────────────────────────── */
@@ -401,6 +400,10 @@
   gap: 1rem;
   padding: 4rem 2rem;
   text-align: center;
+  border: 1.5px dashed var(--outline-variant);
+  border-radius: var(--radius-2xl);
+  background-color: var(--surface-container-lowest);
+  margin-top: 0.5rem;
 }
 
 .admin-placeholder__icono {
@@ -432,9 +435,9 @@
   letter-spacing: 0.06em;
   padding: 0.3rem 0.75rem;
   border-radius: var(--radius-full);
-  background-color: rgba(124, 58, 237, 0.1);
-  color: #7c3aed;
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  background-color: var(--surface-container-high);
+  color: var(--secondary);
+  border: 1px solid var(--outline-variant);
 }
 
 /* ── Página 403 ───────────────────────────────────────────────────────── */
@@ -446,18 +449,4 @@
   gap: 1rem;
   padding: 4rem 2rem;
   text-align: center;
-}
-
-.admin-403__codigo {
-  font-size: 5rem;
-  font-weight: 900;
-  color: var(--error);
-  opacity: 0.15;
-  line-height: 1;
-}
-
-.admin-403__titulo {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--primary);
 }
