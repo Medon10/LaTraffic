@@ -63,7 +63,7 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 | ID | Tarjeta | Tipo |
 |---|---|---|
 | HU-03 | ✓ Recuperar contraseña — **implementado** (token SHA-256, tabla `password_reset_tokens`, modo consola + nodemailer SMTP) | HU |
-| HU-11 | Ver historial de viajes | HU |
+| HU-11 | ✓ Ver historial de viajes — **implementado** (`GET /pasajes/mis-reservas`, DTO plano con fecha/sentido/estado/origen/destino, página MisReservas con filtros futuras/pasadas y tarjetas de reserva) | HU |
 | HU-16 | Marcado automático de moroso | HU |
 | HU-17 | Reactivar a un pasajero moroso | HU |
 | HU-18 | Deshabilitar cuentas | HU |

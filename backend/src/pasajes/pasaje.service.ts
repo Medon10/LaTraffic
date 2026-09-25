@@ -370,7 +370,7 @@ export class PasajeService {
       Pasaje,
       { usuario: usuarioId },
       {
-        populate: ['pago', 'viaje', 'paradaOrigen', 'paradaDestino'],
+        populate: ['pago', 'viaje', 'viaje.horario', 'paradaOrigen', 'paradaDestino'],
         orderBy: { fechaReserva: 'DESC' },
       }
     );

@@ -67,3 +67,13 @@ Esto asegura que:
 6. **Modo SMTP**: cuando `EMAIL_HOST` se configure, el `EmailService` usa nodemailer y el envío es transparente sin cambios de código.
 7. **Seguridad anti-enumeración**: `POST /auth/recuperar-password` siempre responde 200 aunque el email no exista, para no revelar qué emails están registrados en el sistema.
 8. **Expiración**: configurable con `PASSWORD_RESET_EXPIRES_MINUTES` (default: 60 minutos).
+
+## 2026-09-24: HU-11 — Serialización de misReservas como DTO plano
+
+**Contexto**: `PasajeService.misReservas()` devuelve entidades MikroORM con relaciones anidadas (Viaje → Horario). Devolver la entidad cruda al cliente expone campos internos y puede generar problemas de serialización circular o referencias no resueltas.
+
+**Decisión**:
+1. El controller `misReservas` mapea la lista de `Pasaje[]` a un array de DTOs planos antes de responder. Cada DTO incluye: `id`, `fecha_viaje`, `hora_viaje`, `sentido` (leído de `viaje.horario.sentido`), `estado`, `fecha_reserva`, `metodo_pago`, `monto`, `estado_pago`, `fecha_expiracion_hold`, `origen` y `destino` (etiquetas legibles de parada o domicilio) y `viaje_id`.
+2. Se agrega `viaje.horario` al `populate` de `PasajeService.misReservas()` para que el sentido esté disponible sin una query extra.
+3. El campo `sentido` es la cadena cruda del enum backend (`colon_rosario` / `rosario_colon`); el frontend lo traduce a etiqueta legible con un mapa local.
+4. El filtro futuras/pasadas se resuelve íntegramente en el frontend comparando `fecha_viaje` con la fecha actual; no se agrega filtrado en el endpoint para no duplicar lógica ni romper el contrato existente.

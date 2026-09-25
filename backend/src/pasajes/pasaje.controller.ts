@@ -3,6 +3,8 @@ import { PasajeService } from './pasaje.service.js';
 import { AuthRequest } from '../shared/types/index.js';
 import type { CrearPasajeDto, SubirComprobanteDto } from './pasaje.schema.js';
 import { HttpError } from '../shared/middleware/error-handler.middleware.js';
+import { Viaje } from '../viajes/viaje.entity.js';
+import { Horario } from '../horarios/horario.entity.js';
 
 export class PasajeController {
   constructor(private readonly pasajeService: PasajeService = new PasajeService()) {}
@@ -91,14 +93,46 @@ export class PasajeController {
   };
 
   /**
-   * GET /pasajes/mis-reservas
+   * GET /pasajes/mis-reservas (HU-11)
    *
    * Lista todas las reservas del pasajero autenticado, reflejando holds vencidos.
+   * Serializa a DTOs planos: id, fecha_viaje, hora, sentido, estado, metodo_pago,
+   * monto, origen y destino legibles.
    */
   misReservas = async (req: AuthRequest, res: Response): Promise<void> => {
     const usuarioId = req.usuario!.usuarioId;
     const reservas = await this.pasajeService.misReservas(usuarioId);
-    res.status(200).json(reservas);
+
+    const dto = reservas.map((p) => {
+      const viaje = p.viaje as Viaje;
+      const horario = viaje?.horario as Horario | undefined;
+
+      const origenLabel = p.paradaOrigen
+        ? `${p.paradaOrigen.nombre} (${p.paradaOrigen.pueblo})`
+        : (p.domicilioOrigen ?? null);
+
+      const destinoLabel = p.paradaDestino
+        ? `${p.paradaDestino.nombre} (${p.paradaDestino.pueblo})`
+        : (p.domicilioDestino ?? null);
+
+      return {
+        id: p.id,
+        fecha_viaje: viaje?.fecha ?? null,
+        hora_viaje: viaje?.hora ?? null,
+        sentido: horario?.sentido ?? null,
+        estado: p.estado,
+        fecha_reserva: p.fechaReserva,
+        metodo_pago: p.pago?.metodo ?? null,
+        monto: p.pago?.monto ?? null,
+        estado_pago: p.pago?.estado ?? null,
+        fecha_expiracion_hold: p.pago?.fechaExpiracionHold ?? null,
+        origen: origenLabel,
+        destino: destinoLabel,
+        viaje_id: viaje?.id ?? null,
+      };
+    });
+
+    res.status(200).json(dto);
   };
 }
 

@@ -22,7 +22,7 @@ HU-13,Ver ruta optima del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,
 HU-14,Marcar documento no verificado (chofer),HU,Etapa 2 - Operar el primer viaje,Media,RF-17,Completado
 HU-15,Validar comprobantes de transferencia (administrador),HU,Etapa 2 - Operar el primer viaje,Alta,RF-21;RN-06,Completado
 HU-03,Recuperar contrasena,HU,Etapa 3 - Gestion y pulido,Media,RF-25,Completado
-HU-11,Ver historial de viajes,HU,Etapa 3 - Gestion y pulido,Media,RF-13,Por hacer
+HU-11,Ver historial de viajes,HU,Etapa 3 - Gestion y pulido,Media,RF-13,Completado
 HU-16,Marcado automatico de moroso,HU,Etapa 3 - Gestion y pulido,Media,RF-19;RN-05,Por hacer
 HU-17,Reactivar a un pasajero moroso,HU,Etapa 3 - Gestion y pulido,Media,RF-20,Por hacer
 HU-18,Deshabilitar cuentas,HU,Etapa 3 - Gestion y pulido,Baja,RF-18,Por hacer
