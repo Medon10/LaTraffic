@@ -1,32 +1,43 @@
 ID,Titulo,Tipo,Etapa,Prioridad,Relacionado,Estado
-T-01,"Setup del proyecto backend (carpetas, MikroORM + PostgreSQL)",Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Completado
-T-02,"Setup del proyecto frontend (carpetas, React + routing)",Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Completado
-T-03,Migraciones de base de datos (todas las tablas del esquema),Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Completado
-T-04,Autenticacion JWT + middleware de roles,Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Completado
-T-05,Cargar manualmente las cuentas de chofer y administrador,Tecnica,Etapa 1 - Fundacional,Media,der-documento,Completado
-T-07,Sembrar el cupon inicial PRIMERVIAJE directo en la base,Tecnica,Etapa 1 - Fundacional,Alta,der-documento,Completado
-HU-01,"Registrarme (DNI, contrasena, email)",HU,Etapa 1 - Fundacional,Alta,RF-02;RF-25;RN-01,Completado
-HU-02,Iniciar sesion,HU,Etapa 1 - Fundacional,Alta,RF-02;RF-05,Completado
-HU-04,Ver viajes disponibles sin loguearme,HU,Etapa 1 - Fundacional,Alta,RF-01;RF-03,Completado
-HU-05,"Elegir sentido, fecha y puntos del viaje",HU,Etapa 1 - Fundacional,Alta,RF-03,Completado
-HU-06,Ver el precio antes de confirmar,HU,Etapa 1 - Fundacional,Alta,RF-04,Completado
-HU-07,Completar datos de la reserva,HU,Etapa 1 - Fundacional,Alta,RF-05;RF-06,En progreso
-HU-22,Ingresar codigo de cupon,HU,Etapa 1 - Fundacional,Alta,RF-26;RN-02,En progreso
-T-06,Integrar Mercado Pago (modo sandbox),Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura,Completado
-HU-08,Pagar con Mercado Pago,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-08;RF-12,Completado
-HU-09,Pagar por transferencia,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-09;RF-10,Completado
-HU-10,Pagar en efectivo,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-11;RN-05,Completado
-T-08,Integrar Google Maps API,Tecnica,Etapa 2 - Operar el primer viaje,Alta,diseno-arquitectura,Completado
-HU-12,Ver pasajeros del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,RF-15,Completado
-HU-13,Ver ruta optima del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,RF-16,Completado
-HU-14,Marcar documento no verificado (chofer),HU,Etapa 2 - Operar el primer viaje,Media,RF-17,Completado
-HU-15,Validar comprobantes de transferencia (administrador),HU,Etapa 2 - Operar el primer viaje,Alta,RF-21;RN-06,Completado
-HU-03,Recuperar contrasena,HU,Etapa 3 - Gestion y pulido,Media,RF-25,Completado
-HU-11,Ver historial de viajes,HU,Etapa 3 - Gestion y pulido,Media,RF-13,Completado
-HU-16,Marcado automatico de moroso,HU,Etapa 3 - Gestion y pulido,Media,RF-19;RN-05,Por hacer
-HU-17,Reactivar a un pasajero moroso,HU,Etapa 3 - Gestion y pulido,Media,RF-20,Por hacer
-HU-18,Deshabilitar cuentas,HU,Etapa 3 - Gestion y pulido,Baja,RF-18,Por hacer
-HU-19,Ver estadisticas,HU,Etapa 3 - Gestion y pulido,Media,RF-22,Por hacer
-HU-20,Editar horarios,HU,Etapa 3 - Gestion y pulido,Baja,RF-23,Por hacer
-HU-23,Gestionar cupones de descuento,HU,Etapa 3 - Gestion y pulido,Baja,RF-27,Por hacer
-HU-21,Configurar el descuento por transferencia/efectivo (BLOQUEADA: falta monto del cliente),HU,Etapa 3 - Gestion y pulido,Baja,RF-24,Bloqueada
+T-01,"Setup del proyecto backend (carpetas, MikroORM + PostgreSQL)",Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura
+T-02,"Setup del proyecto frontend (carpetas, React + routing)",Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura
+T-03,Migraciones de base de datos (todas las tablas del esquema),Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura
+T-04,Autenticacion JWT + middleware de roles,Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura
+T-05,Cargar manualmente las cuentas de chofer y administrador,Tecnica,Etapa 1 - Fundacional,Media,der-documento
+T-07,Sembrar el cupon inicial PRIMERVIAJE directo en la base,Tecnica,Etapa 1 - Fundacional,Alta,der-documento
+HU-01,"Registrarme (DNI, contrasena, email)",HU,Etapa 1 - Fundacional,Alta,RF-02;RF-25;RN-01
+HU-02,Iniciar sesion,HU,Etapa 1 - Fundacional,Alta,RF-02;RF-05
+HU-04,Ver viajes disponibles sin loguearme,HU,Etapa 1 - Fundacional,Alta,RF-01;RF-03
+HU-05,"Elegir sentido, fecha y puntos del viaje",HU,Etapa 1 - Fundacional,Alta,RF-03
+HU-06,Ver el precio antes de confirmar,HU,Etapa 1 - Fundacional,Alta,RF-04
+HU-07,Completar datos de la reserva,HU,Etapa 1 - Fundacional,Alta,RF-05;RF-06
+HU-22,Ingresar codigo de cupon,HU,Etapa 1 - Fundacional,Alta,RF-26;RN-02
+T-06,Integrar Mercado Pago (modo sandbox),Tecnica,Etapa 1 - Fundacional,Alta,diseno-arquitectura
+HU-08,Pagar con Mercado Pago,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-08;RF-12
+HU-09,Pagar por transferencia,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-09;RF-10
+HU-10,Pagar en efectivo,HU,Etapa 1 - Fundacional,Alta,RF-07;RF-11
+T-08,Integrar Google Maps API,Tecnica,Etapa 2 - Operar el primer viaje,Alta,diseno-arquitectura
+HU-12,Ver pasajeros del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,RF-15
+HU-13,Ver ruta optima del dia (chofer),HU,Etapa 2 - Operar el primer viaje,Alta,RF-16
+HU-14,Marcar documento no verificado (chofer),HU,Etapa 2 - Operar el primer viaje,Media,RF-17
+HU-15,Validar comprobantes de transferencia (administrador),HU,Etapa 2 - Operar el primer viaje,Alta,RF-21;RN-06
+HU-03,Recuperar contrasena,HU,Etapa 3 - Gestion y pulido,Media,RF-25
+HU-11,Ver historial de viajes,HU,Etapa 3 - Gestion y pulido,Media,RF-13
+HU-16,Marcado automatico de moroso,HU,Etapa 3 - Gestion y pulido,Media,RF-19;RN-05
+HU-17,Reactivar a un pasajero moroso,HU,Etapa 3 - Gestion y pulido,Media,RF-20
+HU-18,Deshabilitar cuentas,HU,Etapa 3 - Gestion y pulido,Baja,RF-18
+HU-19,Ver estadisticas,HU,Etapa 3 - Gestion y pulido,Media,RF-22
+HU-20,Editar horarios,HU,Etapa 3 - Gestion y pulido,Baja,RF-23
+HU-23,Gestionar cupones de descuento,HU,Etapa 3 - Gestion y pulido,Baja,RF-27
+HU-21,Configurar el descuento por transferencia/efectivo (BLOQUEADA: falta monto del cliente),HU,Etapa 3 - Gestion y pulido,Baja,RF-24
+T-10,Eliminar el fallback inseguro de TOKEN_SECRET,Tecnica,Correccion - Verificacion Etapa 1,Alta,verificacion-etapa1
+T-11,Expiracion para reservas de Mercado Pago pendientes,Tecnica,Correccion - Verificacion Etapa 1,Alta,verificacion-etapa1
+T-12,Indice unico cupon_id+usuario_id y deshabilitar boton durante el envio,Tecnica,Correccion - Verificacion Etapa 1,Media,verificacion-etapa1
+T-13,Sincronizar HU-09 y campo mpPaymentId en la documentacion,Tecnica,Correccion - Verificacion Etapa 1,Media,verificacion-etapa1
+T-14,Habilitar Maps JavaScript API + Places API y crear el mapa interactivo,Tecnica,Etapa 3 - Gestion y pulido,Media,diseno-arquitectura
+HU-24,Seleccionar domicilio con mapa (con fallback a texto),HU,Etapa 3 - Gestion y pulido,Media,RF-28;RF-29
+T-15,Sincronizar nombres de campos de coordenadas (latOrigen/lonOrigen) en documentacion,Tecnica,Correccion - Verificacion Etapa 2,Baja,verificacion-etapa2
+T-16,Armar el shell de navegacion del panel de administrador (AdminLayout + placeholders),Tecnica,Etapa 3 - Gestion y pulido,Alta,diseno-arquitectura
+T-18,Elegir hosting y documentar variables de entorno de produccion,Tecnica,Etapa 4 - Lanzamiento a produccion,Alta,diseno-arquitectura
+T-19,Configurar base de datos de produccion y correr migraciones + seed inicial,Tecnica,Etapa 4 - Lanzamiento a produccion,Alta,diseno-arquitectura
+T-20,Deploy del backend y frontend con dominio propio HTTPS y prueba de punta a punta,Tecnica,Etapa 4 - Lanzamiento a produccion,Alta,diseno-arquitectura

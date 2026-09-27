@@ -14,6 +14,18 @@ Tablero simple de 3 columnas, ya que trabajás solo: **Por hacer → En progreso
 
 ---
 
+## Correcciones — verificación de Etapa 1 (ver `verificacion-etapa1.md`)
+
+| ID | Tarjeta | Tipo | Prioridad |
+|---|---|---|---|
+| T-10 | 🔴 Eliminar el fallback inseguro de TOKEN_SECRET | Técnica | Alta |
+| T-11 | 🟠 Expiración para reservas de Mercado Pago pendientes (hoy no vencen nunca) | Técnica | Alta |
+| T-12 | 🟠 Índice único (cupon_id, usuario_id) en cupon_usos + deshabilitar botón durante el envío | Técnica | Media |
+| T-13 | 🟡 Sincronizar HU-09 y el campo mpPaymentId en la documentación | Técnica | Media |
+| T-15 | 🟡 Sincronizar nombres de campos de coordenadas (latOrigen/lonOrigen) en DER y arquitectura | Técnica | Baja |
+
+---
+
 ## Por qué este orden
 
 El backlog no sigue el orden de las Historias de Usuario tal cual estaban numeradas — lo reordené por **dependencias técnicas** (no podés reservar sin login, no podés cobrar sin el modelo de pagos) y por **qué necesitás mínimamente para vender el primer pasaje real**, agrupado en 3 etapas:
@@ -35,6 +47,7 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 | T-03 | Migraciones de base de datos (todas las tablas del esquema) | Técnica |
 | T-04 | Autenticación JWT + middleware de roles | Técnica |
 | T-05 | Cargar manualmente las cuentas de chofer y administrador | Técnica |
+| T-09 | Corrección: agregar Cupon/CuponUso y quitar promo_primer_viaje_usada (T-03 ya se había hecho con el esquema anterior) | Técnica |
 | T-07 | Sembrar el cupón inicial PRIMERVIAJE directo en la base | Técnica |
 | HU-01 | Registrarme (DNI, contraseña, email) | HU |
 | HU-02 | Iniciar sesión | HU |
@@ -42,35 +55,46 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 | HU-05 | Elegir sentido, fecha y puntos del viaje | HU |
 | HU-06 | Ver el precio antes de confirmar | HU |
 | HU-07 | Completar datos de la reserva | HU |
-| HU-22 | ✓ Ingresar código de cupón — **implementado** (endpoint `/cupones/validar`, campo en checkout, descuento inline) | HU |
-| T-06 | ✓ Integrar Mercado Pago (modo sandbox) — **implementado** | Técnica |
-| HU-08 | ✓ Pagar con Mercado Pago — **implementado** (preferencias, webhook y control de cupos FOR UPDATE) | HU |
-| HU-09 | ✓ Pagar por transferencia — **implementado** (esquema híbrido Web + WhatsApp, hold 4h, comprobante web y limpieza lazy §7) | HU |
-| HU-10 | ✓ Pagar en efectivo — **implementado** (descuento inmediato de cupo RF-11 y bloqueo por morosidad RN-05) | HU |
+| HU-22 | Ingresar código de cupón | HU |
+| T-06 | Integrar Mercado Pago (modo sandbox) | Técnica |
+| HU-08 | Pagar con Mercado Pago | HU |
+| HU-09 | Pagar por transferencia | HU |
+| HU-10 | Pagar en efectivo | HU |
 
 ## Etapa 2 — Operar el primer viaje
 
 | ID | Tarjeta | Tipo |
 |---|---|---|
-| T-08 | ✓ Integrar Google Maps API — **implementado** (Directions API con waypoint optimization, `GOOGLE_MAPS_API_KEY`, fallback 503 sin key) | Técnica |
-| HU-12 | ✓ Ver pasajeros del día (chofer) — **implementado** (`GET /chofer/viajes/:id/pasajeros`, filtra confirmados y efectivo) | HU |
-| HU-13 | ✓ Ver ruta óptima del día (chofer) — **implementado** (`GET /chofer/viajes/:id/ruta`, ruta optimizada + maps_url) | HU |
-| HU-14 | ✓ Marcar documento no verificado (chofer) — **implementado** (`PATCH /chofer/pasajes/:id/documento`, marca informativa) | HU |
-| HU-15 | ✓ Validar comprobantes de transferencia (administrador) — **implementado** (GET /admin/pagos/pendientes y PATCH /admin/pagos/:id/validar) | HU |
+| T-08 | Integrar Google Maps API | Técnica |
+| HU-12 | Ver pasajeros del día (chofer) | HU |
+| HU-13 | Ver ruta óptima del día (chofer) | HU |
+| HU-14 | Marcar documento no verificado (chofer) | HU |
+| HU-15 | Validar comprobantes de transferencia (administrador) | HU |
 
 ## Etapa 3 — Gestión y pulido
 
 | ID | Tarjeta | Tipo |
 |---|---|---|
-| HU-03 | ✓ Recuperar contraseña — **implementado** (token SHA-256, tabla `password_reset_tokens`, modo consola + nodemailer SMTP) | HU |
-| HU-11 | ✓ Ver historial de viajes — **implementado** (`GET /pasajes/mis-reservas`, DTO plano con fecha/sentido/estado/origen/destino, página MisReservas con filtros futuras/pasadas y tarjetas de reserva) | HU |
+| HU-03 | Recuperar contraseña | HU |
+| HU-11 | Ver historial de viajes | HU |
+| T-16 | ✅ Armar el shell de navegación del panel de administrador (AdminLayout + placeholders "Próximamente" por sección) — **hecho** | Técnica |
 | HU-16 | Marcado automático de moroso | HU |
 | HU-17 | Reactivar a un pasajero moroso | HU |
 | HU-18 | Deshabilitar cuentas | HU |
 | HU-19 | Ver estadísticas | HU |
 | HU-20 | Editar horarios | HU |
+| T-14 | Habilitar Maps JavaScript API + Places API y crear el componente de mapa interactivo (pin + autocompletado) | Técnica |
+| HU-24 | Seleccionar domicilio con mapa (con fallback a texto) | HU |
 | HU-23 | Gestionar cupones de descuento (crear/editar más allá del PRIMERVIAJE inicial) | HU |
 | HU-21 | Configurar el descuento por transferencia/efectivo — **bloqueada**: falta que el cliente defina el monto (pendiente desde el Documento de Requisitos) | HU |
+
+## Etapa 4 — Lanzamiento a producción
+
+| ID | Tarjeta | Tipo |
+|---|---|---|
+| T-18 | Elegir hosting y documentar las variables de entorno de producción | Técnica |
+| T-19 | Configurar la base de datos de producción y correr migraciones + seed inicial | Técnica |
+| T-20 | Deploy del backend y frontend, dominio propio, HTTPS y prueba de punta a punta | Técnica |
 
 ---
 
@@ -80,6 +104,8 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 - Los paneles de **chofer** y **administrador** todavía no tienen bocetos propios (solo el flujo de compra del pasajero). Si querés, los armamos antes de empezar Etapa 2, o sobre la marcha.
 - HU-21 va a quedar frenada en "Por hacer" hasta que el cliente defina el monto del descuento — no la muevas a "En progreso" antes de eso.
 - El descuento de primera vez ahora se implementa como cupón (`PRIMERVIAJE`), no como una bandera automática — por eso se sumaron T-07 y HU-22 a la Etapa 1, y HU-23 a la Etapa 3.
+- El servicio de email (para HU-03) ya está resuelto — se implementó junto con HU-03, sin ticket propio, con un modo consola de respaldo si no hay SMTP configurado. No hace falta ninguna tarjeta nueva para esto.
+- **Mercado Pago en producción requiere verificación de cuenta de negocio** para pasar de credenciales de sandbox a credenciales reales que cobren plata de verdad — es un trámite con Mercado Pago, no técnico, así que conviene arrancarlo con tiempo antes de T-18/T-20 (parecido al trámite de verificación de Google Cloud).
 
 ---
 *Documento vivo: acompaña a `kanban-backlog.csv`, que es la fuente de verdad para importar al tablero real.*
