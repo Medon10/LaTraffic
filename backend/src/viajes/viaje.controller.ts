@@ -59,4 +59,20 @@ export class ViajeController {
     const cupo = await this.viajeService.consultarCupo(id);
     res.status(200).json(cupo);
   };
+
+  /**
+   * PATCH /viajes/:id/finalizar
+   *
+   * Cierra el viaje y dispara el marcado automático de morosos (HU-16, RN-05).
+   * Requiere rol ADMINISTRADOR (validado en las rutas).
+   */
+  finalizar = async (req: Request, res: Response): Promise<void> => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new HttpError(400, 'ID de viaje inválido');
+    }
+
+    const resultado = await this.viajeService.cerrarViaje(id);
+    res.status(200).json(resultado);
+  };
 }

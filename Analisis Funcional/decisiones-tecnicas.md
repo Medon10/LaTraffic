@@ -95,3 +95,24 @@ Esto asegura que:
 5. **Routing (`App.tsx`)**: Las rutas `/admin/*` se definen como hijas de `<AdminGuard><AdminLayout /></AdminGuard>`. La ruta índice `/admin` redirige a `/admin/transferencias`. La URL legacy `/admin/pagos` redirige a `/admin/transferencias` con `<Navigate replace>`.
 
 6. **Por qué no usar un `<ProtectedRoute>` genérico**: Se optó por un guard específico para admin (`AdminGuard`) en lugar de un componente genérico de `ProtectedRoute` parametrizado por rol. Razón: el panel admin tiene su propio layout (sin Navbar global), lo que ya obliga a un wrapper dedicado. Unificar guard + layout en un solo árbol de rutas es más claro que combinar un ProtectedRoute genérico con un AdminLayout separado.
+
+## 2026-09-28: HU-16 — Marcado automático de moroso al cerrar viaje (RN-05)
+
+**Contexto**: Al finalizar un viaje, el sistema debe detectar los pasajes con estado `no_show` cuyo pago fue en efectivo, incrementar el contador `inasistenciasEfectivo` del usuario correspondiente y activar `esMoroso = true` si llega a 3. Esta es lógica de backend automática, disparada exclusivamente por el cierre del viaje; no tiene UI propia en el panel admin (esa parte es HU-17).
+
+**Decisión**:
+
+1. **Dónde vive la lógica**: se implementó como método `cerrarViaje(viajeId)` en `ViajeService` (`src/viajes/viaje.service.ts`). Se decidió no colocarla en `AdminService` porque el cierre de un viaje es una responsabilidad de dominio del viaje en sí, no una acción exclusiva del módulo de administración de usuarios.
+
+2. **Endpoint**: `PATCH /viajes/:id/finalizar`, protegido con `verificarToken + autorizar(Rol.ADMINISTRADOR)` directamente en `viaje.routes.ts`. Las rutas GET de viajes siguen siendo públicas; solo este PATCH requiere autenticación. Se añadieron los imports de `auth.middleware` y `Rol` al archivo de rutas.
+
+3. **Transacción única**: todo el cierre — cambiar el estado del viaje a `FINALIZADO`, buscar los `no_show` en efectivo e incrementar los contadores de usuario — se ejecuta dentro de `em.transactional()` para garantizar consistencia. Si cualquier parte falla, ningún cambio queda parcialmente persistido.
+
+4. **Filtro de pasajes**: la query busca explícitamente `{ estado: NO_SHOW, pago: { metodo: EFECTIVO } }` sobre el viaje. Pasajes confirmados, cancelados o con otro método de pago no se tocan.
+
+5. **Idempotencia del flag `esMoroso`**: la condición `!usuario.esMoroso && inasistenciasEfectivo >= 3` garantiza que el flag solo se activa una vez y que el contador sigue acumulándose en viajes futuros sin pisar el estado ya marcado.
+
+6. **Respuesta**: el endpoint retorna `{ viajeId, noShowsEfectivo, nuevosMorosos, mensaje }`. Esto permite al frontend (HU-17) o a cualquier integración futura saber cuántos usuarios se impactaron sin tener que hacer queries adicionales.
+
+7. **Guardas de estado**: el método rechaza con 400 si el viaje ya es `FINALIZADO` (doble cierre) o `CANCELADO`. Cualquier estado intermedio (PROGRAMADO, EN_CURSO) es válido para cerrar.
+
