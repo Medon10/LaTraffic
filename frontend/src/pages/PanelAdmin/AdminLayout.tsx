@@ -28,7 +28,7 @@ const SECCIONES: SeccionNav[] = [
     label: 'Pasajeros Morosos',
     icono: 'person_off',
     ruta: '/admin/morosos',
-    disponible: false,
+    disponible: true,
   },
   {
     id: 'cuentas',

@@ -31,4 +31,31 @@ export class AdminController {
     const resultado = await this.adminService.validarPago(pagoId, accion, motivo);
     res.status(200).json(resultado);
   };
+
+  /**
+   * GET /admin/usuarios?moroso=true
+   *
+   * Lista los pasajeros marcados como morosos (HU-17, RF-19).
+   * El filtro ?moroso=true es el único soportado actualmente.
+   */
+  listarMorosos = async (_req: Request, res: Response): Promise<void> => {
+    const morosos = await this.adminService.listarMorosos();
+    res.status(200).json(morosos);
+  };
+
+  /**
+   * PATCH /admin/usuarios/:id/reactivar-moroso
+   *
+   * Reactiva manualmente a un pasajero moroso: pone es_moroso = false
+   * e inasistencias_efectivo = 0 (HU-17, RF-20).
+   */
+  reactivarMoroso = async (req: Request, res: Response): Promise<void> => {
+    const usuarioId = Number(req.params.id);
+    if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+      throw new HttpError(400, 'ID de usuario inválido');
+    }
+
+    const resultado = await this.adminService.reactivarMoroso(usuarioId);
+    res.status(200).json(resultado);
+  };
 }

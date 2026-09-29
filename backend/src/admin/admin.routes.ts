@@ -34,4 +34,18 @@ router.patch(
   asyncHandler(adminController.validarPago)
 );
 
+/**
+ * GET /admin/usuarios?moroso=true
+ *
+ * Lista los pasajeros marcados como morosos (HU-17, RF-19).
+ */
+router.get('/usuarios', asyncHandler(adminController.listarMorosos));
+
+/**
+ * PATCH /admin/usuarios/:id/reactivar-moroso
+ *
+ * Reactiva un pasajero moroso: es_moroso = false, inasistencias_efectivo = 0 (HU-17, RF-20).
+ */
+router.patch('/usuarios/:id/reactivar-moroso', asyncHandler(adminController.reactivarMoroso));
+
 export { router as adminRoutes };

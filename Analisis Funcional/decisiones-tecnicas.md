@@ -116,3 +116,21 @@ Esto asegura que:
 
 7. **Guardas de estado**: el método rechaza con 400 si el viaje ya es `FINALIZADO` (doble cierre) o `CANCELADO`. Cualquier estado intermedio (PROGRAMADO, EN_CURSO) es válido para cerrar.
 
+## 2026-09-28: HU-17 — Reactivar pasajero moroso (RF-20)
+
+**Contexto**: El administrador necesita poder reactivar manualmente a un pasajero marcado como moroso, reseteando su flag y contador para que vuelva a poder reservar en efectivo.
+
+**Decisión**:
+
+1. **Endpoints en `AdminService`**: se agregaron `listarMorosos()` (`GET /admin/usuarios`) y `reactivarMoroso(id)` (`PATCH /admin/usuarios/:id/reactivar-moroso`). Conviven con los endpoints de pagos en `admin.routes.ts` y `admin.controller.ts`; no se creó un router separado porque el módulo admin es único y la cantidad de rutas es manejable.
+
+2. **`GET /admin/usuarios` sin filtro de query en el backend**: el backend devuelve todos los usuarios morosos directamente (sin parsear `?moroso=true`). El query param se envía desde el frontend por claridad de semántica REST, pero el backend lo ignora ya que el único caso de uso actual es listar morosos. Si en el futuro se agrega gestión general de usuarios (HU-18), se extenderá el filtrado allí.
+
+3. **`reactivarMoroso` es idempotente en la guarda**: si el usuario ya no es moroso, el endpoint devuelve 400 en vez de silenciar la operación. Evita que una doble llamada rápida del frontend pase sin control.
+
+4. **Reset completo**: al reactivar, se pone `esMoroso = false` e `inasistenciasEfectivo = 0`. No se conserva el contador histórico; si el administrador tomó la decisión de reactivar, se asume que le da la pizarra en blanco. Es la interpretación más simple y consistente con la descripción de HU-17.
+
+5. **Frontend — `MorososPage.tsx`**: sigue exactamente el mismo patrón de `TransferenciasPage` (carga inicial con `useRef` para evitar doble fetch en Strict Mode, estado `idle/loading/success/error`, `refrescando` silencioso, procesados en sesión). La tarjeta `TarjetaMoroso` muestra nombre, DNI, email e inasistencias, con un botón "Reactivar" que da feedback inline inmediato y mueve la fila a la sección "Reactivados en esta sesión".
+
+6. **Sidebar activado**: se cambió `disponible: false → true` en la entrada `morosos` del array `SECCIONES` de `AdminLayout.tsx`, lo que convierte el ítem de "Pronto" a `<NavLink>` funcional en el panel.
+

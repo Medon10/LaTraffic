@@ -14,6 +14,7 @@ import { PanelChoferPage } from './pages/PanelChofer/panelChofer';
 // Panel de administrador — layout + secciones
 import { AdminLayout } from './pages/PanelAdmin/AdminLayout';
 import { TransferenciasPage } from './pages/PanelAdmin/panelAdmin';
+import { MorososPage } from './pages/PanelAdmin/MorososPage';
 import { AdminPlaceholder } from './pages/PanelAdmin/AdminPlaceholder';
 
 // ── Páginas de error ──────────────────────────────────────────────────────────
@@ -83,18 +84,8 @@ export const App: React.FC = () => {
           {/* HU-15 — Validar comprobantes de transferencia (implementado) */}
           <Route path="transferencias" element={<TransferenciasPage />} />
 
-          {/* HU-16 — Pasajeros morosos (placeholder) */}
-          <Route
-            path="morosos"
-            element={
-              <AdminPlaceholder
-                titulo="Pasajeros Morosos"
-                icono="person_off"
-                hu="HU-16"
-                descripcion="Listado de pasajeros con flag es_moroso=true. Permite reactivar cuentas y gestionar inasistencias de efectivo."
-              />
-            }
-          />
+          {/* HU-17 — Pasajeros morosos (implementado) */}
+          <Route path="morosos" element={<MorososPage />} />
 
           {/* HU-17 — Cuentas de usuario (placeholder) */}
           <Route

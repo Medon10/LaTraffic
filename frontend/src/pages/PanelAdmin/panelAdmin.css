@@ -471,3 +471,45 @@
 .btn-refresh--girando .material-symbols-outlined {
   animation: spin 0.6s linear infinite;
 }
+
+/* ── Sección Morosos (HU-17) ────────────────────────────────────────────────── */
+
+/* Badge rojo para el header de morosos */
+.badge--moroso {
+  background: linear-gradient(135deg, rgba(186, 26, 26, 0.1) 0%, rgba(220, 60, 60, 0.14) 100%);
+  color: var(--on-error-container);
+  border: 1px solid rgba(186, 26, 26, 0.2);
+}
+
+/* Chip rojo "Moroso" en la tarjeta */
+.moroso-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  background-color: var(--error-container);
+  color: var(--on-error-container);
+  border: 1px solid rgba(186, 26, 26, 0.2);
+}
+
+/* Contador de inasistencias */
+.moroso-inasistencias {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--on-error-container);
+}
+
+/* Tarjeta en estado reactivado — borde sutil en verde */
+.moroso-tarjeta--reactivado {
+  border-color: rgba(21, 128, 61, 0.3);
+  background-color: var(--surface-container-lowest);
+}
+

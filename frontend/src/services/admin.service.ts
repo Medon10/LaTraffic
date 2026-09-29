@@ -49,6 +49,23 @@ export interface ValidarPagoResponse {
   };
 }
 
+export interface UsuarioMoroso {
+  id: number;
+  nombre: string;
+  apellido: string;
+  dni: string | null;
+  email: string;
+  inasistenciasEfectivo: number;
+  esMoroso: boolean;
+}
+
+export interface ReactivarMorosoResponse {
+  usuarioId: number;
+  nombre: string;
+  apellido: string;
+  mensaje: string;
+}
+
 // ── Service ───────────────────────────────────────────────────────────────────
 
 export const adminService = {
@@ -80,5 +97,25 @@ export const adminService = {
       { accion, ...(motivo ? { motivo } : {}) }
     );
     return res.data;
+  },
+
+  /**
+   * HU-17 — Lista los pasajeros con es_moroso = true.
+   * Backend: GET /admin/usuarios?moroso=true (el backend actual devuelve todos los morosos sin filtro de query)
+   */
+  async getMorosos(): Promise<UsuarioMoroso[]> {
+    const res = await api.get<UsuarioMoroso[] | { data: UsuarioMoroso[] }>('/admin/usuarios', {
+      params: { moroso: 'true' },
+    });
+    if (Array.isArray(res)) return res;
+    if (res && Array.isArray((res as { data: UsuarioMoroso[] }).data)) return (res as { data: UsuarioMoroso[] }).data;
+    return [];
+  },
+
+  /**
+   * HU-17 — Reactiva un pasajero moroso: pone es_moroso = false, inasistencias_efectivo = 0.
+   */
+  async reactivarMoroso(usuarioId: number): Promise<ReactivarMorosoResponse> {
+    return api.patch<ReactivarMorosoResponse>(`/admin/usuarios/${usuarioId}/reactivar-moroso`);
   },
 };
