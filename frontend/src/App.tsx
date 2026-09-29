@@ -15,6 +15,7 @@ import { PanelChoferPage } from './pages/PanelChofer/panelChofer';
 import { AdminLayout } from './pages/PanelAdmin/AdminLayout';
 import { TransferenciasPage } from './pages/PanelAdmin/panelAdmin';
 import { MorososPage } from './pages/PanelAdmin/MorososPage';
+import { CuentasPage } from './pages/PanelAdmin/CuentasPage';
 import { AdminPlaceholder } from './pages/PanelAdmin/AdminPlaceholder';
 
 // ── Páginas de error ──────────────────────────────────────────────────────────
@@ -87,18 +88,8 @@ export const App: React.FC = () => {
           {/* HU-17 — Pasajeros morosos (implementado) */}
           <Route path="morosos" element={<MorososPage />} />
 
-          {/* HU-17 — Cuentas de usuario (placeholder) */}
-          <Route
-            path="cuentas"
-            element={
-              <AdminPlaceholder
-                titulo="Cuentas de Usuario"
-                icono="manage_accounts"
-                hu="HU-17"
-                descripcion="Gestión de usuarios: activar, desactivar y modificar datos de cuenta."
-              />
-            }
-          />
+          {/* HU-18 — Cuentas de usuario (implementado) */}
+          <Route path="cuentas" element={<CuentasPage />} />
 
           {/* HU-18 — Estadísticas (placeholder) */}
           <Route

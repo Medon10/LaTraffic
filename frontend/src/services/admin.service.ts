@@ -66,6 +66,28 @@ export interface ReactivarMorosoResponse {
   mensaje: string;
 }
 
+// ── HU-18 — Cuentas de Usuario ────────────────────────────────────────────────
+
+export interface UsuarioCuenta {
+  id: number;
+  nombre: string;
+  apellido: string;
+  dni: string | null;
+  email: string;
+  rol: string;
+  activo: boolean;
+  esMoroso: boolean;
+  fechaRegistro: string;
+}
+
+export interface CambiarEstadoResponse {
+  usuarioId: number;
+  nombre: string;
+  apellido: string;
+  activo: boolean;
+  mensaje: string;
+}
+
 // ── Service ───────────────────────────────────────────────────────────────────
 
 export const adminService = {
@@ -117,5 +139,24 @@ export const adminService = {
    */
   async reactivarMoroso(usuarioId: number): Promise<ReactivarMorosoResponse> {
     return api.patch<ReactivarMorosoResponse>(`/admin/usuarios/${usuarioId}/reactivar-moroso`);
+  },
+
+  // ── HU-18 — Cuentas de Usuario ────────────────────────────────────────────
+
+  /**
+   * HU-18 — Lista todos los usuarios (pasajeros y choferes) del sistema.
+   */
+  async getUsuarios(): Promise<UsuarioCuenta[]> {
+    const res = await api.get<UsuarioCuenta[] | { data: UsuarioCuenta[] }>('/admin/cuentas/usuarios');
+    if (Array.isArray(res)) return res;
+    if (res && Array.isArray((res as { data: UsuarioCuenta[] }).data)) return (res as { data: UsuarioCuenta[] }).data;
+    return [];
+  },
+
+  /**
+   * HU-18 — Habilita o deshabilita una cuenta de usuario.
+   */
+  async cambiarEstadoCuenta(usuarioId: number, activo: boolean): Promise<CambiarEstadoResponse> {
+    return api.patch<CambiarEstadoResponse>(`/admin/usuarios/${usuarioId}/estado`, { activo });
   },
 };

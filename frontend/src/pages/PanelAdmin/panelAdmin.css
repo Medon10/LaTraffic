@@ -513,3 +513,164 @@
   background-color: var(--surface-container-lowest);
 }
 
+/* ── Sección Cuentas de Usuario (HU-18) ─────────────────────────────────────── */
+
+/* Badge del header */
+.badge--cuentas {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.14) 100%);
+  color: #4f46e5;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+/* Tarjeta inactiva */
+.cuenta-tarjeta--inactiva {
+  opacity: 0.72;
+  border-color: var(--surface-variant);
+}
+
+/* Chip de estado (Activo / Deshabilitado) */
+.cuenta-estado-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.cuenta-estado-chip--activo {
+  background-color: var(--success-bg);
+  color: var(--success);
+  border: 1px solid rgba(21, 128, 61, 0.2);
+}
+
+.cuenta-estado-chip--inactivo {
+  background-color: var(--surface-container);
+  color: var(--on-surface-variant);
+  border: 1px solid var(--outline-variant);
+}
+
+/* Badge de rol */
+.cuenta-rol-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+}
+
+.cuenta-rol-badge--pasajero {
+  background-color: rgba(0, 101, 141, 0.1);
+  color: var(--secondary);
+  border-color: rgba(0, 101, 141, 0.18);
+}
+
+.cuenta-rol-badge--chofer {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: #4f46e5;
+  border-color: rgba(99, 102, 241, 0.18);
+}
+
+/* Filtros ──────────────────────────────────────────────────────────────────── */
+
+.cuenta-filtros {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Buscador */
+.cuenta-filtros__busqueda {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cuenta-filtros__busqueda-icon {
+  position: absolute;
+  left: 0.75rem;
+  font-size: 20px;
+  color: var(--on-surface-variant);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.cuenta-filtros__input {
+  width: 100%;
+  padding: 0.6rem 2.5rem 0.6rem 2.5rem;
+  font-family: var(--font-family);
+  font-size: 0.9rem;
+  color: var(--on-surface);
+  background-color: var(--surface-container-lowest);
+  border: 1.5px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.cuenta-filtros__input:focus {
+  outline: none;
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(0, 101, 141, 0.12);
+}
+
+.cuenta-filtros__clear {
+  position: absolute;
+  right: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.cuenta-filtros__clear:hover {
+  background-color: var(--surface-variant);
+}
+
+/* Chips de filtro */
+.cuenta-filtros__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cuenta-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--outline-variant);
+  background-color: var(--surface-container-lowest);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cuenta-chip:hover:not(.cuenta-chip--activo) {
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+.cuenta-chip--activo {
+  border-color: var(--secondary);
+  background-color: rgba(0, 101, 141, 0.08);
+  color: var(--secondary);
+  font-weight: 700;
+}
+

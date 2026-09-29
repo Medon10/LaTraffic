@@ -170,4 +170,57 @@ export class AdminService {
       mensaje: `${usuario.nombre} ${usuario.apellido} fue reactivado. Ya puede volver a reservar en efectivo.`,
     };
   }
+
+  // ── HU-18 — Gestión de cuentas de usuario ─────────────────────────────────
+
+  /**
+   * Lista todos los usuarios del sistema excepto administradores,
+   * ordenados por apellido y nombre (HU-18).
+   */
+  async listarUsuarios(): Promise<Usuario[]> {
+    const em = this.getEm();
+    return em.find(
+      Usuario,
+      { rol: { $ne: Rol.ADMINISTRADOR } },
+      { orderBy: { apellido: 'ASC', nombre: 'ASC' } }
+    );
+  }
+
+  /**
+   * Habilita o deshabilita una cuenta de usuario (HU-18, RF-21).
+   * - No se puede deshabilitar una cuenta de administrador.
+   * - Devuelve el estado final del campo `activo`.
+   */
+  async cambiarEstadoCuenta(
+    usuarioId: number,
+    activo: boolean
+  ): Promise<{
+    usuarioId: number;
+    nombre: string;
+    apellido: string;
+    activo: boolean;
+    mensaje: string;
+  }> {
+    const em = this.getEm();
+
+    const usuario = await em.findOne(Usuario, { id: usuarioId });
+    if (!usuario) {
+      throw new HttpError(404, 'Usuario no encontrado');
+    }
+    if (usuario.rol === Rol.ADMINISTRADOR) {
+      throw new HttpError(403, 'No se puede cambiar el estado de una cuenta de administrador');
+    }
+
+    usuario.activo = activo;
+    await em.flush();
+
+    const accion = activo ? 'habilitada' : 'deshabilitada';
+    return {
+      usuarioId: usuario.id,
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
+      activo: usuario.activo,
+      mensaje: `La cuenta de ${usuario.nombre} ${usuario.apellido} fue ${accion} exitosamente.`,
+    };
+  }
 }

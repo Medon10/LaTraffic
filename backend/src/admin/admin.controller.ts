@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AdminService } from './admin.service.js';
-import { ValidarPagoDto } from './admin.schema.js';
+import { ValidarPagoDto, CambiarEstadoDto } from './admin.schema.js';
 import { HttpError } from '../shared/middleware/error-handler.middleware.js';
 
 export class AdminController {
@@ -36,7 +36,6 @@ export class AdminController {
    * GET /admin/usuarios?moroso=true
    *
    * Lista los pasajeros marcados como morosos (HU-17, RF-19).
-   * El filtro ?moroso=true es el único soportado actualmente.
    */
   listarMorosos = async (_req: Request, res: Response): Promise<void> => {
     const morosos = await this.adminService.listarMorosos();
@@ -56,6 +55,35 @@ export class AdminController {
     }
 
     const resultado = await this.adminService.reactivarMoroso(usuarioId);
+    res.status(200).json(resultado);
+  };
+
+  // ── HU-18 — Gestión de cuentas ────────────────────────────────────────────
+
+  /**
+   * GET /admin/cuentas/usuarios
+   *
+   * Lista todos los usuarios (pasajeros y choferes) para gestión de cuentas (HU-18).
+   */
+  listarUsuarios = async (_req: Request, res: Response): Promise<void> => {
+    const usuarios = await this.adminService.listarUsuarios();
+    res.status(200).json(usuarios);
+  };
+
+  /**
+   * PATCH /admin/usuarios/:id/estado
+   *
+   * Habilita o deshabilita una cuenta de usuario (HU-18, RF-21).
+   * Body: { activo: boolean }
+   */
+  cambiarEstadoCuenta = async (req: Request, res: Response): Promise<void> => {
+    const usuarioId = Number(req.params.id);
+    if (!Number.isInteger(usuarioId) || usuarioId <= 0) {
+      throw new HttpError(400, 'ID de usuario inválido');
+    }
+
+    const { activo } = req.body as CambiarEstadoDto;
+    const resultado = await this.adminService.cambiarEstadoCuenta(usuarioId, activo);
     res.status(200).json(resultado);
   };
 }

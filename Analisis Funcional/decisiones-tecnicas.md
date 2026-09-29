@@ -134,3 +134,19 @@ Esto asegura que:
 
 6. **Sidebar activado**: se cambió `disponible: false → true` en la entrada `morosos` del array `SECCIONES` de `AdminLayout.tsx`, lo que convierte el ítem de "Pronto" a `<NavLink>` funcional en el panel.
 
+
+## 2026-09-29: HU-18 — Deshabilitar/Habilitar cuentas de usuario
+
+**Contexto**: El administrador necesita poder deshabilitar una cuenta (ctivo = false) para que el usuario no pueda iniciar sesión, o volver a habilitarla. El campo ctivo ya existía en la entidad Usuario y el servicio de login ya lo chequeaba (lanzaba 403 si !activo), por lo que no se requirió migración de base de datos.
+
+**Decisión**:
+
+1. **PATCH /admin/usuarios/:id/estado**: body { activo: boolean }. Validado con Zod (cambiarEstadoSchema). Devuelve 403 si se intenta aplicar sobre una cuenta con ol = 'administrador'. El check de ctivo en el login ya estaba implementado en uth.service.ts — no necesitó cambios.
+
+2. **GET /admin/cuentas/usuarios**: endpoint separado del GET /admin/usuarios (morosos) para no mezclar semántica. Devuelve todos los usuarios con ol != 'administrador' ordenados por apellido/nombre. La ruta /cuentas/usuarios evita colisión con el endpoint de morosos.
+
+3. **Frontend — CuentasPage.tsx**: lista con filtros locales (por rol, por estado activo/inactivo, búsqueda por nombre/email/DNI). Toggle optimista: actualiza el estado local inmediatamente; si hay error de backend, se muestra inline en la tarjeta. Sigue el mismo patrón que MorososPage.tsx.
+
+4. **Sidebar activado**: disponible: false -> true para la entrada cuentas en AdminLayout.tsx; el placeholder fue reemplazado por CuentasPage en App.tsx.
+
+5. **Bug corregido de paso**: en dmin.routes.ts habia un outer.get('/usuarios') duplicado (uno devolvía un mensaje estático vacío, el otro el handler de morosos). Se eliminó el primero.

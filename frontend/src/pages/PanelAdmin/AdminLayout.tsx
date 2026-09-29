@@ -35,7 +35,7 @@ const SECCIONES: SeccionNav[] = [
     label: 'Cuentas de Usuario',
     icono: 'manage_accounts',
     ruta: '/admin/cuentas',
-    disponible: false,
+    disponible: true,
   },
   {
     id: 'estadisticas',
