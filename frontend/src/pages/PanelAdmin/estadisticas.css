@@ -1,0 +1,343 @@
+/* ── Estadísticas (HU-19) ─────────────────────────────────────────────────── */
+/* Vive dentro de AdminLayout → admin-content.                                 */
+
+/* Badge del header */
+.badge--estadisticas {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(139, 92, 246, 0.16) 100%);
+  color: #7c3aed;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+/* Título de sección ──────────────────────────────────────────────────────── */
+
+.est-section-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--on-surface-variant);
+  opacity: 0.65;
+  margin-bottom: 0.75rem;
+}
+
+/* Tarjeta contenedora ──────────────────────────────────────────────────────── */
+
+.est-card {
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--surface-variant);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── KPI grid ──────────────────────────────────────────────────────────────── */
+
+.est-kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+@media (min-width: 480px) {
+  .est-kpi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 900px) {
+  .est-kpi-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.est-kpi {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--surface-variant);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.est-kpi:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--secondary-fixed-dim);
+}
+
+.est-kpi__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  background: rgba(0, 101, 141, 0.1);
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+
+.est-kpi__icon .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.est-kpi__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.est-kpi__titulo {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--on-surface-variant);
+  opacity: 0.7;
+}
+
+.est-kpi__valor {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.est-kpi__sub {
+  font-size: 0.75rem;
+  color: var(--on-surface-variant);
+  opacity: 0.75;
+}
+
+/* ── Recaudación por método ────────────────────────────────────────────────── */
+
+.est-metodos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.est-metodo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.est-metodo__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.est-metodo__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.est-metodo__icon {
+  font-size: 20px;
+}
+
+.est-metodo__nums {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.est-metodo__monto {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.01em;
+}
+
+.est-metodo__cantidad {
+  font-size: 0.78rem;
+  color: var(--on-surface-variant);
+  opacity: 0.7;
+}
+
+.est-metodo__track {
+  height: 8px;
+  background-color: var(--surface-container);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.est-metodo__fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.est-metodo__pct {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  opacity: 0.6;
+  text-align: right;
+}
+
+/* ── Gráfico de barras mensuales ────────────────────────────────────────────── */
+
+.est-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.4rem;
+  height: 180px;
+  padding: 0 0.25rem;
+  overflow-x: auto;
+}
+
+.est-chart__col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 48px;
+  height: 100%;
+}
+
+.est-chart__valor {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  opacity: 0.7;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  max-height: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.est-chart__bar-wrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.est-chart__bar {
+  width: 100%;
+  max-width: 36px;
+  background: linear-gradient(180deg, var(--secondary) 0%, rgba(0, 101, 141, 0.6) 100%);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.est-chart__bar:hover {
+  filter: brightness(1.15);
+}
+
+.est-chart__label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--on-surface-variant);
+  opacity: 0.65;
+  white-space: nowrap;
+}
+
+/* ── Tabla mensual ────────────────────────────────────────────────────────── */
+
+.est-tabla-scroll {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--surface-variant);
+}
+
+.est-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.est-tabla thead tr {
+  background-color: var(--surface-container-low);
+}
+
+.est-tabla th {
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--on-surface-variant);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.est-tabla td {
+  padding: 0.55rem 1rem;
+  border-top: 1px solid var(--surface-variant);
+  color: var(--on-surface);
+}
+
+.est-tabla tbody tr:hover {
+  background-color: var(--surface-container-low);
+}
+
+.est-tabla__monto {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* ── Pasajes por estado ─────────────────────────────────────────────────────── */
+
+.est-estados-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.est-estado-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.85rem;
+  background-color: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-full);
+}
+
+.est-estado-chip__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.est-estado-chip__label {
+  font-size: 0.82rem;
+  color: var(--on-surface-variant);
+}
+
+.est-estado-chip__cantidad {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-left: 0.1rem;
+}

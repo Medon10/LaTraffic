@@ -68,4 +68,15 @@ router.patch(
   asyncHandler(adminController.cambiarEstadoCuenta)
 );
 
+// ── HU-19 — Estadísticas ───────────────────────────────────────────────────────
+
+/**
+ * GET /admin/estadisticas
+ *
+ * Retorna métricas de recaudación total y por método de pago, pasajes por estado,
+ * ingresos mensuales (últimos 12 meses), totales de usuarios y ocupación de viajes.
+ * (HU-19, RF-22)
+ */
+router.get('/estadisticas', asyncHandler(adminController.obtenerEstadisticas));
+
 export { router as adminRoutes };

@@ -223,4 +223,162 @@ export class AdminService {
       mensaje: `La cuenta de ${usuario.nombre} ${usuario.apellido} fue ${accion} exitosamente.`,
     };
   }
+
+  // ── HU-19 — Estadísticas de recaudación ───────────────────────────────────
+
+  /**
+   * Devuelve estadísticas de recaudación y uso del sistema (HU-19, RF-22).
+   *
+   * Todas las consultas corren en paralelo para minimizar latencia.
+   * Solo se consideran pagos con estado = 'aprobado' para los totales de dinero.
+   */
+  async obtenerEstadisticas(): Promise<EstadisticasAdmin> {
+    const em = this.getEm();
+    const conn = em.getConnection();
+
+    const [
+      recaudacionPorMetodo,
+      pasajesPorEstado,
+      ingresosMensuales,
+      totalesUsuarios,
+      ocupacionViajes,
+    ] = await Promise.all([
+      // 1. Recaudación total y por método (solo pagos aprobados)
+      conn.execute(`
+        SELECT
+          metodo,
+          COUNT(*)::int            AS cantidad,
+          COALESCE(SUM(monto), 0)  AS total
+        FROM pagos
+        WHERE estado = 'aprobado'
+        GROUP BY metodo
+      `),
+
+      // 2. Pasajes por estado
+      conn.execute(`
+        SELECT estado, COUNT(*)::int AS cantidad
+        FROM pasajes
+        GROUP BY estado
+      `),
+
+      // 3. Ingresos mensuales — últimos 12 meses (pagos aprobados)
+      conn.execute(`
+        SELECT
+          TO_CHAR(fecha_pago, 'YYYY-MM') AS mes,
+          COUNT(*)::int                  AS cantidad,
+          COALESCE(SUM(monto), 0)        AS total
+        FROM pagos
+        WHERE estado = 'aprobado'
+          AND fecha_pago >= NOW() - INTERVAL '12 months'
+        GROUP BY mes
+        ORDER BY mes ASC
+      `),
+
+      // 4. Totales de usuarios
+      conn.execute(`
+        SELECT
+          COUNT(*) FILTER (WHERE rol = 'pasajero')::int   AS total_pasajeros,
+          COUNT(*) FILTER (WHERE rol = 'chofer')::int     AS total_choferes,
+          COUNT(*) FILTER (WHERE activo = false)::int     AS total_inactivos,
+          COUNT(*) FILTER (WHERE es_moroso = true)::int   AS total_morosos
+        FROM usuarios
+        WHERE rol != 'administrador'
+      `),
+
+      // 5. Ocupación promedio de los viajes finalizados
+      conn.execute(`
+        SELECT
+          COUNT(*)::int                                         AS total_viajes,
+          COALESCE(AVG(cupos_ocupados::float / NULLIF(capacidad_total, 0) * 100), 0) AS ocupacion_promedio_pct
+        FROM viajes
+        WHERE estado = 'finalizado'
+      `),
+    ]);
+
+    // ── Procesar recaudación por método ──
+    const metodos: Record<string, { cantidad: number; total: number }> = {};
+    let recaudacionTotal = 0;
+    let cantidadPagosAprobados = 0;
+
+    for (const row of recaudacionPorMetodo) {
+      const total = parseFloat(row.total);
+      metodos[row.metodo] = { cantidad: row.cantidad, total };
+      recaudacionTotal += total;
+      cantidadPagosAprobados += row.cantidad;
+    }
+
+    // ── Procesar pasajes por estado ──
+    const pasajes: Record<string, number> = {};
+    let totalPasajes = 0;
+    for (const row of pasajesPorEstado) {
+      pasajes[row.estado] = row.cantidad;
+      totalPasajes += row.cantidad;
+    }
+
+    // ── Procesar ingresos mensuales ──
+    const mensuales: { mes: string; cantidad: number; total: number }[] =
+      ingresosMensuales.map((r: any) => ({
+        mes: r.mes,
+        cantidad: r.cantidad,
+        total: parseFloat(r.total),
+      }));
+
+    // ── Totales de usuarios ──
+    const u = totalesUsuarios[0] ?? {};
+    const usuarios = {
+      totalPasajeros: u.total_pasajeros ?? 0,
+      totalChoferes: u.total_choferes ?? 0,
+      totalInactivos: u.total_inactivos ?? 0,
+      totalMorosos: u.total_morosos ?? 0,
+    };
+
+    // ── Ocupación ──
+    const oc = ocupacionViajes[0] ?? {};
+    const ocupacion = {
+      totalViajes: oc.total_viajes ?? 0,
+      ocupacionPromedioPct: parseFloat(
+        (parseFloat(oc.ocupacion_promedio_pct) || 0).toFixed(1)
+      ),
+    };
+
+    return {
+      recaudacion: {
+        total: recaudacionTotal,
+        porMetodo: metodos,
+        cantidadPagosAprobados,
+      },
+      pasajes: {
+        total: totalPasajes,
+        porEstado: pasajes,
+      },
+      ingresosMensuales: mensuales,
+      usuarios,
+      ocupacion,
+    };
+  }
+}
+
+// ── Tipos de respuesta de estadísticas ────────────────────────────────────────
+
+export interface EstadisticasAdmin {
+  recaudacion: {
+    total: number;
+    porMetodo: Record<string, { cantidad: number; total: number }>;
+    cantidadPagosAprobados: number;
+  };
+  pasajes: {
+    total: number;
+    porEstado: Record<string, number>;
+  };
+  ingresosMensuales: { mes: string; cantidad: number; total: number }[];
+  usuarios: {
+    totalPasajeros: number;
+    totalChoferes: number;
+    totalInactivos: number;
+    totalMorosos: number;
+  };
+  ocupacion: {
+    totalViajes: number;
+    ocupacionPromedioPct: number;
+  };
 }

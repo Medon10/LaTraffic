@@ -159,4 +159,43 @@ export const adminService = {
   async cambiarEstadoCuenta(usuarioId: number, activo: boolean): Promise<CambiarEstadoResponse> {
     return api.patch<CambiarEstadoResponse>(`/admin/usuarios/${usuarioId}/estado`, { activo });
   },
+
+  // ── HU-19 — Estadísticas ──────────────────────────────────────────────────
+
+  /**
+   * HU-19 — Retorna métricas de recaudación y uso del sistema.
+   */
+  async getEstadisticas(): Promise<EstadisticasAdmin> {
+    return api.get<EstadisticasAdmin>('/admin/estadisticas');
+  },
 };
+
+// ── HU-19 — Tipos de estadísticas ────────────────────────────────────────────
+
+export interface MetodoStats {
+  cantidad: number;
+  total: number;
+}
+
+export interface EstadisticasAdmin {
+  recaudacion: {
+    total: number;
+    porMetodo: Record<string, MetodoStats>;
+    cantidadPagosAprobados: number;
+  };
+  pasajes: {
+    total: number;
+    porEstado: Record<string, number>;
+  };
+  ingresosMensuales: { mes: string; cantidad: number; total: number }[];
+  usuarios: {
+    totalPasajeros: number;
+    totalChoferes: number;
+    totalInactivos: number;
+    totalMorosos: number;
+  };
+  ocupacion: {
+    totalViajes: number;
+    ocupacionPromedioPct: number;
+  };
+}

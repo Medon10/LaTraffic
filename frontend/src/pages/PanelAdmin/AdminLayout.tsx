@@ -42,7 +42,7 @@ const SECCIONES: SeccionNav[] = [
     label: 'Estadísticas',
     icono: 'bar_chart',
     ruta: '/admin/estadisticas',
-    disponible: false,
+    disponible: true,
   },
   {
     id: 'horarios',

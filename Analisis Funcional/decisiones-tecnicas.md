@@ -150,3 +150,19 @@ Esto asegura que:
 4. **Sidebar activado**: disponible: false -> true para la entrada cuentas en AdminLayout.tsx; el placeholder fue reemplazado por CuentasPage en App.tsx.
 
 5. **Bug corregido de paso**: en dmin.routes.ts habia un outer.get('/usuarios') duplicado (uno devolvía un mensaje estático vacío, el otro el handler de morosos). Se eliminó el primero.
+
+## 2026-09-29: HU-19 — Estadísticas de recaudación (RF-22)
+
+**Contexto**: El administrador necesita ver la recaudación total y desglosada por método de pago, con ingresos mensuales históricos (RF-22). No hay entidad nueva — los datos ya existen en pagos, pasajes, iajes y usuarios.
+
+**Decisión**:
+
+1. **GET /admin/estadisticas**: endpoint de solo lectura, sin parámetros. Devuelve un objeto con 5 secciones: ecaudacion (total + por método), pasajes (total + por estado), ingresosMensuales (últimos 12 meses), usuarios (totales pasajeros/choferes/inactivos/morosos) y ocupacion (viajes finalizados + % promedio).
+
+2. **SQL nativo vía em.getConnection().execute()**: se eligió sobre las APIs de MikroORM porque las queries usan FILTER, TO_CHAR, INTERVAL y NULLIF — construcciones de PostgreSQL que el QueryBuilder no maneja bien sin volverse ilegible. Las 5 queries corren en Promise.all() para minimizar latencia.
+
+3. **Solo pagos probado** para los totales de dinero: los pagos pendiente, echazado o encido no representan dinero cobrado y podrían distorsionar los números operativos del negocio.
+
+4. **Frontend — EstadisticasPage.tsx**: 4 tarjetas KPI, barras proporcionales por método de pago, gráfico de barras verticales CSS-only para los 12 meses (sin librería externa), tabla compacta con los mismos datos, y chips por estado de pasaje. CSS propio en estadisticas.css para no inflar panelAdmin.css.
+
+5. **Sidebar activado**: disponible: false -> true para la entrada estadisticas en AdminLayout.tsx.

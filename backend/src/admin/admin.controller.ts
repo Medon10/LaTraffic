@@ -86,4 +86,18 @@ export class AdminController {
     const resultado = await this.adminService.cambiarEstadoCuenta(usuarioId, activo);
     res.status(200).json(resultado);
   };
+
+  // ── HU-19 — Estadísticas ───────────────────────────────────────────────────
+
+  /**
+   * GET /admin/estadisticas
+   *
+   * Retorna métricas de recaudación y uso del sistema (HU-19, RF-22).
+   * Incluye: totales por método de pago, pasajes por estado,
+   * ingresos mensuales (12 meses), totales de usuarios y ocupación de viajes.
+   */
+  obtenerEstadisticas = async (_req: Request, res: Response): Promise<void> => {
+    const estadisticas = await this.adminService.obtenerEstadisticas();
+    res.status(200).json(estadisticas);
+  };
 }
