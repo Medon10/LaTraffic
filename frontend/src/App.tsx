@@ -17,6 +17,7 @@ import { TransferenciasPage } from './pages/PanelAdmin/panelAdmin';
 import { MorososPage } from './pages/PanelAdmin/MorososPage';
 import { CuentasPage } from './pages/PanelAdmin/CuentasPage';
 import { EstadisticasPage } from './pages/PanelAdmin/EstadisticasPage';
+import { HorariosPage } from './pages/PanelAdmin/HorariosPage';
 import { AdminPlaceholder } from './pages/PanelAdmin/AdminPlaceholder';
 
 // ── Páginas de error ──────────────────────────────────────────────────────────
@@ -95,18 +96,8 @@ export const App: React.FC = () => {
           {/* HU-19 — Estadísticas (implementado) */}
           <Route path="estadisticas" element={<EstadisticasPage />} />
 
-          {/* HU-20 — Horarios (placeholder) */}
-          <Route
-            path="horarios"
-            element={
-              <AdminPlaceholder
-                titulo="Horarios"
-                icono="schedule"
-                hu="HU-20"
-                descripcion="Alta, baja y modificación de horarios de salida para cada sentido y día de la semana."
-              />
-            }
-          />
+          {/* HU-20 — Horarios (implementado) */}
+          <Route path="horarios" element={<HorariosPage />} />
 
           {/* HU-20 a HU-23 — Cupones (placeholder) */}
           <Route

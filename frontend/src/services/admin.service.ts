@@ -88,6 +88,33 @@ export interface CambiarEstadoResponse {
   mensaje: string;
 }
 
+// ── HU-20 — Horarios ──────────────────────────────────────────────────────────
+
+export type SentidoHorario = 'colon_rosario' | 'rosario_colon';
+export type DiaSemana =
+  | 'lunes'
+  | 'martes'
+  | 'miercoles'
+  | 'jueves'
+  | 'viernes'
+  | 'sabado'
+  | 'domingo';
+
+export interface Horario {
+  id: number;
+  sentido: SentidoHorario;
+  diaSemana: DiaSemana;
+  hora: string; // HH:MM
+  activo: boolean;
+}
+
+export interface CrearHorarioDto {
+  sentido: SentidoHorario;
+  diaSemana: DiaSemana;
+  hora: string;
+  activo?: boolean;
+}
+
 // ── Service ───────────────────────────────────────────────────────────────────
 
 export const adminService = {
@@ -167,6 +194,32 @@ export const adminService = {
    */
   async getEstadisticas(): Promise<EstadisticasAdmin> {
     return api.get<EstadisticasAdmin>('/admin/estadisticas');
+  },
+
+  // ── HU-20 — Horarios ────────────────────────────────────────────────────────────────
+
+  /**
+   * HU-20 — Lista todos los horarios del sistema.
+   */
+  async getHorarios(): Promise<Horario[]> {
+    const res = await api.get<Horario[] | { data: Horario[] }>('/admin/horarios');
+    if (Array.isArray(res)) return res;
+    if (res && Array.isArray((res as { data: Horario[] }).data)) return (res as { data: Horario[] }).data;
+    return [];
+  },
+
+  /**
+   * HU-20 — Crea un nuevo horario.
+   */
+  async crearHorario(dto: CrearHorarioDto): Promise<Horario> {
+    return api.post<Horario>('/admin/horarios', dto);
+  },
+
+  /**
+   * HU-20 — Edita un horario existente (no afecta viajes ya generados).
+   */
+  async editarHorario(id: number, dto: Partial<CrearHorarioDto>): Promise<Horario> {
+    return api.patch<Horario>(`/admin/horarios/${id}`, dto);
   },
 };
 

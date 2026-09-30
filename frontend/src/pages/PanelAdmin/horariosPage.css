@@ -1,0 +1,317 @@
+/* ── Horarios Page — sección /admin/horarios (HU-20) ──────────────────────── */
+
+/* Badge específico de la sección */
+.badge--horarios {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.12) 0%, rgba(139, 92, 246, 0.14) 100%);
+  color: #7c3aed;
+  border: 1px solid rgba(79, 70, 229, 0.2);
+}
+
+/* ── Lista de horarios ──────────────────────────────────────────────────────── */
+
+.horario-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+/* ── Tarjeta de horario ─────────────────────────────────────────────────────── */
+
+.horario-card {
+  background: var(--surface-container);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.horario-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: var(--primary);
+}
+
+.horario-card--inactivo {
+  opacity: 0.65;
+}
+
+.horario-card__sentido {
+  display: flex;
+}
+
+/* Chips de sentido */
+.horario-sentido-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.horario-sentido-chip--colon_rosario {
+  background: rgba(0, 101, 141, 0.1);
+  color: var(--secondary);
+  border: 1px solid rgba(0, 101, 141, 0.18);
+}
+
+.horario-sentido-chip--rosario_colon {
+  background: rgba(79, 70, 229, 0.1);
+  color: #7c3aed;
+  border: 1px solid rgba(79, 70, 229, 0.18);
+}
+
+/* Info (día + hora) */
+.horario-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.horario-card__dia,
+.horario-card__hora {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.92rem;
+  color: var(--on-surface);
+}
+
+.horario-card__hora {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.horario-card__icon {
+  font-size: 16px;
+  color: var(--on-surface-variant);
+  flex-shrink: 0;
+}
+
+/* Footer */
+.horario-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--outline-variant);
+}
+
+/* Chips de estado */
+.horario-estado-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+
+.horario-estado-chip--activo {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid rgba(21, 128, 61, 0.2);
+}
+
+.horario-estado-chip--inactivo {
+  background: var(--error-container);
+  color: var(--on-error-container);
+  border: 1px solid rgba(186, 26, 26, 0.18);
+}
+
+/* Botón pequeño */
+.btn--sm {
+  padding: 0.3rem 0.75rem !important;
+  font-size: 0.82rem !important;
+  gap: 0.3rem !important;
+}
+
+/* ── CTA sin formulario ─────────────────────────────────────────────────────── */
+
+.horario-cta {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── Panel del formulario ───────────────────────────────────────────────────── */
+
+.horario-form-panel {
+  background: var(--surface-container);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+.horario-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.5rem;
+}
+
+.horario-form__titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin: 0 0 0.25rem;
+}
+
+.horario-form__grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.horario-form__grupo--toggle {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.horario-form__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+
+.horario-form__select,
+.horario-form__input {
+  padding: 0.6rem 0.85rem;
+  border: 1.5px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--on-surface);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.horario-form__select:focus,
+.horario-form__input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 0, 101, 141), 0.12);
+}
+
+.horario-form__select:disabled,
+.horario-form__input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Toggle switch */
+.horario-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.horario-toggle__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.horario-toggle__slider {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  background: var(--outline-variant);
+  border-radius: 999px;
+  transition: background 0.25s;
+  flex-shrink: 0;
+}
+
+.horario-toggle__slider::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.horario-toggle__input:checked ~ .horario-toggle__slider {
+  background: var(--primary);
+}
+
+.horario-toggle__input:checked ~ .horario-toggle__slider::after {
+  transform: translateX(18px);
+}
+
+.horario-toggle__label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--on-surface);
+  min-width: 52px;
+}
+
+.horario-form__acciones {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-top: 0.25rem;
+}
+
+/* Botón cerrar alerta de éxito */
+.horario-alert-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+  padding: 0;
+}
+
+.horario-alert-close:hover {
+  opacity: 1;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .horario-lista {
+    grid-template-columns: 1fr;
+  }
+
+  .horario-form__grupo--toggle {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .horario-form__acciones {
+    flex-direction: column;
+  }
+}

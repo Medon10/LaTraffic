@@ -166,3 +166,20 @@ Esto asegura que:
 4. **Frontend â€” EstadisticasPage.tsx**: 4 tarjetas KPI, barras proporcionales por mÃ©todo de pago, grÃ¡fico de barras verticales CSS-only para los 12 meses (sin librerÃ­a externa), tabla compacta con los mismos datos, y chips por estado de pasaje. CSS propio en estadisticas.css para no inflar panelAdmin.css.
 
 5. **Sidebar activado**: disponible: false -> true para la entrada estadisticas en AdminLayout.tsx.
+
+## 2026-09-30: HU-20 — Editar horarios (GET/POST/PATCH /admin/horarios)
+**Contexto**: Se implementó la gestión de horarios (plantillas recurrentes) desde el panel de administrador, conforme a RF-23. Los viajes ya generados guardan su propia `hora` copiada al momento de creación (DER §1.3), por lo que editar un horario no los afecta retroactivamente.
+
+**Decisiones**:
+
+1. **Rutas en `horario.admin.routes.ts`** (distinto de `horario.routes.ts` existente): las rutas admin se montaron en un archivo separado para no mezclar con las rutas públicas, siguiendo el patrón de `admin.routes.ts`.
+
+2. **Validación de duplicados a nivel servicio**: al crear o editar se verifica que no exista otro horario con la misma combinación (sentido + diaSemana + hora). Conflicto devuelve 409. No se agrega índice único en BD porque el volumen es pequeño y la validación en servicio es suficiente.
+
+3. **diaSemana como string enum cerrado**: validado contra lista fija en español (`lunes`...`domingo`) para mantener legibilidad en la BD y la API, consistente con el campo existente en la entidad.
+
+4. **No genera viajes**: `crearHorario` y `editarHorario` solo tocan la tabla `horarios`. La generación de viajes a partir de horarios es responsabilidad de un proceso separado (futuro HU-21).
+
+5. **Frontend — HorariosPage.tsx + horariosPage.css**: tarjetas en CSS Grid (auto-fill 280px), formulario inline con scroll automático, chips de filtro por sentido y estado, toggle switch para `activo`, nota informativa al editar sobre la integridad de viajes generados.
+
+6. **Sidebar activado**: `disponible: false` ? `true` para la entrada `horarios` en `AdminLayout.tsx`.

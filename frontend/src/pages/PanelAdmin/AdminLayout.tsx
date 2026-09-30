@@ -49,7 +49,7 @@ const SECCIONES: SeccionNav[] = [
     label: 'Horarios',
     icono: 'schedule',
     ruta: '/admin/horarios',
-    disponible: false,
+    disponible: true,
   },
   {
     id: 'cupones',

@@ -22,6 +22,7 @@ import { errorHandler } from './shared/middleware/error-handler.middleware.js';
 import { authRoutes } from './auth/auth.routes.js';
 import { usuarioRoutes } from './usuarios/usuario.routes.js';
 import { horarioRoutes } from './horarios/horario.routes.js';
+import { horarioAdminRoutes } from './horarios/horario.admin.routes.js';
 import { viajeRoutes } from './viajes/viaje.routes.js';
 import { paradaRoutes } from './paradas/parada.routes.js';
 import { pasajeRoutes } from './pasajes/pasaje.routes.js';
@@ -84,6 +85,7 @@ async function bootstrap() {
   app.use('/cupones', cuponRoutes);
   app.use('/chofer', choferRoutes);
   app.use('/admin', adminRoutes);
+  app.use('/admin/horarios', horarioAdminRoutes);
 
   // Health check
   app.get('/health', (_req, res) => {

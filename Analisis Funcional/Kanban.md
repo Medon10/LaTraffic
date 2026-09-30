@@ -82,7 +82,7 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 | HU-17 | Reactivar a un pasajero moroso | HU |
 | HU-18 | ✅ Deshabilitar cuentas — **hecho** (`PATCH /admin/usuarios/:id/estado`, `CuentasPage` en `/admin/cuentas`) | HU |
 | HU-19 | ✅ Ver estadísticas — **hecho** (`GET /admin/estadisticas`, `EstadisticasPage` en `/admin/estadisticas`) | HU |
-| HU-20 | Editar horarios | HU |
+| HU-20 | ✅ Editar horarios — **hecho** (`GET/POST/PATCH /admin/horarios`, `HorariosPage` en `/admin/horarios`) | HU |
 | T-14 | Habilitar Maps JavaScript API + Places API y crear el componente de mapa interactivo (pin + autocompletado) | Técnica |
 | HU-24 | Seleccionar domicilio con mapa (con fallback a texto) | HU |
 | HU-23 | Gestionar cupones de descuento (crear/editar más allá del PRIMERVIAJE inicial) | HU |
