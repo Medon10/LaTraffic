@@ -33,8 +33,12 @@ export class PasajeController {
         monto: body.monto,
         paradaOrigenId: body.parada_origen_id,
         domicilioOrigen: body.domicilio_origen,
+        latOrigen: body.lat_origen,
+        lonOrigen: body.lon_origen,
         paradaDestinoId: body.parada_destino_id,
         domicilioDestino: body.domicilio_destino,
+        latDestino: body.lat_destino,
+        lonDestino: body.lon_destino,
         codigoCupon: body.codigo_cupon,
       },
       usuarioId

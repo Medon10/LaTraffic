@@ -183,3 +183,16 @@ Esto asegura que:
 5. **Frontend — HorariosPage.tsx + horariosPage.css**: tarjetas en CSS Grid (auto-fill 280px), formulario inline con scroll automático, chips de filtro por sentido y estado, toggle switch para `activo`, nota informativa al editar sobre la integridad de viajes generados.
 
 6. **Sidebar activado**: `disponible: false` ? `true` para la entrada `horarios` en `AdminLayout.tsx`.
+
+## 2026-09-30: T-14 — Mapa interactivo de domicilio (Maps JavaScript API + Places API)
+**Contexto**: Los pasajeros necesitan poder indicar su domicilio de origen/destino en Rosario de forma precisa. T-09 construyo el componente MapaPicker y los campos de coordenadas en la entidad Pasaje, pero no termino de conectar el circuito completo (schema Zod sin coordenadas, controller sin pasarlas, useCheckout con placeholder).
+
+**Decision**:
+1. **API Key separada por tipo**: La key del backend (Directions API, restringida por IP) se mantiene como GOOGLE_MAPS_API_KEY en ackend/.env. La key del frontend (Maps JavaScript API + Places API) vive como VITE_GOOGLE_MAPS_API_KEY en rontend/.env y debe restringirse por HTTP referrer al dominio de produccion, no por IP. Ambas coexisten en el mismo proyecto de Google Cloud.
+2. **Schema Zod**: Se agregan lat_origen, lon_origen, lat_destino, lon_destino (todos z.number().finite().optional()) al schema crearPasajeSchema. Son opcionales — si el usuario uso texto libre sin el mapa, simplemente no vienen.
+3. **Controller**: Se pasan los cuatro campos de coordenadas del DTO al ReservarPasajeDto del service. El service ya manejaba 
+ull correctamente (ya existia desde T-09).
+4. **Frontend service**: pasajesService.crearPasaje() anade los campos de coordenadas al tipo CrearPasajePayload y los incluye en el POST /pasajes solo si son distintos de null (spread condicional).
+5. **useCheckout**: Se reemplaza el placeholder setTimeout por una llamada real a pasajesService.crearPasaje(). El payload arma el origen/destino segun el sentido del viaje (colon-rosario vs rosario-colon), incluyendo lat/lon del domicilio solo si el usuario uso el MapaPicker. El metodo_pago defaultea a 'efectivo' temporalmente hasta que se implemente el step de seleccion de pago (HU-08/09/10).
+6. **Error handling**: handleConfirmar captura errores de API y los expone via errorApiReserva; el checkout renderiza un banner inline con el mensaje sin resetear el formulario.
+7. **Fallback texto libre**: Si VITE_GOOGLE_MAPS_API_KEY no esta configurada, el useGoogleMaps hook setea error y MapaPicker renderiza un input de texto plano — la reserva funciona igual sin coordenadas.

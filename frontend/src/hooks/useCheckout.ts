@@ -2,6 +2,7 @@ import { useState, useMemo, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import type { SentidoViaje } from '../types/index.ts';
 import { validarCupon } from '../services/cupones.service.ts';
+import { pasajesService } from '../services/pasajes.service.ts';
 import { ApiError } from '../shared/api.ts';
 import type { MapaPickerResult } from '../componentes/MapaPicker.tsx';
 
@@ -25,6 +26,9 @@ export function useCheckout() {
   const horaParam = searchParams.get('hora');
   const hora = horaParam || (esColonRosario ? '18:00 hs' : '21:30 hs');
   const precio = Number(searchParams.get('precio')) || 9500;
+  const viajeId = Number(searchParams.get('viaje_id')) || 0;
+  const paradaOrigenId = searchParams.get('parada_origen_id') ? Number(searchParams.get('parada_origen_id')) : undefined;
+  const paradaDestinoId = searchParams.get('parada_destino_id') ? Number(searchParams.get('parada_destino_id')) : undefined;
   const direccionRosarioParam = searchParams.get('direccionRosario') || '';
 
   const paradaFija = esColonRosario ? origenParam : destinoParam;
@@ -123,6 +127,8 @@ export function useCheckout() {
     return qs ? `/checkout?${qs}` : '/checkout';
   }, [searchParams]);
 
+  const [errorApiReserva, setErrorApiReserva] = useState<string | null>(null);
+
   const handleConfirmar = async (e: React.FormEvent) => {
     e.preventDefault();
     // Bloqueo síncrono inmediato: si ya está procesando, ignora cualquier click posterior
@@ -135,14 +141,43 @@ export function useCheckout() {
 
     isSubmittingRef.current = true;
     setLoading(true);
+    setErrorApiReserva(null);
 
     try {
-      // Llamada a la API de reservas (HU-08/09/10)
-      // cuponId queda disponible para incluirlo en el payload
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      // Armar el payload según sentido:
+      // colon-rosario: origen = parada fija (paradaOrigenId), destino = domicilio Rosario
+      // rosario-colon: origen = domicilio Rosario,             destino = parada fija (paradaDestinoId)
+      const hayCoords = latDomicilio !== null && lonDomicilio !== null;
+
+      const payload = esColonRosario
+        ? {
+            viaje_id: viajeId,
+            metodo_pago: 'efectivo' as const, // TODO: reemplazar con el valor del step de pago (HU-08/09/10)
+            monto: precioFinal,
+            parada_origen_id: paradaOrigenId,
+            domicilio_destino: direccionRosario,
+            ...(hayCoords && { lat_destino: latDomicilio!, lon_destino: lonDomicilio! }),
+            ...(cuponId && { codigo_cupon: codigoCupon }),
+          }
+        : {
+            viaje_id: viajeId,
+            metodo_pago: 'efectivo' as const,
+            monto: precioFinal,
+            domicilio_origen: direccionRosario,
+            ...(hayCoords && { lat_origen: latDomicilio!, lon_origen: lonDomicilio! }),
+            parada_destino_id: paradaDestinoId,
+            ...(cuponId && { codigo_cupon: codigoCupon }),
+          };
+
+      await pasajesService.crearPasaje(payload);
       navigate('/mis-reservas');
     } catch (err) {
       console.error('Error al confirmar reserva:', err);
+      const mensaje =
+        err instanceof ApiError
+          ? err.message
+          : 'No pudimos confirmar la reserva. Intentá de nuevo o contactá al equipo por WhatsApp.';
+      setErrorApiReserva(mensaje);
     } finally {
       setLoading(false);
       isSubmittingRef.current = false;
@@ -173,6 +208,7 @@ export function useCheckout() {
     loading,
     redirectUrl,
     handleConfirmar,
+    errorApiReserva,
     // Cupón (HU-22)
     codigoCupon,
     setCodigoCupon,

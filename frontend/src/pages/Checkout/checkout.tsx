@@ -306,6 +306,7 @@ export const CheckoutPage: React.FC = () => {
     errorDir,
     loading,
     handleConfirmar,
+    errorApiReserva,
     // Cupón
     codigoCupon,
     setCodigoCupon,
@@ -638,6 +639,30 @@ export const CheckoutPage: React.FC = () => {
           >
             ← Modificar selección de viaje
           </Link>
+
+          {/* ── Error de API al confirmar reserva (T-14) ──────────────────── */}
+          {errorApiReserva && (
+            <div
+              role="alert"
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '0.5rem',
+                padding: '0.65rem 0.85rem',
+                background: 'var(--error-container)',
+                borderRadius: 'var(--radius-md)',
+                border: '1.5px solid var(--error)',
+                fontSize: '0.85rem',
+                color: 'var(--on-error-container)',
+                fontWeight: 500,
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>
+                error
+              </span>
+              {errorApiReserva}
+            </div>
+          )}
         </div>
       </form>
     </div>

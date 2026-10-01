@@ -18,9 +18,15 @@ export const crearPasajeSchema = z
     // Origen: exactamente uno de los dos
     parada_origen_id: z.number().int().positive().optional(),
     domicilio_origen: z.string().min(5).max(255).optional(),
+    /** Coordenadas del domicilio de origen (T-14: map picker frontend). Solo presentes si el usuario usó el mapa. */
+    lat_origen: z.number().finite().optional(),
+    lon_origen: z.number().finite().optional(),
     // Destino: exactamente uno de los dos
     parada_destino_id: z.number().int().positive().optional(),
     domicilio_destino: z.string().min(5).max(255).optional(),
+    /** Coordenadas del domicilio de destino (T-14: map picker frontend). Solo presentes si el usuario usó el mapa. */
+    lat_destino: z.number().finite().optional(),
+    lon_destino: z.number().finite().optional(),
     // Cupón opcional
     codigo_cupon: z.string().max(50).optional(),
   })
