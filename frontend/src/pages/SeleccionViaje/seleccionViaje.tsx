@@ -34,6 +34,7 @@ export const SeleccionViajePage: React.FC = () => {
   const [paradaSeleccionadaId, setParadaSeleccionadaId] = useState<number>(PARADAS_FALLBACK[0].id);
   const [direccionRosario, setDireccionRosario] = useState('');
   const [errorDireccion, setErrorDireccion] = useState(false);
+  const [loadingReserva, setLoadingReserva] = useState(false);
 
   // Fecha
   const salidasDisponibles = useWeeklyDepartures(sentido, 2);
@@ -70,12 +71,27 @@ export const SeleccionViajePage: React.FC = () => {
   const paradaSeleccionada = paradas.find((p) => p.id === paradaSeleccionadaId);
 
   // ── Validar y navegar a Checkout ───────────────────────────────────────────
-  const handleReservar = (e: React.FormEvent) => {
+  const handleReservar = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!direccionRosario.trim()) {
       setErrorDireccion(true);
       return;
+    }
+
+    setLoadingReserva(true);
+
+    let viajeId = 0;
+    try {
+      const viajes = await viajesService.getViajes(sentido, fechaISO || salidaActiva?.fechaISO || '');
+      if (viajes.length > 0) {
+        viajeId = viajes[0].id;
+      }
+    } catch {
+      // Si falla la red o el backend no está disponible en dev, viajeId queda en 0.
+      // El checkout fallará al confirmar si no hay viaje, mostrando el error correspondiente.
+    } finally {
+      setLoadingReserva(false);
     }
 
     const origen =
@@ -94,10 +110,20 @@ export const SeleccionViajePage: React.FC = () => {
       destino,
       fecha: salidaActiva?.fechaFormato || '',
       hora: salidaActiva?.hora || '',
-      paradaId: String(paradaSeleccionadaId),
-      direccionRosario: direccionRosario.trim(),
       precio: String(precioBase),
+      direccionRosario: direccionRosario.trim(),
     });
+
+    if (viajeId > 0) params.set('viaje_id', String(viajeId));
+
+    // Según el sentido, la parada es origen o destino del pasaje:
+    //   colon-rosario: parada = origen fijo, domicilio = destino
+    //   rosario-colon: domicilio = origen, parada = destino fijo
+    if (sentido === 'colon-rosario') {
+      params.set('parada_origen_id', String(paradaSeleccionadaId));
+    } else {
+      params.set('parada_destino_id', String(paradaSeleccionadaId));
+    }
 
     navigate(`/checkout?${params.toString()}`);
   };
@@ -315,9 +341,27 @@ export const SeleccionViajePage: React.FC = () => {
           />
 
           {/* CTA */}
-          <button type="submit" className="btn-reserve-main">
-            <span>Continuar con la reserva • Precio base ${precioBase.toLocaleString('es-AR')}</span>
-            <span className="material-symbols-outlined">arrow_forward</span>
+          <button
+            type="submit"
+            className="btn-reserve-main"
+            disabled={loadingReserva}
+            aria-disabled={loadingReserva}
+            style={{
+              opacity: loadingReserva ? 0.7 : 1,
+              pointerEvents: loadingReserva ? 'none' : 'auto',
+            }}
+          >
+            {loadingReserva ? (
+              <>
+                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>hourglass_empty</span>
+                Buscando viaje...
+              </>
+            ) : (
+              <>
+                <span>Continuar con la reserva • Precio base ${precioBase.toLocaleString('es-AR')}</span>
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </>
+            )}
           </button>
         </form>
       </section>

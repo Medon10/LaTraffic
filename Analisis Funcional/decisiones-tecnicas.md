@@ -137,62 +137,72 @@ Esto asegura que:
 
 ## 2026-09-29: HU-18 — Deshabilitar/Habilitar cuentas de usuario
 
-**Contexto**: El administrador necesita poder deshabilitar una cuenta (ctivo = false) para que el usuario no pueda iniciar sesión, o volver a habilitarla. El campo ctivo ya existía en la entidad Usuario y el servicio de login ya lo chequeaba (lanzaba 403 si !activo), por lo que no se requirió migración de base de datos.
+**Contexto**: El administrador necesita poder deshabilitar una cuenta (`activo = false`) para que el usuario no pueda iniciar sesión, o volver a habilitarla. El campo `activo` ya existía en la entidad Usuario y el servicio de login ya lo chequeaba (lanzaba 403 si !activo), por lo que no se requirió migración de base de datos.
 
 **Decisión**:
 
-1. **PATCH /admin/usuarios/:id/estado**: body { activo: boolean }. Validado con Zod (cambiarEstadoSchema). Devuelve 403 si se intenta aplicar sobre una cuenta con ol = 'administrador'. El check de ctivo en el login ya estaba implementado en uth.service.ts — no necesitó cambios.
+1. **PATCH /admin/usuarios/:id/estado**: body `{ activo: boolean }`. Validado con Zod (`cambiarEstadoSchema`). Devuelve 403 si se intenta aplicar sobre una cuenta con `rol = 'administrador'`. El check de `activo` en el login ya estaba implementado en `auth.service.ts` — no necesitó cambios.
 
-2. **GET /admin/cuentas/usuarios**: endpoint separado del GET /admin/usuarios (morosos) para no mezclar semántica. Devuelve todos los usuarios con ol != 'administrador' ordenados por apellido/nombre. La ruta /cuentas/usuarios evita colisión con el endpoint de morosos.
+2. **GET /admin/cuentas/usuarios**: endpoint separado del GET /admin/usuarios (morosos) para no mezclar semántica. Devuelve todos los usuarios con `rol != 'administrador'` ordenados por apellido/nombre. La ruta `/cuentas/usuarios` evita colisión con el endpoint de morosos.
 
 3. **Frontend — CuentasPage.tsx**: lista con filtros locales (por rol, por estado activo/inactivo, búsqueda por nombre/email/DNI). Toggle optimista: actualiza el estado local inmediatamente; si hay error de backend, se muestra inline en la tarjeta. Sigue el mismo patrón que MorososPage.tsx.
 
-4. **Sidebar activado**: disponible: false -> true para la entrada cuentas en AdminLayout.tsx; el placeholder fue reemplazado por CuentasPage en App.tsx.
+4. **Sidebar activado**: `disponible: false → true` para la entrada `cuentas` en `AdminLayout.tsx`; el placeholder fue reemplazado por `CuentasPage` en `App.tsx`.
 
-5. **Bug corregido de paso**: en dmin.routes.ts habia un outer.get('/usuarios') duplicado (uno devolvía un mensaje estático vacío, el otro el handler de morosos). Se eliminó el primero.
+5. **Bug corregido de paso**: en `admin.routes.ts` había un `router.get('/usuarios')` duplicado (uno devolvía un mensaje estático vacío, el otro el handler de morosos). Se eliminó el primero.
 
 ## 2026-09-29: HU-19 — Estadísticas de recaudación (RF-22)
 
-**Contexto**: El administrador necesita ver la recaudación total y desglosada por método de pago, con ingresos mensuales históricos (RF-22). No hay entidad nueva — los datos ya existen en pagos, pasajes, iajes y usuarios.
+**Contexto**: El administrador necesita ver la recaudación total y desglosada por método de pago, con ingresos mensuales históricos (RF-22). No hay entidad nueva — los datos ya existen en pagos, pasajes, viajes y usuarios.
 
 **Decisión**:
 
-1. **GET /admin/estadisticas**: endpoint de solo lectura, sin parámetros. Devuelve un objeto con 5 secciones: ecaudacion (total + por método), pasajes (total + por estado), ingresosMensuales (últimos 12 meses), usuarios (totales pasajeros/choferes/inactivos/morosos) y ocupacion (viajes finalizados + % promedio).
+1. **GET /admin/estadisticas**: endpoint de solo lectura, sin parámetros. Devuelve un objeto con 5 secciones: `recaudacion` (total + por método), `pasajes` (total + por estado), `ingresosMensuales` (últimos 12 meses), `usuarios` (totales pasajeros/choferes/inactivos/morosos) y `ocupacion` (viajes finalizados + % promedio).
 
 2. **SQL nativo vía em.getConnection().execute()**: se eligió sobre las APIs de MikroORM porque las queries usan FILTER, TO_CHAR, INTERVAL y NULLIF — construcciones de PostgreSQL que el QueryBuilder no maneja bien sin volverse ilegible. Las 5 queries corren en Promise.all() para minimizar latencia.
 
-3. **Solo pagos probado** para los totales de dinero: los pagos pendiente, echazado o encido no representan dinero cobrado y podrían distorsionar los números operativos del negocio.
+3. **Solo pagos aprobado** para los totales de dinero: los pagos `pendiente`, `rechazado` o `vencido` no representan dinero cobrado y podrían distorsionar los números operativos del negocio.
 
-4. **Frontend — EstadisticasPage.tsx**: 4 tarjetas KPI, barras proporcionales por método de pago, gráfico de barras verticales CSS-only para los 12 meses (sin librería externa), tabla compacta con los mismos datos, y chips por estado de pasaje. CSS propio en estadisticas.css para no inflar panelAdmin.css.
+4. **Frontend — EstadisticasPage.tsx**: 4 tarjetas KPI, barras proporcionales por método de pago, gráfico de barras verticales CSS-only para los 12 meses (sin librería externa), tabla compacta con los mismos datos, y chips por estado de pasaje. CSS propio en `estadisticas.css` para no inflar `panelAdmin.css`.
 
-5. **Sidebar activado**: disponible: false -> true para la entrada estadisticas en AdminLayout.tsx.
+5. **Sidebar activado**: `disponible: false → true` para la entrada `estadisticas` en `AdminLayout.tsx`.
 
-## 2026-09-30: HU-20 � Editar horarios (GET/POST/PATCH /admin/horarios)
-**Contexto**: Se implement� la gesti�n de horarios (plantillas recurrentes) desde el panel de administrador, conforme a RF-23. Los viajes ya generados guardan su propia `hora` copiada al momento de creaci�n (DER �1.3), por lo que editar un horario no los afecta retroactivamente.
+## 2026-09-30: HU-20 — Editar horarios (GET/POST/PATCH /admin/horarios)
+**Contexto**: Se implementó la gestión de horarios (plantillas recurrentes) desde el panel de administrador, conforme a RF-23. Los viajes ya generados guardan su propia `hora` copiada al momento de creación (DER §1.3), por lo que editar un horario no los afecta retroactivamente.
 
 **Decisiones**:
 
-1. **Rutas en `horario.admin.routes.ts`** (distinto de `horario.routes.ts` existente): las rutas admin se montaron en un archivo separado para no mezclar con las rutas p�blicas, siguiendo el patr�n de `admin.routes.ts`.
+1. **Rutas en `horario.admin.routes.ts`** (distinto de `horario.routes.ts` existente): las rutas admin se montaron en un archivo separado para no mezclar con las rutas públicas, siguiendo el patrón de `admin.routes.ts`.
 
-2. **Validaci�n de duplicados a nivel servicio**: al crear o editar se verifica que no exista otro horario con la misma combinaci�n (sentido + diaSemana + hora). Conflicto devuelve 409. No se agrega �ndice �nico en BD porque el volumen es peque�o y la validaci�n en servicio es suficiente.
+2. **Validación de duplicados a nivel servicio**: al crear o editar se verifica que no exista otro horario con la misma combinación (sentido + diaSemana + hora). Conflicto devuelve 409. No se agrega índice único en BD porque el volumen es pequeño y la validación en servicio es suficiente.
 
-3. **diaSemana como string enum cerrado**: validado contra lista fija en espa�ol (`lunes`...`domingo`) para mantener legibilidad en la BD y la API, consistente con el campo existente en la entidad.
+3. **diaSemana como string enum cerrado**: validado contra lista fija en español (`lunes`...`domingo`) para mantener legibilidad en la BD y la API, consistente con el campo existente en la entidad.
 
-4. **No genera viajes**: `crearHorario` y `editarHorario` solo tocan la tabla `horarios`. La generaci�n de viajes a partir de horarios es responsabilidad de un proceso separado (futuro HU-21).
+4. **No genera viajes**: `crearHorario` y `editarHorario` solo tocan la tabla `horarios`. La generación de viajes a partir de horarios es responsabilidad de un proceso separado (futuro HU-21).
 
-5. **Frontend � HorariosPage.tsx + horariosPage.css**: tarjetas en CSS Grid (auto-fill 280px), formulario inline con scroll autom�tico, chips de filtro por sentido y estado, toggle switch para `activo`, nota informativa al editar sobre la integridad de viajes generados.
+5. **Frontend — HorariosPage.tsx + horariosPage.css**: tarjetas en CSS Grid (auto-fill 280px), formulario inline con scroll automático, chips de filtro por sentido y estado, toggle switch para `activo`, nota informativa al editar sobre la integridad de viajes generados.
 
-6. **Sidebar activado**: `disponible: false` ? `true` para la entrada `horarios` en `AdminLayout.tsx`.
+6. **Sidebar activado**: `disponible: false → true` para la entrada `horarios` en `AdminLayout.tsx`.
 
-## 2026-09-30: T-14 � Mapa interactivo de domicilio (Maps JavaScript API + Places API)
-**Contexto**: Los pasajeros necesitan poder indicar su domicilio de origen/destino en Rosario de forma precisa. T-09 construyo el componente MapaPicker y los campos de coordenadas en la entidad Pasaje, pero no termino de conectar el circuito completo (schema Zod sin coordenadas, controller sin pasarlas, useCheckout con placeholder).
+## 2026-09-30: T-14 — Mapa interactivo de domicilio (Maps JavaScript API + Places API)
+**Contexto**: Los pasajeros necesitan poder indicar su domicilio de origen/destino en Rosario de forma precisa. T-09 construyó el componente MapaPicker y los campos de coordenadas en la entidad Pasaje, pero no terminó de conectar el circuito completo (schema Zod sin coordenadas, controller sin pasarlas, useCheckout con placeholder).
 
-**Decision**:
-1. **API Key separada por tipo**: La key del backend (Directions API, restringida por IP) se mantiene como GOOGLE_MAPS_API_KEY en ackend/.env. La key del frontend (Maps JavaScript API + Places API) vive como VITE_GOOGLE_MAPS_API_KEY en rontend/.env y debe restringirse por HTTP referrer al dominio de produccion, no por IP. Ambas coexisten en el mismo proyecto de Google Cloud.
-2. **Schema Zod**: Se agregan lat_origen, lon_origen, lat_destino, lon_destino (todos z.number().finite().optional()) al schema crearPasajeSchema. Son opcionales � si el usuario uso texto libre sin el mapa, simplemente no vienen.
-3. **Controller**: Se pasan los cuatro campos de coordenadas del DTO al ReservarPasajeDto del service. El service ya manejaba 
-ull correctamente (ya existia desde T-09).
-4. **Frontend service**: pasajesService.crearPasaje() anade los campos de coordenadas al tipo CrearPasajePayload y los incluye en el POST /pasajes solo si son distintos de null (spread condicional).
-5. **useCheckout**: Se reemplaza el placeholder setTimeout por una llamada real a pasajesService.crearPasaje(). El payload arma el origen/destino segun el sentido del viaje (colon-rosario vs rosario-colon), incluyendo lat/lon del domicilio solo si el usuario uso el MapaPicker. El metodo_pago defaultea a 'efectivo' temporalmente hasta que se implemente el step de seleccion de pago (HU-08/09/10).
-6. **Error handling**: handleConfirmar captura errores de API y los expone via errorApiReserva; el checkout renderiza un banner inline con el mensaje sin resetear el formulario.
-7. **Fallback texto libre**: Si VITE_GOOGLE_MAPS_API_KEY no esta configurada, el useGoogleMaps hook setea error y MapaPicker renderiza un input de texto plano � la reserva funciona igual sin coordenadas.
+**Decisión**:
+1. **API Key separada por tipo**: La key del backend (Directions API, restringida por IP) se mantiene como GOOGLE_MAPS_API_KEY en `backend/.env`. La key del frontend (Maps JavaScript API + Places API) vive como VITE_GOOGLE_MAPS_API_KEY en `frontend/.env` y debe restringirse por HTTP referrer al dominio de producción, no por IP. Ambas coexisten en el mismo proyecto de Google Cloud.
+2. **Schema Zod**: Se agregan `lat_origen`, `lon_origen`, `lat_destino`, `lon_destino` (todos `z.number().finite().optional()`) al schema `crearPasajeSchema`. Son opcionales — si el usuario usó texto libre sin el mapa, simplemente no vienen.
+3. **Controller**: Se pasan los cuatro campos de coordenadas del DTO al `ReservarPasajeDto` del service. El service ya manejaba `null` correctamente (ya existía desde T-09).
+4. **Frontend service**: `pasajesService.crearPasaje()` añade los campos de coordenadas al tipo `CrearPasajePayload` y los incluye en el `POST /pasajes` solo si son distintos de `null` (spread condicional).
+5. **useCheckout**: Se reemplaza el placeholder `setTimeout` por una llamada real a `pasajesService.crearPasaje()`. El payload arma el origen/destino según el sentido del viaje (`colon-rosario` vs `rosario-colon`), incluyendo lat/lon del domicilio solo si el usuario usó el MapaPicker. El `metodo_pago` defaultea a `'efectivo'` temporalmente hasta que se implemente el step de selección de pago (HU-08/09/10).
+6. **Error handling**: `handleConfirmar` captura errores de API y los expone vía `errorApiReserva`; el checkout renderiza un banner inline con el mensaje sin resetear el formulario.
+7. **Fallback texto libre**: Si `VITE_GOOGLE_MAPS_API_KEY` no está configurada, el hook `useGoogleMaps` setea error y `MapaPicker` renderiza un input de texto plano — la reserva funciona igual sin coordenadas.
+
+## 2026-10-01: HU-24 — Seleccionar domicilio con mapa (integración completa del flujo)
+**Contexto**: T-14 construyó el componente MapaPicker y lo integró en el Checkout, pero el flujo no cerraba porque SeleccionViaje nunca resolvía el `viaje_id` real del backend, por lo que `POST /pasajes` siempre recibía `viaje_id = 0`.
+
+**Decisión**:
+1. **Resolución asíncrona de `viaje_id`**: `handleReservar` en `SeleccionViajePage` se convierte en `async`. Al presionar "Continuar", llama a `GET /viajes?sentido=&fecha=` para obtener el viaje real del backend, extrae `viajes[0].id` y lo pasa como `viaje_id` en los query params del checkout.
+2. **Nombrado correcto de paradas**: se reemplaza el genérico `paradaId` por `parada_origen_id` (cuando sentido es `colon-rosario`, la parada es el origen) o `parada_destino_id` (cuando es `rosario-colon`, la parada es el destino). `useCheckout` ya leía estos nombres desde T-14.
+3. **Fallback silencioso**: si `getViajes()` falla (backend no disponible en dev), `viaje_id` queda en 0 y la navegación igual ocurre; el checkout mostrará el error de la API al intentar confirmar.
+4. **UX: botón de loading**: el CTA muestra "Buscando viaje..." y se deshabilita durante la consulta asíncrona para evitar doble click.
+5. **`chofer.service.ts`**: la lógica de preferencia de coordenadas ya estaba implementada desde T-09 (`latOrigen`/`lonOrigen` → `WaypointCoords`, fallback a `WaypointAddress`). HU-24 confirma y documenta que este circuito está cerrado end-to-end.
+6. **Nuevo tipo `Viaje`** en `frontend/src/types/viaje.ts` y nueva función `viajesService.getViajes()` con normalización de sentido (guión → guión bajo para el backend).

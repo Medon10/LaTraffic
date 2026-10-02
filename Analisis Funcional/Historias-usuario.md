@@ -236,6 +236,18 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 
 **Trazabilidad:** RF-24 · **Prioridad:** Baja
 
+### HU-24 — Seleccionar domicilio con mapa interactivo
+**Como** pasajero, **quiero** poder indicar mi domicilio de origen/destino en Rosario usando un mapa interactivo con autocompletado, **para** que el chofer tenga la ubicación exacta y la ruta del día se calcule con mayor precisión.
+
+**Criterios de aceptación:**
+- En el paso de completar la reserva (HU-07), el campo de domicilio muestra un mapa con un pin arrastrable y autocompletado de dirección (estilo PedidosYa / Uber) como opción preferida.
+- Si el pasajero selecciona una ubicación con el mapa, las coordenadas (lat/lon) quedan guardadas junto con el texto de la dirección en el pasaje.
+- Si el pasajero escribe manualmente sin usar el mapa, el campo de texto libre sigue funcionando igual que antes; no se guardan coordenadas (lat/lon quedan null).
+- Si la API de Google Maps no está disponible (sin clave o error de carga), el sistema cae al input de texto libre transparentemente.
+- El chofer, al consultar la ruta del día (T-08), recibe las coordenadas exactas del domicilio cuando están disponibles, en lugar del string de dirección, para una ruta más precisa.
+
+**Trazabilidad:** RF-05, RF-06, RF-16, T-08, T-14 · **Prioridad:** Alta
+
 ---
 
 ## Resumen de trazabilidad

@@ -34,8 +34,8 @@ T-10,Eliminar el fallback inseguro de TOKEN_SECRET,Tecnica,Correccion - Verifica
 T-11,Expiracion para reservas de Mercado Pago pendientes,Tecnica,Correccion - Verificacion Etapa 1,Alta,verificacion-etapa1
 T-12,Indice unico cupon_id+usuario_id y deshabilitar boton durante el envio,Tecnica,Correccion - Verificacion Etapa 1,Media,verificacion-etapa1
 T-13,Sincronizar HU-09 y campo mpPaymentId en la documentacion,Tecnica,Correccion - Verificacion Etapa 1,Media,verificacion-etapa1
-T-14,Habilitar Maps JavaScript API + Places API y crear el mapa interactivo,Tecnica,Etapa 3 - Gestion y pulido,Media,diseno-arquitectura
-HU-24,Seleccionar domicilio con mapa (con fallback a texto),HU,Etapa 3 - Gestion y pulido,Media,RF-28;RF-29
+T-14,Habilitar Maps JavaScript API + Places API y crear el mapa interactivo,Tecnica,Etapa 3 - Gestion y pulido,Media,diseno-arquitectura,Hecho
+HU-24,Seleccionar domicilio con mapa (con fallback a texto),HU,Etapa 3 - Gestion y pulido,Media,RF-28;RF-29,Hecho
 T-15,Sincronizar nombres de campos de coordenadas (latOrigen/lonOrigen) en documentacion,Tecnica,Correccion - Verificacion Etapa 2,Baja,verificacion-etapa2
 T-16,Armar el shell de navegacion del panel de administrador (AdminLayout + placeholders),Tecnica,Etapa 3 - Gestion y pulido,Alta,diseno-arquitectura
 T-18,Elegir hosting y documentar variables de entorno de produccion,Tecnica,Etapa 4 - Lanzamiento a produccion,Alta,diseno-arquitectura
