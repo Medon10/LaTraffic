@@ -49,9 +49,11 @@ export function useCheckout() {
 
   const isSubmittingRef = useRef(false);
   const [direccionRosario, setDireccionRosario] = useState(direccionRosarioParam);
-  /** Coordenadas del domicilio seleccionado con el map picker (T-09). */
-  const [latDomicilio, setLatDomicilio] = useState<number | null>(null);
-  const [lonDomicilio, setLonDomicilio] = useState<number | null>(null);
+  const latParam = searchParams.get('lat');
+  const lngParam = searchParams.get('lng');
+
+  const [latDomicilio, setLatDomicilio] = useState<number | null>(latParam ? Number(latParam) : null);
+  const [lonDomicilio, setLonDomicilio] = useState<number | null>(lngParam ? Number(lngParam) : null);
   const [errorDir, setErrorDir] = useState(false);
   const [loading, setLoading] = useState(false);
 

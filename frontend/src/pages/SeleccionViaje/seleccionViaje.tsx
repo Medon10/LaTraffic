@@ -4,6 +4,8 @@ import type { SentidoViaje, Parada } from '../../types/index.ts';
 import { viajesService, PARADAS_FALLBACK } from '../../services/viajes.service.ts';
 import { useWeeklyDepartures } from '../../hooks/useWeeklyDepartures.ts';
 import { StopField, PriceSummary } from '../../componentes/ui/index.ts';
+import { MapaPicker } from '../../componentes/MapaPicker.tsx';
+import type { MapaPickerResult } from '../../hooks/useGoogleMaps.ts';
 import './seleccionViaje.css';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -33,8 +35,22 @@ export const SeleccionViajePage: React.FC = () => {
   // Campos de origen/destino
   const [paradaSeleccionadaId, setParadaSeleccionadaId] = useState<number>(PARADAS_FALLBACK[0].id);
   const [direccionRosario, setDireccionRosario] = useState('');
+  const [latDomicilio, setLatDomicilio] = useState<number | null>(null);
+  const [lonDomicilio, setLonDomicilio] = useState<number | null>(null);
   const [errorDireccion, setErrorDireccion] = useState(false);
   const [loadingReserva, setLoadingReserva] = useState(false);
+
+  const handleDireccionChange = (result: MapaPickerResult) => {
+    setDireccionRosario(result.direccion);
+    if (result.direccion && result.lat !== 0 && result.lng !== 0) {
+      setLatDomicilio(result.lat);
+      setLonDomicilio(result.lng);
+    } else {
+      setLatDomicilio(null);
+      setLonDomicilio(null);
+    }
+    if (errorDireccion) setErrorDireccion(false);
+  };
 
   // Fecha
   const salidasDisponibles = useWeeklyDepartures(sentido, 2);
@@ -61,11 +77,12 @@ export const SeleccionViajePage: React.FC = () => {
     };
   }, []);
 
-  // Resetear error de dirección y parada seleccionada al cambiar sentido
   const handleCambiarSentido = (nuevo: SentidoViaje) => {
     setSentido(nuevo);
     setErrorDireccion(false);
     setDireccionRosario('');
+    setLatDomicilio(null);
+    setLonDomicilio(null);
   };
 
   const paradaSeleccionada = paradas.find((p) => p.id === paradaSeleccionadaId);
@@ -113,6 +130,11 @@ export const SeleccionViajePage: React.FC = () => {
       precio: String(precioBase),
       direccionRosario: direccionRosario.trim(),
     });
+
+    if (latDomicilio !== null && lonDomicilio !== null) {
+      params.set('lat', String(latDomicilio));
+      params.set('lng', String(lonDomicilio));
+    }
 
     if (viajeId > 0) params.set('viaje_id', String(viajeId));
 
@@ -279,17 +301,14 @@ export const SeleccionViajePage: React.FC = () => {
                   ))}
                 </select>
               ) : (
-                <input
-                  id="input-domicilio-origen"
-                  type="text"
-                  value={direccionRosario}
-                  onChange={(e) => {
-                    setDireccionRosario(e.target.value);
-                    if (errorDireccion) setErrorDireccion(false);
-                  }}
+                <MapaPicker
+                  inputId="input-domicilio-origen"
+                  label={labelOrigen}
                   placeholder={placeholderDir}
-                  className="stop-address-input"
-                  autoComplete="street-address"
+                  value={direccionRosario}
+                  onChange={handleDireccionChange}
+                  hasError={!mostrarParadaOrigen && errorDireccion}
+                  errorMessage={errorMsgDir}
                 />
               )}
             </StopField>
@@ -317,17 +336,14 @@ export const SeleccionViajePage: React.FC = () => {
                   ))}
                 </select>
               ) : (
-                <input
-                  id="input-domicilio-destino"
-                  type="text"
-                  value={direccionRosario}
-                  onChange={(e) => {
-                    setDireccionRosario(e.target.value);
-                    if (errorDireccion) setErrorDireccion(false);
-                  }}
+                <MapaPicker
+                  inputId="input-domicilio-destino"
+                  label={labelDestino}
                   placeholder={placeholderDir}
-                  className="stop-address-input"
-                  autoComplete="street-address"
+                  value={direccionRosario}
+                  onChange={handleDireccionChange}
+                  hasError={mostrarParadaOrigen && errorDireccion}
+                  errorMessage={errorMsgDir}
                 />
               )}
             </StopField>
