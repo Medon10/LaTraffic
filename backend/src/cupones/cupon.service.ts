@@ -6,6 +6,7 @@ import { CuponUso } from './cupon-uso.entity.js';
 import { Cupon } from './cupon.entity.js';
 import { Usuario } from '../usuarios/usuario.entity.js';
 import { Pasaje } from '../pasajes/pasaje.entity.js';
+import { CrearCuponDto, ActualizarCuponDto } from './cupon.schema.js';
 
 export interface CuponValidado {
   cuponId: number;
@@ -117,5 +118,59 @@ export class CuponService {
     }
     // MONTO_FIJO: no puede exceder el precio base
     return Math.min(valor, precioBase);
+  }
+
+  // ── HU-23 — Gestión de cupones (admin) ────────────────────────────────────
+
+  /**
+   * Lista todos los cupones del sistema (activos e inactivos).
+   * GET /admin/cupones
+   */
+  async listarCupones(): Promise<Cupon[]> {
+    return this.cuponRepo.listarTodos();
+  }
+
+  /**
+   * Crea un nuevo cupón. Lanza 409 si el código ya existe.
+   * POST /admin/cupones
+   */
+  async crearCupon(dto: CrearCuponDto): Promise<Cupon> {
+    // Verificar unicidad del código (case-insensitive)
+    const existente = await this.cuponRepo.findByCodigo(dto.codigo);
+    if (existente) {
+      throw new HttpError(409, `Ya existe un cupón con el código "${dto.codigo.toUpperCase()}"`);
+    }
+
+    return this.cuponRepo.create({
+      codigo: dto.codigo.toUpperCase(),
+      tipo: dto.tipo as TipoCupon,
+      valor: dto.valor,
+      fechaInicio: dto.fechaInicio ? new Date(dto.fechaInicio) : null,
+      fechaFin: dto.fechaFin ? new Date(dto.fechaFin) : null,
+      usoUnicoPorPersona: dto.usoUnicoPorPersona,
+      activo: dto.activo,
+    } as any);
+  }
+
+  /**
+   * Actualiza los campos editables de un cupón (tipo, valor, vigencia, activo, uso único).
+   * El código no se puede cambiar para no romper referencias en CuponUso.
+   * PATCH /admin/cupones/:id
+   */
+  async actualizarCupon(id: number, dto: ActualizarCuponDto): Promise<Cupon> {
+    const cupon = await this.cuponRepo.findById(id);
+    if (!cupon) {
+      throw new HttpError(404, 'Cupón no encontrado');
+    }
+
+    const cambios: Partial<Cupon> = {};
+    if (dto.tipo !== undefined) cambios.tipo = dto.tipo as TipoCupon;
+    if (dto.valor !== undefined) cambios.valor = dto.valor as any;
+    if (dto.usoUnicoPorPersona !== undefined) cambios.usoUnicoPorPersona = dto.usoUnicoPorPersona;
+    if (dto.activo !== undefined) cambios.activo = dto.activo;
+    if ('fechaInicio' in dto) cambios.fechaInicio = dto.fechaInicio ? new Date(dto.fechaInicio) : null;
+    if ('fechaFin' in dto) cambios.fechaFin = dto.fechaFin ? new Date(dto.fechaFin) : null;
+
+    return this.cuponRepo.update(cupon, cambios as any);
   }
 }

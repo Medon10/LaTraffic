@@ -18,7 +18,7 @@ import { MorososPage } from './pages/PanelAdmin/MorososPage';
 import { CuentasPage } from './pages/PanelAdmin/CuentasPage';
 import { EstadisticasPage } from './pages/PanelAdmin/EstadisticasPage';
 import { HorariosPage } from './pages/PanelAdmin/HorariosPage';
-import { AdminPlaceholder } from './pages/PanelAdmin/AdminPlaceholder';
+import { CuponesPage } from './pages/PanelAdmin/CuponesPage';
 
 // ── Páginas de error ──────────────────────────────────────────────────────────
 
@@ -99,18 +99,8 @@ export const App: React.FC = () => {
           {/* HU-20 — Horarios (implementado) */}
           <Route path="horarios" element={<HorariosPage />} />
 
-          {/* HU-20 a HU-23 — Cupones (placeholder) */}
-          <Route
-            path="cupones"
-            element={
-              <AdminPlaceholder
-                titulo="Cupones de Descuento"
-                icono="local_activity"
-                hu="HU-20"
-                descripcion="Creación y gestión de cupones de descuento (monto fijo o porcentaje) con fechas de vigencia."
-              />
-            }
-          />
+          {/* HU-23 — Cupones (implementado) */}
+          <Route path="cupones" element={<CuponesPage />} />
         </Route>
 
         {/* Ruta legacy — redirige la vieja URL /admin/pagos a la nueva sección */}

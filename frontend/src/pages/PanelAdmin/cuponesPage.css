@@ -1,0 +1,602 @@
+/* ============================================================
+   cuponesPage.css — Estilos para CuponesPage (HU-23)
+   Usa las variables de panelAdmin.css / adminLayout.css
+   ============================================================ */
+
+/* ── Layout principal ─────────────────────────────────────── */
+
+.cupones-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+
+.cupones-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cupones-header__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #fff;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.cupones-header__icon .material-symbols-outlined {
+  font-size: 1.5rem;
+}
+
+.cupones-header__titulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--admin-text, #f1f5f9);
+  margin: 0 0 0.15rem 0;
+  line-height: 1.2;
+}
+
+.cupones-header__sub {
+  font-size: 0.875rem;
+  color: var(--admin-text-muted, #94a3b8);
+  margin: 0;
+}
+
+/* ── Alertas ──────────────────────────────────────────────── */
+
+.cupones-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.cupones-alert .material-symbols-outlined {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.cupones-alert--error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.cupones-alert--ok {
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #86efac;
+}
+
+.cupones-alert--inline {
+  margin-top: 0.5rem;
+}
+
+/* ── Grid de dos columnas ─────────────────────────────────── */
+
+.cupones-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .cupones-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Cards ────────────────────────────────────────────────── */
+
+.cupones-card {
+  background: var(--admin-card-bg, #1e293b);
+  border: 1px solid var(--admin-border, rgba(255, 255, 255, 0.08));
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.cupones-card--tabla {
+  overflow: hidden;
+}
+
+.cupones-card__titulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--admin-text, #f1f5f9);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cupones-card__titulo .material-symbols-outlined {
+  font-size: 1.2rem;
+  color: #6366f1;
+}
+
+/* ── Badge de cantidad ────────────────────────────────────── */
+
+.cupones-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 0.25rem;
+}
+
+/* ── Formulario ───────────────────────────────────────────── */
+
+.cupones-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cupones-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cupones-form__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--admin-text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cupones-form__label span[aria-hidden] {
+  color: #f87171;
+  margin-left: 0.1rem;
+}
+
+.cupones-form__hint {
+  font-size: 0.73rem;
+  color: var(--admin-text-muted, #64748b);
+  line-height: 1.4;
+}
+
+.cupones-form__input,
+.cupones-form__select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: var(--admin-text, #f1f5f9);
+  font-size: 0.875rem;
+  padding: 0.55rem 0.75rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.cupones-form__input:focus,
+.cupones-form__select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.cupones-form__input::placeholder {
+  color: #475569;
+}
+
+/* input date color-scheme para tema oscuro */
+.cupones-form__input[type="date"] {
+  color-scheme: dark;
+}
+
+/* Fila de dos columnas dentro del form */
+.cupones-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+/* Input con prefijo */
+.cupones-form__input-prefix {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cupones-form__input-prefix:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.cupones-form__prefix-icon {
+  padding: 0 0.6rem;
+  color: #6366f1;
+  font-size: 0.875rem;
+  font-weight: 700;
+  user-select: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cupones-form__input--prefixed {
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  flex: 1;
+}
+
+/* Checkboxes personalizados */
+.cupones-form__checks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cupones-form__check {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--admin-text, #f1f5f9);
+  position: relative;
+  user-select: none;
+}
+
+.cupones-form__checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.cupones-form__check-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.3rem;
+  background: rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.cupones-form__checkbox:checked + .cupones-form__check-mark {
+  background: #6366f1;
+  border-color: #6366f1;
+}
+
+.cupones-form__checkbox:checked + .cupones-form__check-mark::after {
+  content: '';
+  display: block;
+  width: 0.35rem;
+  height: 0.6rem;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+/* ── Botón principal ──────────────────────────────────────── */
+
+.cupones-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  font-family: inherit;
+}
+
+.cupones-btn--primary {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #fff;
+  width: 100%;
+}
+
+.cupones-btn--primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.cupones-btn--primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.cupones-btn .material-symbols-outlined {
+  font-size: 1.1rem;
+}
+
+/* ── Spinner ──────────────────────────────────────────────── */
+
+.cupones-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: cupones-spin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+
+.cupones-spinner--sm {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-width: 1.5px;
+}
+
+.cupones-spinner--lg {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-width: 2.5px;
+}
+
+@keyframes cupones-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Estado de carga / vacío ──────────────────────────────── */
+
+.cupones-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 0;
+  color: var(--admin-text-muted, #94a3b8);
+  font-size: 0.875rem;
+}
+
+.cupones-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--admin-text-muted, #94a3b8);
+  font-size: 0.875rem;
+}
+
+.cupones-empty__icono {
+  font-size: 2.5rem;
+  color: #334155;
+  margin-bottom: 0.25rem;
+}
+
+.cupones-empty__sub {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin: 0;
+}
+
+.cupones-empty p {
+  margin: 0;
+}
+
+/* ── Tabla ────────────────────────────────────────────────── */
+
+.cupones-tabla-wrapper {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cupones-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  color: var(--admin-text, #f1f5f9);
+}
+
+.cupones-tabla thead tr {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.cupones-tabla th {
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--admin-text-muted, #94a3b8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  white-space: nowrap;
+}
+
+.cupones-tabla tbody tr {
+  transition: background 0.15s;
+}
+
+.cupones-tabla tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.cupones-tabla td {
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.cupones-tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Fila inactiva */
+.cupones-tabla__fila--inactivo td {
+  opacity: 0.5;
+}
+
+.cupones-tabla__fila--inactivo .cupones-toggle {
+  opacity: 1; /* el botón siempre visible */
+}
+
+/* Código del cupón */
+.cupones-codigo {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.3rem;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* Tipo */
+.cupones-tipo {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 0.3rem;
+  white-space: nowrap;
+}
+
+.cupones-tipo--porcentaje {
+  background: rgba(14, 165, 233, 0.12);
+  color: #7dd3fc;
+  border: 1px solid rgba(14, 165, 233, 0.2);
+}
+
+.cupones-tipo--monto_fijo {
+  background: rgba(16, 185, 129, 0.12);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* Valor */
+.cupones-valor {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #f1f5f9;
+}
+
+/* Pill uso único */
+.cupones-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+}
+
+.cupones-pill--si {
+  background: rgba(34, 197, 94, 0.12);
+  color: #86efac;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.cupones-pill--no {
+  background: rgba(148, 163, 184, 0.1);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+/* ── Toggle activo/inactivo ───────────────────────────────── */
+
+.cupones-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.cupones-toggle:disabled {
+  cursor: not-allowed;
+}
+
+.cupones-toggle .material-symbols-outlined {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.cupones-toggle--activo {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.25);
+  color: #86efac;
+}
+
+.cupones-toggle--activo:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+}
+
+.cupones-toggle--inactivo {
+  background: rgba(148, 163, 184, 0.08);
+  border-color: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+
+.cupones-toggle--inactivo:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.25);
+  color: #86efac;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .cupones-page {
+    padding: 1rem;
+  }
+
+  .cupones-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .cupones-header__titulo {
+    font-size: 1.2rem;
+  }
+}

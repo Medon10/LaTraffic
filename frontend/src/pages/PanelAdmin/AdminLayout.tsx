@@ -56,7 +56,7 @@ const SECCIONES: SeccionNav[] = [
     label: 'Cupones',
     icono: 'local_activity',
     ruta: '/admin/cupones',
-    disponible: false,
+    disponible: true,
   },
 ];
 

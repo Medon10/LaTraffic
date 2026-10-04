@@ -11,6 +11,16 @@ export class CuponRepository extends Repository<Cupon> {
     super(em, Cupon);
   }
 
+  /** Lista todos los cupones, ordenados por id descendente (HU-23). */
+  listarTodos(): Promise<Cupon[]> {
+    return this.findAll({ orderBy: { id: 'DESC' } } as any);
+  }
+
+  /** Busca un cupón por su ID (HU-23). */
+  findById(id: number): Promise<Cupon | null> {
+    return this.findOne({ id } as any);
+  }
+
   /** Busca un cupón por su código (case-insensitive). */
   findByCodigo(codigo: string): Promise<Cupon | null> {
     return this.findOne({ codigo: { $ilike: codigo } } as any);

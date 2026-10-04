@@ -30,6 +30,7 @@ import { pagoRoutes } from './pagos/pago.routes.js';
 import { choferRoutes } from './chofer/chofer.routes.js';
 import { adminRoutes } from './admin/admin.routes.js';
 import { cuponRoutes } from './cupones/cupon.routes.js';
+import { cuponAdminRoutes } from './cupones/cupon.admin.routes.js';
 
 const PORT = process.env.PORT || 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -86,6 +87,7 @@ async function bootstrap() {
   app.use('/chofer', choferRoutes);
   app.use('/admin', adminRoutes);
   app.use('/admin/horarios', horarioAdminRoutes);
+  app.use('/admin/cupones', cuponAdminRoutes);
 
   // Health check
   app.get('/health', (_req, res) => {

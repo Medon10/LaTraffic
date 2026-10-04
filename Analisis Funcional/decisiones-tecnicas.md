@@ -207,3 +207,19 @@ Esto asegura que:
 5. **`chofer.service.ts`**: la lógica de preferencia de coordenadas ya estaba implementada desde T-09 (`latOrigen`/`lonOrigen` → `WaypointCoords`, fallback a `WaypointAddress`). HU-24 confirma y documenta que este circuito está cerrado end-to-end.
 6. **Nuevo tipo `Viaje`** en `frontend/src/types/viaje.ts` y nueva función `viajesService.getViajes()` con normalización de sentido (guión → guión bajo para el backend).
 7. **Captura temprana de coordenadas**: Se reemplazó el `<input>` de texto libre en `SeleccionViajePage` por el componente `MapaPicker`. Al seleccionar el domicilio, las coordenadas se envían por query params (`lat`, `lng`) a `CheckoutPage` (`useCheckout.ts` las inicializa en su estado), asegurando que si el usuario completa el domicilio en el primer paso, no tenga que re-ubicar el pin en el Checkout.
+
+## 2026-10-04: HU-23 — Gestión de cupones de descuento (admin)
+
+**Contexto**: El administrador necesita poder crear y gestionar cupones de descuento desde el panel admin, sin depender de un cambio de código (RF-27). La entidad `Cupon` y la lógica de validación (HU-22) ya existían; solo faltaban los endpoints de administración y la pantalla correspondiente.
+
+**Decisión**:
+1. **Código no editable post-creación**: El `PATCH /admin/cupones/:id` no permite cambiar el campo `codigo`. Razón: ya pueden existir registros en `CuponUso` que referencian el cupón por su ID, pero el código es la clave de negocio que el pasajero conoce y que puede estar impresa o comunicada. Cambiar el código rompería la trazabilidad y confundiría a usuarios que ya lo tienen. Si se necesita un código diferente, la solución es desactivar el cupón viejo y crear uno nuevo.
+2. **El código se normaliza a mayúsculas**: tanto el backend (`crearCupon` en `CuponService`) como el frontend (antes de enviar el DTO) hacen `toUpperCase()` sobre el código. Esto garantiza uniformidad y evita duplicados case-sensitive que el índice UNIQUE no captaría si hubiera colación case-sensitive.
+3. **Archivos creados**:
+   - `backend/src/cupones/cupon.admin.controller.ts` — controlador con `listar`, `crear`, `actualizar`.
+   - `backend/src/cupones/cupon.admin.routes.ts` — router montado en `/admin/cupones`, protegido con `verificarToken + autorizar(ADMINISTRADOR)`.
+   - Métodos `listarCupones`, `crearCupon`, `actualizarCupon` agregados a `CuponService`.
+   - `frontend/src/pages/PanelAdmin/CuponesPage.tsx` — página con tabla de cupones + formulario de creación.
+   - `frontend/src/pages/PanelAdmin/cuponesPage.css` — estilos propios.
+4. **Toggle activo/inactivo inline**: La tabla de cupones permite activar/desactivar con un clic directamente (llama a `PATCH /admin/cupones/:id` con solo `{ activo: boolean }`). No hay pantalla de edición full-form — los campos de tipo, valor y vigencia se configuran al crear el cupón y raramente cambian; si cambian, el admin puede desactivar y crear uno nuevo. Esto mantiene la UI simple.
+5. **Sidebar activado**: `disponible: false → true` para la entrada `cupones` en `AdminLayout.tsx`; el `AdminPlaceholder` fue reemplazado por `CuponesPage` en `App.tsx`.

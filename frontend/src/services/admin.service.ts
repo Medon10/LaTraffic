@@ -115,7 +115,42 @@ export interface CrearHorarioDto {
   activo?: boolean;
 }
 
+// ── HU-23 — Cupones ───────────────────────────────────────────────────────────
+
+export type TipoCupon = 'monto_fijo' | 'porcentaje';
+
+export interface Cupon {
+  id: number;
+  codigo: string;
+  tipo: TipoCupon;
+  valor: string | number;
+  fechaInicio: string | null;
+  fechaFin: string | null;
+  usoUnicoPorPersona: boolean;
+  activo: boolean;
+}
+
+export interface CrearCuponDto {
+  codigo: string;
+  tipo: TipoCupon;
+  valor: number;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
+  usoUnicoPorPersona: boolean;
+  activo: boolean;
+}
+
+export interface ActualizarCuponDto {
+  tipo?: TipoCupon;
+  valor?: number;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
+  usoUnicoPorPersona?: boolean;
+  activo?: boolean;
+}
+
 // ── Service ───────────────────────────────────────────────────────────────────
+
 
 export const adminService = {
   /**
@@ -220,6 +255,32 @@ export const adminService = {
    */
   async editarHorario(id: number, dto: Partial<CrearHorarioDto>): Promise<Horario> {
     return api.patch<Horario>(`/admin/horarios/${id}`, dto);
+  },
+
+  // ── HU-23 — Cupones ───────────────────────────────────────────────────────
+
+  /**
+   * HU-23 — Lista todos los cupones del sistema (activos e inactivos).
+   */
+  async getCupones(): Promise<Cupon[]> {
+    const res = await api.get<Cupon[] | { data: Cupon[] }>('/admin/cupones');
+    if (Array.isArray(res)) return res;
+    if (res && Array.isArray((res as { data: Cupon[] }).data)) return (res as { data: Cupon[] }).data;
+    return [];
+  },
+
+  /**
+   * HU-23 — Crea un nuevo cupón.
+   */
+  async crearCupon(dto: CrearCuponDto): Promise<Cupon> {
+    return api.post<Cupon>('/admin/cupones', dto);
+  },
+
+  /**
+   * HU-23 — Edita un cupón existente (tipo, valor, vigencia, activo, uso único).
+   */
+  async actualizarCupon(id: number, dto: ActualizarCuponDto): Promise<Cupon> {
+    return api.patch<Cupon>(`/admin/cupones/${id}`, dto);
   },
 };
 
