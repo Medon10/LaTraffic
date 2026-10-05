@@ -86,7 +86,7 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 | T-14 | ✅ Habilitar Maps JavaScript API + Places API y crear el componente de mapa interactivo (pin + autocompletado) — **hecho** | Técnica |
 | HU-24 | ✅ Seleccionar domicilio con mapa (con fallback a texto) — **hecho** | HU |
 | HU-23 | Gestionar cupones de descuento (crear/editar más allá del PRIMERVIAJE inicial) | HU |
-| HU-21 | Configurar el descuento por transferencia/efectivo — **bloqueada**: falta que el cliente defina el monto (pendiente desde el Documento de Requisitos) | HU |
+| HU-21 | Configurar el descuento por transferencia/efectivo — **bloqueada**: falta confirmar con el cliente si es monto fijo o porcentaje (prompt previsto: `PATCH /admin/config/descuento`) | HU |
 
 ## Etapa 4 — Lanzamiento a producción
 
@@ -102,7 +102,7 @@ Las tareas técnicas (prefijo **T-**) no vienen de una Historia de Usuario porqu
 
 - El **diseño visual** ya definido (home minimalista + cabecera de confianza mínima) aplica de forma transversal a cada tarjeta de frontend — no es una tarjeta aparte, es el criterio con el que se construye cada pantalla.
 - Los paneles de **chofer** y **administrador** todavía no tienen bocetos propios (solo el flujo de compra del pasajero). Si querés, los armamos antes de empezar Etapa 2, o sobre la marcha.
-- HU-21 va a quedar frenada en "Por hacer" hasta que el cliente defina el monto del descuento — no la muevas a "En progreso" antes de eso.
+- HU-21 va a quedar frenada en "Por hacer" hasta que el cliente defina si el descuento es monto fijo o porcentaje — no la muevas a "En progreso" antes de eso.
 - El descuento de primera vez ahora se implementa como cupón (`PRIMERVIAJE`), no como una bandera automática — por eso se sumaron T-07 y HU-22 a la Etapa 1, y HU-23 a la Etapa 3.
 - El servicio de email (para HU-03) ya está resuelto — se implementó junto con HU-03, sin ticket propio, con un modo consola de respaldo si no hay SMTP configurado. No hace falta ninguna tarjeta nueva para esto.
 - **Mercado Pago en producción requiere verificación de cuenta de negocio** para pasar de credenciales de sandbox a credenciales reales que cobren plata de verdad — es un trámite con Mercado Pago, no técnico, así que conviene arrancarlo con tiempo antes de T-18/T-20 (parecido al trámite de verificación de Google Cloud).

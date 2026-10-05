@@ -233,6 +233,9 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 
 **Criterios de aceptación:**
 - Puedo definir el descuento como un monto fijo o un porcentaje (a definir junto con el cliente cuando se determine el monto).
+- Endpoint previsto para la configuración: `PATCH /admin/config/descuento`.
+
+> **Nota / Estado:** Bloqueada hasta confirmar con el cliente si el descuento es monto fijo o porcentaje. No implementar hasta su definición.
 
 **Trazabilidad:** RF-24 · **Prioridad:** Baja
 
