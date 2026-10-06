@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { getUser, type UsuarioSession } from '../../shared/auth.ts';
 import { authService } from '../../services/auth.service.ts';
 import './adminLayout.css';
@@ -167,6 +167,15 @@ export const AdminLayout: React.FC = () => {
 
         {/* Pie del sidebar */}
         <div className="admin-sidebar__footer">
+          <Link
+            to="/"
+            id="btn-admin-volver-home"
+            className="admin-sidebar__home-link"
+            title="Volver al sitio web principal"
+          >
+            <span className="material-symbols-outlined">home</span>
+            <span>Volver a la web</span>
+          </Link>
           <div className="admin-sidebar__divider" />
           <button
             id="btn-admin-logout"
@@ -203,12 +212,24 @@ export const AdminLayout: React.FC = () => {
             Panel Admin
           </div>
 
-          <div className="admin-topbar__user">
-            {user && (
-              <span className="admin-topbar__avatar" aria-hidden="true">
-                {user.nombre.charAt(0).toUpperCase()}
-              </span>
-            )}
+          <div className="admin-topbar__actions">
+            <Link
+              to="/"
+              id="btn-admin-topbar-home"
+              className="admin-topbar__home-link"
+              title="Volver a la web principal"
+            >
+              <span className="material-symbols-outlined">home</span>
+              <span className="admin-topbar__home-text">Ir a la web</span>
+            </Link>
+
+            <div className="admin-topbar__user">
+              {user && (
+                <span className="admin-topbar__avatar" aria-hidden="true">
+                  {user.nombre.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
           </div>
         </header>
 

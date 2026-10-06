@@ -141,6 +141,11 @@ export function useCheckout() {
       return;
     }
 
+    if (!viajeId || viajeId <= 0) {
+      setErrorApiReserva('El viaje seleccionado no es válido o ha expirado. Por favor volvé a la pantalla de selección de viaje.');
+      return;
+    }
+
     isSubmittingRef.current = true;
     setLoading(true);
     setErrorApiReserva(null);

@@ -32,6 +32,8 @@ import { adminRoutes } from './admin/admin.routes.js';
 import { cuponRoutes } from './cupones/cupon.routes.js';
 import { cuponAdminRoutes } from './cupones/cupon.admin.routes.js';
 
+import { seedInitialDefaults } from './shared/seed-defaults.js';
+
 const PORT = process.env.PORT || 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
@@ -41,6 +43,7 @@ async function bootstrap() {
     const ormInstance = await MikroORM.init(config);
     orm = ormInstance;
     console.log('✓ Conectado a la base de datos');
+    await seedInitialDefaults(ormInstance);
   } catch (err: any) {
     console.warn('⚠ No se pudo conectar a PostgreSQL:', err?.message || err);
     console.warn('⚠ El servidor continuará corriendo en modo desarrollo sin conexión a BD activa.');

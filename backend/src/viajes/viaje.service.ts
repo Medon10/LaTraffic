@@ -2,6 +2,7 @@ import { EntityManager, RequestContext } from '@mikro-orm/core';
 import { Viaje } from './viaje.entity.js';
 import { Pasaje } from '../pasajes/pasaje.entity.js';
 import { Usuario } from '../usuarios/usuario.entity.js';
+import { Horario } from '../horarios/horario.entity.js';
 import { EstadoViaje, EstadoPasaje, MetodoPago, Sentido } from '../shared/types/index.js';
 import { HttpError } from '../shared/middleware/error-handler.middleware.js';
 import { liberarHoldsVencidos } from '../pasajes/hold.service.js';
@@ -47,12 +48,56 @@ export class ViajeService {
    * Lista los viajes según filtros opcionales (sentido, fecha).
    * Ejecuta primero la limpieza lazy de holds vencidos a nivel general (§7)
    * antes de responder el catálogo con cupos actualizados.
+   * Si se consulta por fecha y no existe viaje generado, lo genera a partir
+   * de los horarios activos correspondientes.
    */
   async listar(filtros?: { sentido?: Sentido; fecha?: string }): Promise<Viaje[]> {
     const em = this.getEm();
 
     // 1. Limpieza lazy de holds vencidos en todos los viajes
     await liberarHoldsVencidos(em);
+
+    // 2. Si se consulta por fecha, auto-generar viaje a partir de horarios activos si no existe aún
+    if (filtros?.fecha) {
+      const fechaReq = filtros.fecha;
+      const sentidoReq = filtros.sentido;
+
+      const partes = fechaReq.split('-').map(Number);
+      if (partes.length === 3 && !partes.some(isNaN)) {
+        const [y, m, d] = partes;
+        const dateObj = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+        const diasSemana = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+        const diaNombre = diasSemana[dateObj.getUTCDay()];
+
+        const horarioWhere: Record<string, any> = {
+          activo: true,
+          diaSemana: diaNombre,
+        };
+        if (sentidoReq) {
+          horarioWhere.sentido = sentidoReq;
+        }
+
+        const horarios = await em.find(Horario, horarioWhere);
+        for (const horario of horarios) {
+          const yaExiste = await em.findOne(Viaje, {
+            horario: horario.id,
+            fecha: fechaReq,
+          });
+          if (!yaExiste) {
+            const nuevoViaje = em.create(Viaje, {
+              horario,
+              fecha: fechaReq,
+              hora: horario.hora,
+              capacidadTotal: 14,
+              cuposOcupados: 0,
+              estado: EstadoViaje.PROGRAMADO,
+            });
+            em.persist(nuevoViaje);
+            await em.flush();
+          }
+        }
+      }
+    }
 
     // 2. Filtrado de viajes
     const where: Record<string, any> = {};

@@ -39,6 +39,7 @@ export const SeleccionViajePage: React.FC = () => {
   const [lonDomicilio, setLonDomicilio] = useState<number | null>(null);
   const [errorDireccion, setErrorDireccion] = useState(false);
   const [loadingReserva, setLoadingReserva] = useState(false);
+  const [errorViaje, setErrorViaje] = useState<string | null>(null);
 
   const handleDireccionChange = (result: MapaPickerResult) => {
     setDireccionRosario(result.direccion);
@@ -50,6 +51,7 @@ export const SeleccionViajePage: React.FC = () => {
       setLonDomicilio(null);
     }
     if (errorDireccion) setErrorDireccion(false);
+    if (errorViaje) setErrorViaje(null);
   };
 
   // Fecha
@@ -80,6 +82,7 @@ export const SeleccionViajePage: React.FC = () => {
   const handleCambiarSentido = (nuevo: SentidoViaje) => {
     setSentido(nuevo);
     setErrorDireccion(false);
+    setErrorViaje(null);
     setDireccionRosario('');
     setLatDomicilio(null);
     setLonDomicilio(null);
@@ -90,6 +93,7 @@ export const SeleccionViajePage: React.FC = () => {
   // ── Validar y navegar a Checkout ───────────────────────────────────────────
   const handleReservar = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorViaje(null);
 
     if (!direccionRosario.trim()) {
       setErrorDireccion(true);
@@ -100,15 +104,20 @@ export const SeleccionViajePage: React.FC = () => {
 
     let viajeId = 0;
     try {
-      const viajes = await viajesService.getViajes(sentido, fechaISO || salidaActiva?.fechaISO || '');
+      const fechaConsulta = fechaISO || salidaActiva?.fechaISO || '';
+      const viajes = await viajesService.getViajes(sentido, fechaConsulta);
       if (viajes.length > 0) {
         viajeId = viajes[0].id;
       }
     } catch {
-      // Si falla la red o el backend no está disponible en dev, viajeId queda en 0.
-      // El checkout fallará al confirmar si no hay viaje, mostrando el error correspondiente.
+      // Error al consultar viaje
     } finally {
       setLoadingReserva(false);
+    }
+
+    if (viajeId <= 0) {
+      setErrorViaje('No encontramos un viaje disponible para la fecha seleccionada. Por favor, elegí otra fecha o contactanos por WhatsApp.');
+      return;
     }
 
     const origen =
@@ -355,6 +364,31 @@ export const SeleccionViajePage: React.FC = () => {
             subtitle="Descuentos por cupón o medio de pago se aplican en los siguientes pasos"
             amount={precioBase}
           />
+
+          {/* Mensaje de error si no hay viaje */}
+          {errorViaje && (
+            <div
+              role="alert"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                padding: '0.85rem 1rem',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                color: '#b91c1c',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                marginTop: '1rem',
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '20px', flexShrink: 0 }}>
+                error
+              </span>
+              <span>{errorViaje}</span>
+            </div>
+          )}
 
           {/* CTA */}
           <button

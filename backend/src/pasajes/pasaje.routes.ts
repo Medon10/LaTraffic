@@ -17,7 +17,7 @@ const pasajeController = new PasajeController();
 router.post(
   '/',
   verificarToken,
-  autorizar(Rol.PASAJERO),
+  autorizar(Rol.PASAJERO, Rol.ADMINISTRADOR, Rol.CHOFER),
   validate(crearPasajeSchema),
   asyncHandler(pasajeController.crear)
 );
@@ -25,25 +25,25 @@ router.post(
 /**
  * GET /pasajes/mis-reservas
  *
- * Lista el historial y reservas del pasajero autenticado (HU-09, HU-11).
+ * Lista el historial y reservas del usuario autenticado (HU-09, HU-11).
  * Ejecuta la limpieza lazy de holds antes de responder.
  */
 router.get(
   '/mis-reservas',
   verificarToken,
-  autorizar(Rol.PASAJERO),
+  autorizar(Rol.PASAJERO, Rol.ADMINISTRADOR, Rol.CHOFER),
   asyncHandler(pasajeController.misReservas)
 );
 
 /**
  * POST /pasajes/:id/comprobante
  *
- * Permite al pasajero subir comprobante en la web como opción adicional a WhatsApp (HU-09).
+ * Permite al usuario subir comprobante en la web como opción adicional a WhatsApp (HU-09).
  */
 router.post(
   '/:id/comprobante',
   verificarToken,
-  autorizar(Rol.PASAJERO),
+  autorizar(Rol.PASAJERO, Rol.ADMINISTRADOR, Rol.CHOFER),
   validate(subirComprobanteSchema),
   asyncHandler(pasajeController.subirComprobante)
 );

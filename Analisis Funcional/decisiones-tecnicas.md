@@ -223,3 +223,19 @@ Esto asegura que:
    - `frontend/src/pages/PanelAdmin/cuponesPage.css` — estilos propios.
 4. **Toggle activo/inactivo inline**: La tabla de cupones permite activar/desactivar con un clic directamente (llama a `PATCH /admin/cupones/:id` con solo `{ activo: boolean }`). No hay pantalla de edición full-form — los campos de tipo, valor y vigencia se configuran al crear el cupón y raramente cambian; si cambian, el admin puede desactivar y crear uno nuevo. Esto mantiene la UI simple.
 5. **Sidebar activado**: `disponible: false → true` para la entrada `cupones` en `AdminLayout.tsx`; el `AdminPlaceholder` fue reemplazado por `CuponesPage` en `App.tsx`.
+
+## 2026-10-05: Ajustes de permisos de reserva, provisión de viajes y rediseño de Cupones
+
+**Contexto**: Se detectaron tres inconvenientes: (1) las cuentas con rol `administrador` o `chofer` no podían reservar ni pagar pasajes por restricción de rol en middleware (HTTP 403); (2) al intentar reservar con usuario no admin, fallaba la validación de Zod con `viaje_id: "Too small: expected number to be >0"` debido a que la tabla `viajes` no contenía registros y la BD no contaba con un seed inicial de paradas y horarios; (3) la sección de "cupones" del panel admin requería una interfaz acorde al sistema visual del panel y faltaba un acceso directo para regresar a la web pública.
+
+**Decisión**:
+1. **Permisos de reserva ampliados**: en `pasaje.routes.ts` (`POST /pasajes`, `GET /pasajes/mis-reservas`, `POST /pasajes/:id/comprobante`) y `pago.routes.ts` (`POST /pagos/mercadopago/preferencia`), se amplió la guarda de roles a `autorizar(Rol.PASAJERO, Rol.ADMINISTRADOR, Rol.CHOFER)`. Cualquier usuario autenticado puede reservar y abonar sus propios viajes.
+2. **Seed inicial y auto-generación de viajes**:
+   - Se implementó `seedInitialDefaults` en el bootstrap del backend (`src/shared/seed-defaults.ts`) que garantiza la existencia de las 3 paradas fijas de recorrido, los 2 horarios regulares y el cupón `PRIMERVIAJE` si las tablas están vacías.
+   - En `ViajeService.listar`, cuando se solicita una fecha puntual (`filtros.fecha`), si no existe aún un viaje para esa fecha pero coincide con el día de la semana de un horario activo, se genera y persiste automáticamente el viaje programado (`capacidadTotal: 14`, `cuposOcupados: 0`).
+3. **Guardas en frontend**:
+   - En `SeleccionViajePage.tsx`: se impide la navegación al checkout si `viajeId <= 0` y se muestra un banner explicativo al usuario.
+   - En `useCheckout.ts`: se valida `viajeId > 0` antes de invocar la API, evitando envíos erróneos con `viaje_id: 0`.
+4. **Botón para volver a Home**: en `AdminLayout.tsx` y `adminLayout.css`, se añadió un enlace destacado "Volver a la web" en el pie del sidebar y un botón con icono en la topbar móvil y de cabecera.
+5. **Rediseño visual de Cupones**: se reescribió `cuponesPage.css` y `CuponesPage.tsx` eliminando colores oscuros desconectados del resto del sistema. La pantalla ahora implementa `.panel-admin`, tarjetas KPI de métricas, input de código con normalización a mayúsculas, filtros rápidos por estado (todos / activos / inactivos), buscador dinámico y switch interactivo para activar o pausar cupones.
+

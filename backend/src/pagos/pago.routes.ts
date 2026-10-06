@@ -21,7 +21,7 @@ const pagoController = new PagoController();
 router.post(
   '/mercadopago/preferencia',
   verificarToken,
-  autorizar(Rol.PASAJERO),
+  autorizar(Rol.PASAJERO, Rol.ADMINISTRADOR, Rol.CHOFER),
   validate(iniciarPagoMpSchema),
   asyncHandler(pagoController.iniciarPagoMp)
 );
