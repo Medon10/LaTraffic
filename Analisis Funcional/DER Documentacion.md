@@ -79,9 +79,11 @@ La reserva en sí (nominativa — no existe un "boleto" aparte, ver Minuta §5).
 | usuario_id | FK → Usuario | |
 | viaje_id | FK → Viaje | |
 | parada_origen_id | FK → Parada, nullable | Solo si el origen es un punto fijo |
-| domicilio_origen | string, nullable | Solo si el origen es un domicilio (ej. Rosario en la vuelta) |
+| domicilioOrigen | string, nullable | Solo si el origen es un domicilio (ej. Rosario en la vuelta) |
+| latOrigen / lonOrigen | decimal(10,7), nullable | Solo si el pasajero marcó el domicilio con el mapa interactivo (RF-28); si usó el campo de texto libre, quedan vacíos |
 | parada_destino_id | FK → Parada, nullable | Solo si el destino es un punto fijo |
-| domicilio_destino | string, nullable | Solo si el destino es un domicilio (ej. Rosario en la ida) |
+| domicilioDestino | string, nullable | Solo si el destino es un domicilio (ej. Rosario en la ida) |
+| latDestino / lonDestino | decimal(10,7), nullable | Igual que el origen — solo si se usó el mapa |
 | estado | enum: `pendiente_pago` / `confirmada` / `vencida` / `cancelada` / `completada` / `no_show` | |
 | documento_verificado | boolean, nullable | Solo relevante si es el primer viaje del usuario; por defecto `true` (RF-17) |
 | fecha_reserva | datetime | |
@@ -99,8 +101,9 @@ Registro histórico de precio y estado de pago de cada Pasaje.
 | monto | decimal | Precio final, ya aplicados el descuento por método de pago y el cupón si corresponde |
 | estado | enum: `pendiente` / `aprobado` / `rechazado` / `vencido` | |
 | comprobante_url | string, nullable | Solo transferencia |
+| mpPaymentId | string, nullable | ID del pago en Mercado Pago, usado para conciliar vía webhook. Solo `metodo = mercadopago` |
 | fecha_pago | datetime, nullable | |
-| fecha_expiracion_hold | datetime, nullable | Solo transferencia — momento en que vence el hold de 4hs (RF-10) |
+| fecha_expiracion_hold | datetime, nullable | Momento en que vence el hold: 4hs para transferencia, 30 min para Mercado Pago pendiente (RF-10, corrección T-11) |
 
 > **Nota de diseño:** modelé Pago como 1:1 con Pasaje (no 1:N) — si una reserva vence o se rechaza, se asume que el pasajero inicia una reserva nueva en vez de reintentar sobre la misma. Es más simple de mantener (RNF-06) y evita casos raros de "reserva con dos pagos distintos". Confirmame si esto no encaja con cómo lo pensás vos.
 

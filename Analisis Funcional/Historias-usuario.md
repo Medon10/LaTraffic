@@ -97,6 +97,16 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 
 **Trazabilidad:** RF-05, RF-06 · **Prioridad:** Alta
 
+### HU-24 — Seleccionar domicilio con mapa
+**Como** pasajero, **quiero** poder marcar mi domicilio en un mapa interactivo (estilo Uber/PedidosYa), **para** que el chofer tenga mi ubicación exacta sin depender de que yo escriba bien la dirección.
+
+**Criterios de aceptación:**
+- Al ingresar el domicilio (origen o destino, según el sentido del viaje), se me ofrece un mapa donde puedo mover un pin a mi ubicación.
+- Si marco un punto en el mapa, el sistema guarda la dirección de texto (autocompletada) junto con latitud y longitud.
+- Si no uso el mapa (no carga, o prefiero no usarlo), puedo seguir completando el domicilio como texto libre, sin coordenadas — el mapa es una mejora, no un paso obligatorio.
+
+**Trazabilidad:** RF-28, RF-29 · **Prioridad:** Media
+
 ### HU-08 — Pagar con Mercado Pago
 **Como** pasajero, **quiero** pagar con Mercado Pago (QR), **para** que mi lugar se confirme al instante.
 
@@ -111,6 +121,7 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 
 **Criterios de aceptación:**
 - Al elegir transferencia, el cupo queda reservado ("hold") por 4 horas.
+- Puedo subir el comprobante desde la web (`POST /pasajes/:id/comprobante`) **o** enviarlo por WhatsApp al número del negocio — flujo híbrido decidido durante la implementación, no estaba en el relevamiento original.
 - Si el administrador no valida el comprobante dentro de las 4 horas, el cupo se libera automáticamente y la reserva queda como vencida.
 - Puedo ver el estado de mi reserva (pendiente/confirmada/vencida) desde mi cuenta.
 
@@ -191,6 +202,7 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 
 **Criterios de aceptación:**
 - Puedo ver la lista de pasajeros morosos y reactivarlos individualmente.
+- La sección "Morosos" del panel de administrador deja de mostrar el placeholder "Próximamente" y queda conectada a esta funcionalidad.
 
 **Trazabilidad:** RF-20 · **Prioridad:** Media
 
@@ -199,6 +211,7 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 
 **Criterios de aceptación:**
 - Un usuario deshabilitado no puede iniciar sesión ni comprar.
+- La sección "Cuentas de Usuario" del panel de administrador deja de mostrar el placeholder "Próximamente" y queda conectada a esta funcionalidad.
 
 **Trazabilidad:** RF-18 · **Prioridad:** Baja
 
@@ -207,6 +220,7 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 
 **Criterios de aceptación:**
 - Puedo ver totales recaudados por período y desglosados por método de pago (Mercado Pago, transferencia, efectivo).
+- La sección "Estadísticas" del panel de administrador deja de mostrar el placeholder "Próximamente" y queda conectada a esta funcionalidad.
 
 **Trazabilidad:** RF-22 · **Prioridad:** Media
 
@@ -215,6 +229,7 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 
 **Criterios de aceptación:**
 - Puedo modificar día y horario de los viajes fijos existentes.
+- La sección "Horarios" del panel de administrador deja de mostrar el placeholder "Próximamente" y queda conectada a esta funcionalidad.
 
 **Trazabilidad:** RF-23 · **Prioridad:** Baja
 
@@ -225,6 +240,7 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 - Puedo crear un cupón nuevo con código, tipo (monto fijo o porcentaje), valor, vigencia y si es de uso único por persona.
 - Puedo activar/desactivar un cupón existente.
 - El cupón `PRIMERVIAJE` inicial no depende de esta pantalla para existir — se puede cargar directo en la base al lanzar el sistema (ver T-07 en el Kanban); esta historia es para gestionar cupones *después* del lanzamiento.
+- La sección "Cupones" del panel de administrador deja de mostrar el placeholder "Próximamente" y queda conectada a esta funcionalidad.
 
 **Trazabilidad:** RF-27 · **Prioridad:** Baja
 
@@ -233,23 +249,8 @@ Formato: *Como \<rol\>, quiero \<acción\>, para \<objetivo\>*, con criterios de
 
 **Criterios de aceptación:**
 - Puedo definir el descuento como un monto fijo o un porcentaje (a definir junto con el cliente cuando se determine el monto).
-- Endpoint previsto para la configuración: `PATCH /admin/config/descuento`.
-
-> **Nota / Estado:** Bloqueada hasta confirmar con el cliente si el descuento es monto fijo o porcentaje. No implementar hasta su definición.
 
 **Trazabilidad:** RF-24 · **Prioridad:** Baja
-
-### HU-24 — Seleccionar domicilio con mapa interactivo
-**Como** pasajero, **quiero** poder indicar mi domicilio de origen/destino en Rosario usando un mapa interactivo con autocompletado, **para** que el chofer tenga la ubicación exacta y la ruta del día se calcule con mayor precisión.
-
-**Criterios de aceptación:**
-- En el paso de completar la reserva (HU-07), el campo de domicilio muestra un mapa con un pin arrastrable y autocompletado de dirección (estilo PedidosYa / Uber) como opción preferida.
-- Si el pasajero selecciona una ubicación con el mapa, las coordenadas (lat/lon) quedan guardadas junto con el texto de la dirección en el pasaje.
-- Si el pasajero escribe manualmente sin usar el mapa, el campo de texto libre sigue funcionando igual que antes; no se guardan coordenadas (lat/lon quedan null).
-- Si la API de Google Maps no está disponible (sin clave o error de carga), el sistema cae al input de texto libre transparentemente.
-- El chofer, al consultar la ruta del día (T-08), recibe las coordenadas exactas del domicilio cuando están disponibles, en lugar del string de dirección, para una ruta más precisa.
-
-**Trazabilidad:** RF-05, RF-06, RF-16, T-08, T-14 · **Prioridad:** Alta
 
 ---
 
