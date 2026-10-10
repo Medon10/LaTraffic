@@ -239,3 +239,24 @@ Esto asegura que:
 4. **Botón para volver a Home**: en `AdminLayout.tsx` y `adminLayout.css`, se añadió un enlace destacado "Volver a la web" en el pie del sidebar y un botón con icono en la topbar móvil y de cabecera.
 5. **Rediseño visual de Cupones**: se reescribió `cuponesPage.css` y `CuponesPage.tsx` eliminando colores oscuros desconectados del resto del sistema. La pantalla ahora implementa `.panel-admin`, tarjetas KPI de métricas, input de código con normalización a mayúsculas, filtros rápidos por estado (todos / activos / inactivos), buscador dinámico y switch interactivo para activar o pausar cupones.
 
+## 2026-10-10: Refactor integral Mobile-First del Frontend y Paneles de Administración
+
+**Contexto**: La aplicación requería una arquitectura de diseño centrada en dispositivos móviles (mobile-first), asegurando que todas las vistas de usuario y, fundamentalmente, los paneles de administración (`/admin/*`) fuesen completamente funcionales, legibles y accesibles en pantallas pequeñas (smartphones desde 320px/360px) sin overflow horizontal ni elementos superpuestos.
+
+**Decisión**:
+1. **Inversión de media queries a `min-width`**: Se eliminaron los patrones desktop-first basados en `@media (max-width: ...)` reemplazándolos por estilos base definidos para pantallas móviles chicas (320px-360px) y escalados progresivamente mediante breakpoints `@media (min-width: 375px)`, `@media (min-width: 480px)`, `@media (min-width: 640px)`, `@media (min-width: 768px)` y `@media (min-width: 1024px)`.
+2. **Layout Shell de Administrador (`adminLayout.css`)**:
+   - Se implementó drawer lateral móvil con `position: fixed`, oculto por defecto con `transform: translateX(-100%)` y overlay oscuro con animación de fade.
+   - En viewports desktop (`>= 768px`), el sidebar pasa a visibilidad fija continua (`transform: translateX(0)`) y el contenedor principal aplica compensación de margen (`margin-left: 240px`/`252px`).
+   - Se incorporó sticky topbar móvil (`height: 52px` / `56px`) con botón hamburger táctil (`40x40px`), badge de sección, botón "Ir a la web" con etiqueta colapsable y avatar del admin autenticado.
+   - Padding progresivo en `.admin-content` desde `0.65rem` en móviles pequeños hasta `1.75rem` en escritorio.
+3. **Módulos de Gestión de Administración**:
+   - **Cupones (`cuponesPage.css`)**: Grilla de KPIs configurable en 1 columna por defecto, expandiendo a 2 y 4 columnas; formularios de creación en columna única apilada en mobile; tabla de cupones con soporte de scroll horizontal suave.
+   - **Estadísticas (`estadisticas.css`)**: Tarjetas de métricas en columna única apilada para móviles; contenedores de gráficos responsivos con altura dinámica.
+   - **Horarios (`horariosPage.css`)**: Grilla de horarios y selector de días convertidos a layout de 1 columna con botones de acción full-width en pantallas chicas.
+   - **Transferencias, Cuentas y Morosos (`panelAdmin.css`)**: Tarjetas de pago y usuario con diseño adaptativo, filtros con envoltura responsiva, inputs y botones táctiles optimizados.
+4. **Vistas Públicas y Pasajero**:
+   - **Home (`home.css`)**: El banner de WhatsApp se adapta automáticamente de disposición en columna con botón de ancho completo a fila horizontal en tablets/escritorio.
+   - **Autenticación (`login.css`)**: Las filas de campos (`.auth-fields-row`) usan 1 columna en móvil y 2 columnas solo a partir de `400px`.
+   - **Navegación Global (`index.css`)**: Bottom nav bar compacta con targets táctiles fluidos (ancho mínimo por ítem y tamaño de texto adaptativo) y clearance seguro en el pie.
+

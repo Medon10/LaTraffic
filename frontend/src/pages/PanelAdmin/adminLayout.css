@@ -6,6 +6,7 @@
 .admin-shell {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--surface-container-low);
 }
 
@@ -23,8 +24,10 @@
   top: 0;
   left: 0;
   height: 100vh;
+  height: 100dvh;
   z-index: 300;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   /* Oculto por transform en móvil */
   transform: translateX(-100%);
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
@@ -33,8 +36,15 @@
 /* En desktop siempre visible */
 @media (min-width: 768px) {
   .admin-sidebar {
+    width: 240px;
     transform: translateX(0);
     box-shadow: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-sidebar {
+    width: 252px;
   }
 }
 
@@ -328,6 +338,13 @@
 /* En desktop: compensar el sidebar fijo */
 @media (min-width: 768px) {
   .admin-main {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-main {
     margin-left: 252px;
     width: calc(100% - 252px);
   }
@@ -338,15 +355,23 @@
 .admin-topbar {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0 1rem;
-  height: 56px;
+  gap: 0.5rem;
+  padding: 0 0.65rem;
+  height: 52px;
   background-color: var(--surface-container-lowest);
   border-bottom: 1px solid var(--surface-variant);
   position: sticky;
   top: 0;
   z-index: 200;
   flex-shrink: 0;
+}
+
+@media (min-width: 375px) {
+  .admin-topbar {
+    gap: 0.75rem;
+    padding: 0 1rem;
+    height: 56px;
+  }
 }
 
 @media (min-width: 768px) {
@@ -419,12 +444,12 @@
 }
 
 .admin-topbar__home-text {
-  display: inline;
+  display: none;
 }
 
-@media (max-width: 480px) {
+@media (min-width: 480px) {
   .admin-topbar__home-text {
-    display: none;
+    display: inline;
   }
 }
 
@@ -451,15 +476,27 @@
 
 .admin-content {
   flex: 1;
-  padding: 1.75rem 1.5rem;
+  padding: 1rem 0.65rem;
   max-width: 900px;
   width: 100%;
   margin: 0 auto;
 }
 
-@media (max-width: 480px) {
+@media (min-width: 375px) {
   .admin-content {
     padding: 1.25rem 1rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .admin-content {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .admin-content {
+    padding: 1.75rem 1.5rem;
   }
 }
 

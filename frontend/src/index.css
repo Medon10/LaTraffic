@@ -162,9 +162,15 @@ button {
   width: 100%;
   max-width: 560px;
   margin: 0 auto;
-  padding: 4.75rem 1rem 6rem;
+  padding: 4.5rem 0.75rem 5.5rem;
   /* Top header & Bottom nav clearance */
   transition: max-width var(--transition-normal);
+}
+
+@media (min-width: 375px) {
+  .main-content {
+    padding: 4.75rem 1rem 6rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -197,12 +203,21 @@ button {
 
 .header-container {
   max-width: 1000px;
-  height: 60px;
+  height: 56px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 0.65rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.25rem;
+}
+
+@media (min-width: 375px) {
+  .header-container {
+    height: 60px;
+    padding: 0 1rem;
+    gap: 0;
+  }
 }
 
 .brand-section {
@@ -333,9 +348,15 @@ button {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  height: 60px;
+  height: 56px;
   max-width: 520px;
   margin: 0 auto;
+}
+
+@media (min-width: 375px) {
+  .bottom-nav-container {
+    height: 60px;
+  }
 }
 
 .bottom-nav-item {
@@ -344,13 +365,23 @@ button {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  width: 80px;
+  min-width: 64px;
+  width: auto;
+  flex: 1;
+  max-width: 100px;
   height: 100%;
   color: var(--on-surface-variant);
-  font-size: 0.775rem;
+  font-size: 0.72rem;
   font-weight: 500;
   transition: color var(--transition-fast);
   text-decoration: none;
+}
+
+@media (min-width: 375px) {
+  .bottom-nav-item {
+    font-size: 0.775rem;
+    min-width: 72px;
+  }
 }
 
 .bottom-nav-item .material-symbols-outlined {
@@ -387,10 +418,22 @@ button {
 }
 
 h1 {
-  font-size: 1.75rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--primary);
   letter-spacing: -0.02em;
+}
+
+@media (min-width: 375px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 640px) {
+  h1 {
+    font-size: 1.75rem;
+  }
 }
 
 .subtitle {
